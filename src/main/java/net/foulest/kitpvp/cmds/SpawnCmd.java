@@ -55,16 +55,6 @@ public class SpawnCmd {
                     return;
                 }
 
-                // Cancels teleport if the player starts moving.
-                if (player.getLocation().getBlockX() != playerLoc.getBlockX()
-                        || player.getLocation().getBlockY() != playerLoc.getBlockY()
-                        || player.getLocation().getBlockZ() != playerLoc.getBlockZ()) {
-                    MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
-                    cancel();
-                    kitUser.setTeleportingToSpawn(null);
-                    return;
-                }
-
                 // Teleports the player to spawn.
                 if (secondsDiff == 0) {
                     spawn.teleport(player);

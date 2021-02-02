@@ -563,6 +563,14 @@ public class EventListener implements Listener {
             return;
         }
 
+        if ((event.getTo().getX() != event.getFrom().getX()
+                || event.getTo().getY() != event.getFrom().getY()
+                || event.getTo().getZ() != event.getFrom().getZ()) && kitUser.isTeleportingToSpawn()) {
+            MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
+            kitUser.getTeleportingToSpawnTask().cancel();
+            kitUser.setTeleportingToSpawn(null);
+        }
+
         // Kills the player if they leave the map/fall into the void.
         if (!kitUser.isInRegion() && player.getGameMode() != GameMode.CREATIVE) {
             DeathListener.handleDeath(player);
