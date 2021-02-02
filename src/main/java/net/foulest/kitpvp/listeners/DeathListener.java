@@ -74,7 +74,6 @@ public class DeathListener implements Listener {
         // Runs specific code if the player is killed by another player.
         if (combatLog.getLastAttacker(player) != null) {
             KitUser damager = KitUser.getInstance(combatLog.getLastAttacker(player));
-            int rewardAmount = ConfigManager.get().getInt("coins.kill-bonus");
 
             // Adds a kill to the damager.
             damager.addKill();
@@ -99,9 +98,9 @@ public class DeathListener implements Listener {
             }
 
             // Gives the damager coins and experience.
-            rewardAmount += 5 * (damager.getKillstreak() / 5);
-            damager.addCoins(rewardAmount);
-            damager.addExperience(25);
+            int rewardAmount = 5 * (damager.getKillstreak() / 5);
+            damager.addCoins(ConfigManager.get().getInt("kill.coins-bonus") + rewardAmount);
+            damager.addExperience(ConfigManager.get().getInt("kill.experience-bonus") + rewardAmount);
 
             // Saves the damager's stats.
             damager.saveStats();

@@ -7,7 +7,6 @@ import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.Spawn;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,11 +20,15 @@ public class SpawnCmd {
     @Command(name = "spawn", description = "Teleports you to spawn.", usage = "/spawn", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
-        Location playerLoc = player.getLocation();
         KitUser kitUser = KitUser.getInstance(player);
 
         if (combatLog.isInCombat(player)) {
             MiscUtils.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");
+            return;
+        }
+
+        if (!player.isOnGround()) {
+            MiscUtils.messagePlayer(args.getPlayer(), "&cYou need to be on the ground.");
             return;
         }
 
@@ -47,13 +50,6 @@ public class SpawnCmd {
 
             public void run() {
                 long secondsDiff = Math.round(((teleportTime - System.currentTimeMillis()) + 5500) / 1000.0D);
-                // Cancels teleport if the player enters combat.
-                if (combatLog.isInCombat(player)) {
-                    MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you entered combat."));
-                    cancel();
-                    kitUser.setTeleportingToSpawn(null);
-                    return;
-                }
 
                 // Teleports the player to spawn.
                 if (secondsDiff == 0) {

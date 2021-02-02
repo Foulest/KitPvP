@@ -4,6 +4,7 @@ import com.lunarclient.bukkitapi.LunarClientAPI;
 import com.lunarclient.bukkitapi.object.LCCooldown;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.MiscUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -53,6 +54,13 @@ public class CombatLog {
             combatHandler.replace(damager, getRemainingTime(damager), 15);
         }
 
+        // Cancels the damager's pending teleportation when taking damage for.
+        if (damagerUser.isTeleportingToSpawn()) {
+            MiscUtils.messagePlayer(damager, MiscUtils.colorize("&cTeleportation cancelled, you entered combat."));
+            damagerUser.getTeleportingToSpawnTask().cancel();
+            damagerUser.setTeleportingToSpawn(null);
+        }
+
         // Handles combat tagging for the receiver.
         if (!isInCombat(receiver)) {
             combatHandler.put(receiver, 15);
@@ -67,6 +75,13 @@ public class CombatLog {
             }, 0L, 20L));
         } else {
             combatHandler.replace(receiver, getRemainingTime(receiver), 15);
+        }
+
+        // Cancels the receiver's pending teleportation when moving.
+        if (receiverUser.isTeleportingToSpawn()) {
+            MiscUtils.messagePlayer(receiver, MiscUtils.colorize("&cTeleportation cancelled, you entered combat."));
+            receiverUser.getTeleportingToSpawnTask().cancel();
+            receiverUser.setTeleportingToSpawn(null);
         }
 
         // Sets the last attackers.

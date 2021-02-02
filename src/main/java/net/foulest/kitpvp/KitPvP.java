@@ -47,8 +47,9 @@ public class KitPvP extends JavaPlugin {
         ConfigManager.get().addDefault("spawn.z", 0.5);
         ConfigManager.get().addDefault("spawn.yaw", 90.0);
         ConfigManager.get().addDefault("spawn.pitch", 0.0);
-        ConfigManager.get().addDefault("coins.kill-bonus", 10);
-        ConfigManager.get().addDefault("coins.killstreak-bonus", 5);
+        ConfigManager.get().addDefault("kill.coins-bonus", 10);
+        ConfigManager.get().addDefault("kill.experience-bonus", 25);
+        ConfigManager.get().addDefault("kill.killstreak-bonus", 5);
         ConfigManager.get().addDefault("mysql.host", "host");
         ConfigManager.get().addDefault("mysql.user", "user");
         ConfigManager.get().addDefault("mysql.password", "password");

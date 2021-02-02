@@ -268,7 +268,7 @@ public class EventListener implements Listener {
 
             if (kitUser.isTeleportingToSpawn()) {
                 kitUser.getTeleportingToSpawnTask().cancel();
-                MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled."));
+                MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you took damage."));
                 kitUser.setTeleportingToSpawn(null);
             }
         }
@@ -556,6 +556,8 @@ public class EventListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         KitUser kitUser = KitUser.getInstance(player);
+        double deltaY = event.getTo().getY() - event.getFrom().getY();
+        double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
 
         // Locks the user in place if they aren't loaded.
         if (!kitUser.isLoaded()) {
@@ -563,9 +565,8 @@ public class EventListener implements Listener {
             return;
         }
 
-        if ((event.getTo().getX() != event.getFrom().getX()
-                || event.getTo().getY() != event.getFrom().getY()
-                || event.getTo().getZ() != event.getFrom().getZ()) && kitUser.isTeleportingToSpawn()) {
+        // Cancels pending teleportation when moving.
+        if ((deltaXZ > 0.05 || Math.abs(deltaY) > 0.05) && kitUser.isTeleportingToSpawn()) {
             MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
             kitUser.getTeleportingToSpawnTask().cancel();
             kitUser.setTeleportingToSpawn(null);
