@@ -43,16 +43,12 @@ public class SpawnCmd {
             MiscUtils.messagePlayer(player, MiscUtils.colorize("&cYou are already teleporting to spawn."));
             return;
         }
-
         kitUser.setTeleportingToSpawn(new BukkitRunnable() {
-            final long teleportTime = System.currentTimeMillis();
-            long pastValue = 6;
-
+            int counter = 0;
+            int remainingSeconds = 5;
             public void run() {
-                long secondsDiff = Math.round(((teleportTime - System.currentTimeMillis()) + 5500) / 1000.0D);
-
                 // Teleports the player to spawn.
-                if (secondsDiff == 0) {
+                if (counter++ == 5) {
                     spawn.teleport(player);
                     player.getInventory().setHeldItemSlot(0);
                     player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
@@ -61,15 +57,9 @@ public class SpawnCmd {
                     kitUser.setTeleportingToSpawn(null);
                     return;
                 }
-
-                // Sends a message and sound to the player.
-                if (secondsDiff != pastValue) {
-                    player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
-                    MiscUtils.messagePlayer(player, MiscUtils.colorize("&eTeleporting to spawn in &a" + secondsDiff + " seconds&e..."));
-                }
-
-                pastValue = secondsDiff;
+                player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
+                MiscUtils.messagePlayer(player, MiscUtils.colorize("&eTeleporting to spawn in &a" + remainingSeconds-- + " seconds&e..."));
             }
-        }.runTaskTimer(kitPvP, 0L, 0L));
+        }.runTaskTimer(kitPvP, 0L, 20L));
     }
 }
