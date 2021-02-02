@@ -99,8 +99,10 @@ public class DeathListener implements Listener {
 
             // Gives the damager coins and experience.
             int rewardAmount = 5 * (damager.getKillstreak() / 5);
-            damager.addCoins(ConfigManager.get().getInt("kill.coins-bonus") + rewardAmount);
-            damager.addExperience(ConfigManager.get().getInt("kill.experience-bonus") + rewardAmount);
+            int coinsGiven = ConfigManager.get().getInt("kill.coins-bonus") + rewardAmount;
+            int experienceGiven = ConfigManager.get().getInt("kill.experience-bonus") + rewardAmount;
+            damager.addCoins(coinsGiven);
+            damager.addExperience(experienceGiven);
 
             // Saves the damager's stats.
             damager.saveStats();
@@ -109,7 +111,7 @@ public class DeathListener implements Listener {
             MiscUtils.messagePlayer(receiver.getPlayer(), "&cYou were killed by &e" + damager.getPlayer().getName()
                     + " &con &e" + damager.getPlayer().getHealth() + " health.");
             MiscUtils.messagePlayer(damager.getPlayer(), "&eYou killed &a" + receiver.getPlayer().getName()
-                    + "&e for &a" + rewardAmount + " coins &eand &a25 exp&e.");
+                    + "&e for &a" + coinsGiven + " coins &eand &a" + experienceGiven + " exp&e.");
         } else {
             MiscUtils.messagePlayer(player, "&cYou killed yourself.");
         }

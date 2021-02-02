@@ -442,17 +442,19 @@ public class KitUser {
     public void calcLevel(boolean afterKill) {
         if (experience == 0) {
             level = 1;
-        } else if ((double) experience / ((level * 25) * 25) >= 1.0) {
-            level += 1;
+        } else {
+            while ((double) experience / ((level * 25) * 25) >= 1.0) {
+                level += 1;
 
-            if (afterKill) {
-                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "");
-                MiscUtils.messagePlayer(player, "&bLevel Up");
-                MiscUtils.messagePlayer(player, "&7You leveled up to &fLevel " + level);
-                MiscUtils.messagePlayer(player, "&7and earned &f150 Coins&7!");
-                MiscUtils.messagePlayer(player, "");
-                addCoins(150);
+                if (afterKill) {
+                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
+                    MiscUtils.messagePlayer(player, "");
+                    MiscUtils.messagePlayer(player, " &b&lLevel Up");
+                    MiscUtils.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
+                    MiscUtils.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
+                    MiscUtils.messagePlayer(player, "");
+                    addCoins(150);
+                }
             }
         }
 

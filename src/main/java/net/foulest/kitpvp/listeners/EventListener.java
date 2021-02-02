@@ -280,9 +280,10 @@ public class EventListener implements Listener {
         KitUser kitUser = KitUser.getInstance(player);
 
         // Fixes the weird hotbar swap bug.
-        if (event.getAction() == InventoryAction.HOTBAR_SWAP && kitUser.isInSafezone()
+        if (event.getAction() == InventoryAction.HOTBAR_SWAP
                 && (!kitUser.hasKit() || !(event.getClickedInventory().getName() == null
-                || event.getClickedInventory().getName().equals("container.inventory")))) {
+                || event.getClickedInventory().getName().equals("container.inventory")))
+                && kitUser.isInSafezone()) {
             event.setCancelled(true);
             player.updateInventory();
             return;
@@ -558,6 +559,7 @@ public class EventListener implements Listener {
         KitUser kitUser = KitUser.getInstance(player);
         double deltaY = event.getTo().getY() - event.getFrom().getY();
         double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
+        boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
 
         // Locks the user in place if they aren't loaded.
         if (!kitUser.isLoaded()) {
@@ -565,8 +567,13 @@ public class EventListener implements Listener {
             return;
         }
 
+        // Ignores rotation updates.
+        if (!playerMoved) {
+            return;
+        }
+
         // Cancels pending teleportation when moving.
-        if ((deltaXZ > 0.05 || Math.abs(deltaY) > 0.05) && kitUser.isTeleportingToSpawn()) {
+        if (kitUser.isTeleportingToSpawn()) {
             MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
             kitUser.getTeleportingToSpawnTask().cancel();
             kitUser.setTeleportingToSpawn(null);
@@ -579,8 +586,8 @@ public class EventListener implements Listener {
         }
 
         // Teleports the player back to spawn if they leave without a kit.
-        if (!kitUser.isInSafezone(event.getTo()) && !kitUser.hasKit() && !player.isDead()
-                && kitUser.isLoaded() && !kitUser.isInStaffMode() && player.getGameMode() != GameMode.CREATIVE) {
+        if (!kitUser.isInSafezone(event.getTo()) && !kitUser.hasKit()
+                && player.getGameMode() != GameMode.CREATIVE && !player.isDead()) {
             spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
             player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);

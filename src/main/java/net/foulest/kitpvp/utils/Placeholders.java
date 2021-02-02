@@ -110,7 +110,7 @@ public class Placeholders extends PlaceholderExpansion {
 
         // Placeholder: %kitpvp_combattag%
         if (identifier.equals("combattag")) {
-            return combatLog.isInCombat(player) ? "00:" + combatLog.getRemainingTime(player) : "Safe";
+            return combatLog.isInCombat(player) ? "&c00:" + String.format("%02d", combatLog.getRemainingTime(player)) : "&aSafe";
         }
 
         // Placeholder: %kitpvp_activekit%
