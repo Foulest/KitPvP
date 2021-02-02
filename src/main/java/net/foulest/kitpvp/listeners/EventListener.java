@@ -279,6 +279,13 @@ public class EventListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         KitUser kitUser = KitUser.getInstance(player);
 
+        // Prevents users in staff mode from moving inventory items.
+        if (kitUser.isInStaffMode()) {
+            event.setCancelled(true);
+            player.updateInventory();
+            return;
+        }
+
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
                 && (!kitUser.hasKit() || !(event.getClickedInventory().getName() == null
@@ -292,13 +299,6 @@ public class EventListener implements Listener {
         // ???
         if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()
                 || event.getCurrentItem().getItemMeta() == null) {
-            return;
-        }
-
-        // Prevents users in staff mode from moving inventory items.
-        if (kitUser.isInStaffMode()) {
-            event.setCancelled(true);
-            player.updateInventory();
             return;
         }
 
@@ -580,14 +580,14 @@ public class EventListener implements Listener {
         }
 
         // Kills the player if they leave the map/fall into the void.
-        if (!kitUser.isInRegion() && player.getGameMode() != GameMode.CREATIVE) {
+        if (player.getLocation().getY() < 0 && player.getGameMode() != GameMode.CREATIVE) {
             DeathListener.handleDeath(player);
             return;
         }
 
         // Teleports the player back to spawn if they leave without a kit.
-        if (!kitUser.isInSafezone(event.getTo()) && !kitUser.hasKit()
-                && player.getGameMode() != GameMode.CREATIVE && !player.isDead()) {
+        if (!kitUser.hasKit() && player.getGameMode() != GameMode.CREATIVE && !player.isDead()
+                && !kitUser.isInSafezone(event.getTo())) {
             spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
             player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);

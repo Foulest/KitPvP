@@ -715,7 +715,7 @@ public class KitListener implements Listener {
             }
 
             for (Player playerInList : playerList) {
-                KitUser playerInListUser = KitUser.getInstance(player);
+                KitUser playerInListUser = KitUser.getInstance(playerInList);
 
                 if (!playerInListUser.isInSafezone()) {
                     double distance = playerInList.getLocation().distanceSquared(player.getLocation());
