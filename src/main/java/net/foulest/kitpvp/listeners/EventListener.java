@@ -496,9 +496,7 @@ public class EventListener implements Listener {
                         MiscUtils.messagePlayer(player, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
                         MiscUtils.messagePlayer(player, " &fCoins: &6" + playerData.getCoins());
                         MiscUtils.messagePlayer(player, " &fBounty: &cWIP");
-                        MiscUtils.messagePlayer(player, "");
                         MiscUtils.messagePlayer(player, " &fEvents Won: &cWIP");
-                        MiscUtils.messagePlayer(player, " &fMost Used Kit: &cWIP");
                         MiscUtils.messagePlayer(player, "");
                     }
                     break;
