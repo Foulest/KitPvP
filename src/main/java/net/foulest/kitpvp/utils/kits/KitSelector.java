@@ -9,7 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KitSelector {
 
@@ -70,6 +72,7 @@ public class KitSelector {
             inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").build());
         }
 
+
         List<Kit> checkedKits = kitManager.getKits().subList(page * 36, (page * 36) + ensureKits(kitManager.getKits().size() - (page * 36)));
 
         try {
@@ -81,19 +84,11 @@ public class KitSelector {
         } catch (IllegalArgumentException ignored) {
         }
 
-        List<Kit> kitsOrderedByPrice = new ArrayList<>();
-
+        // TODO: SORT ALPHABETICALLY
         for (Kit kits : checkedKits) {
-            if (playerData.ownsKit(kits) && (kitsOrderedByPrice.isEmpty()
-                    || kits.getCost() > kitsOrderedByPrice.get(0).getCost())) {
-                kitsOrderedByPrice.add(0, kits);
-            } else if (kits.getCost() == 0) {
-                kitsOrderedByPrice.add(kits);
+            if (playerData.ownsKit(kits)) {
+                inv.addItem(createKitItem(kits));
             }
-        }
-
-        for (Kit kits : kitsOrderedByPrice) {
-            inv.addItem(createKitItem(kits));
         }
     }
 

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,21 +86,12 @@ public class KitShop {
         } catch (IllegalArgumentException ignored) {
         }
 
-        List<Kit> kitsOrderedByPrice = new ArrayList<>();
-
+        // TODO: SORT ALPHABETICALLY
         for (Kit kits : checkedKits) {
             if (!playerData.ownsKit(kits)) {
-                if (kitsOrderedByPrice.isEmpty() || kits.getCost() > kitsOrderedByPrice.get(0).getCost()) {
-                    kitsOrderedByPrice.add(0, kits);
-                } else {
-                    kitsOrderedByPrice.add(kits);
-                }
+                inv.addItem(createKitItem(kits));
+                paidKits++;
             }
-        }
-
-        for (Kit kits : kitsOrderedByPrice) {
-            inv.addItem(createKitItem(kits));
-            paidKits++;
         }
 
         return paidKits != 0;
