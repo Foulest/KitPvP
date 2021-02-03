@@ -1,7 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.utils.MiscUtils;
-import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;

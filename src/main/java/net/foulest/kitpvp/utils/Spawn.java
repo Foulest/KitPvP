@@ -49,9 +49,9 @@ public class Spawn {
             player.removePotionEffect(effect.getType());
         }
 
-        player.setHealth(20);
         kitPvP.giveDefaultItems(player);
 
+        player.setHealth(20);
         player.teleport(location);
         player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(),
                 player.getLocation().getZ(), location.getYaw(), location.getPitch())); // Might fix the yaw bug.

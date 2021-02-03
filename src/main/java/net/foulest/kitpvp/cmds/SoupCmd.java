@@ -12,8 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class SoupCmd {
 
-    @Command(name = "soup", aliases = {"stew", "mushroomsoup"}, description = "Sets your healing item to soup.",
-            usage = "/soup", inGameOnly = true)
+    @Command(name = "soup", description = "Sets your healing item to Soup.", usage = "/soup", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);

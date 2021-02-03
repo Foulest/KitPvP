@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -132,33 +133,37 @@ public class KitPvP extends JavaPlugin {
     public void giveDefaultItems(Player player) {
         PlayerData playerData = PlayerData.getInstance(player);
 
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
+        new BukkitRunnable() {
+            public void run() {
+                player.getInventory().clear();
+                player.getInventory().setArmorContents(null);
 
-        ItemStack kitSelector = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").build();
-        player.getInventory().setItem(0, kitSelector);
+                ItemStack kitSelector = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").build();
+                player.getInventory().setItem(0, kitSelector);
 
-        ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").build();
-        player.getInventory().setItem(1, shopSelector);
+                ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").build();
+                player.getInventory().setItem(1, shopSelector);
 
-        ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
-        player.getInventory().setItem(2, previousKit);
+                ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
+                player.getInventory().setItem(2, previousKit);
 
-        ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").build();
-        player.getInventory().setItem(4, yourStats);
+                ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").build();
+                player.getInventory().setItem(4, yourStats);
 
-        ItemStack healingItem;
-        if (playerData.isUsingSoup()) {
-            healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
-        } else {
-            healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
-        }
-        player.getInventory().setItem(6, healingItem);
+                ItemStack healingItem;
+                if (playerData.isUsingSoup()) {
+                    healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
+                } else {
+                    healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
+                }
+                player.getInventory().setItem(6, healingItem);
 
-        if (player.hasPermission("kitpvp.staff")) {
-            ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
-            player.getInventory().setItem(8, staffMode);
-        }
+                if (player.hasPermission("kitpvp.staff")) {
+                    ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
+                    player.getInventory().setItem(8, staffMode);
+                }
+            }
+        }.runTaskLater(this, 1L);
     }
 
     /**

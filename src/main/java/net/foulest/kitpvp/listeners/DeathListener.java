@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.listeners;
 
+import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
@@ -18,6 +19,7 @@ import java.util.List;
 
 public class DeathListener implements Listener {
 
+    private static final KitPvP kitPvP = KitPvP.getInstance();
     private static final KitListener kitListener = KitListener.getInstance();
     private static final Spawn spawn = Spawn.getInstance();
     private static final CombatLog combatLog = CombatLog.getInstance();
