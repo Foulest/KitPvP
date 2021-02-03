@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.utils.kits;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class KitManager {
     }
 
     public boolean hasRequiredKit(Player player, String required) {
-        KitUser user = KitUser.getInstance(player);
-        return user.hasKit() && valueOf(required) != null && user.getKit().getName().equals(valueOf(required).getName());
+        PlayerData playerData = PlayerData.getInstance(player);
+        return playerData.hasKit() && valueOf(required) != null && playerData.getKit().getName().equals(valueOf(required).getName());
     }
 }

@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
@@ -29,18 +29,18 @@ public class EcoSetCmd {
             return;
         }
 
-        KitUser targetUser = KitUser.getInstance(target);
+        PlayerData targetData = PlayerData.getInstance(target);
         int amount = Integer.parseInt(args.getArgs(1));
 
-        targetUser.setCoins(amount);
-        targetUser.saveStats();
+        targetData.setCoins(amount);
+        targetData.saveStats();
 
         if ((args.getSender() instanceof Player) && target == args.getSender()) {
-            MiscUtils.messagePlayer(target, "&aYou set your balance to " + targetUser.getCoins() + " coins.");
+            MiscUtils.messagePlayer(target, "&aYou set your balance to " + targetData.getCoins() + " coins.");
             return;
         }
 
-        MiscUtils.messagePlayer(target, "&aYour balance was set to " + targetUser.getCoins() + " coins.");
-        MiscUtils.messagePlayer(args.getSender(), "&aYou set " + target.getName() + "'s balance to " + targetUser.getCoins() + " coins.");
+        MiscUtils.messagePlayer(target, "&aYour balance was set to " + targetData.getCoins() + " coins.");
+        MiscUtils.messagePlayer(args.getSender(), "&aYou set " + target.getName() + "'s balance to " + targetData.getCoins() + " coins.");
     }
 }

@@ -57,7 +57,7 @@ public class KitShop {
 
     private boolean populateInventory(Player player, int page) {
         int paidKits = 0;
-        KitUser user = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
 
         // Sets non-present items to glass.
@@ -87,7 +87,7 @@ public class KitShop {
         }
 
         for (Kit kits : checkedKits) {
-            if (!user.ownsKit(kits)) {
+            if (!playerData.ownsKit(kits)) {
                 inv.addItem(createKitItem(kits));
                 paidKits++;
             }

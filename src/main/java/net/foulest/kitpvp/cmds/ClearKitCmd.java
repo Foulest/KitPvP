@@ -2,8 +2,9 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.listeners.CombatLog;
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.bukkit.Bukkit;
@@ -24,7 +25,7 @@ public class ClearKitCmd {
         }
 
         Player sender = args.getPlayer();
-        KitUser kitUser = KitUser.getInstance(sender);
+        PlayerData playerData = PlayerData.getInstance(sender);
 
         // Clearing your own kit.
         if (args.length() == 0) {
@@ -33,13 +34,13 @@ public class ClearKitCmd {
                 return;
             }
 
-            if (kitUser.isInSafezone()) {
-                if (!kitUser.hasKit()) {
+            if (Regions.getInstance().isInSafezone(sender)) {
+                if (!playerData.hasKit()) {
                     MiscUtils.messagePlayer(sender, "&cYou do not have a kit selected.");
                     return;
                 }
 
-                clearKit(kitUser);
+                clearKit(playerData);
                 MiscUtils.messagePlayer(sender, "&aYour kit has been cleared.");
                 return;
             }
@@ -57,7 +58,7 @@ public class ClearKitCmd {
                 return;
             }
 
-            KitUser targetData = KitUser.getInstance(target);
+            PlayerData targetData = PlayerData.getInstance(target);
             if (!targetData.hasKit()) {
                 MiscUtils.messagePlayer(target, "&cYou do not have a kit selected.");
                 return;
@@ -69,12 +70,12 @@ public class ClearKitCmd {
         }
     }
 
-    public void clearKit(KitUser user) {
-        Player player = user.getPlayer();
+    public void clearKit(PlayerData playerData) {
+        Player player = playerData.getPlayer();
 
-        user.setPreviousKit(user.getKit());
-        user.clearCooldowns();
-        user.setKit(null);
+        playerData.setPreviousKit(playerData.getKit());
+        playerData.clearCooldowns();
+        playerData.setKit(null);
 
         player.setHealth(20);
         player.getInventory().setHeldItemSlot(0);

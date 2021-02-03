@@ -6,7 +6,7 @@
 
     <groupId>net.foulest</groupId>
     <artifactId>KitPvP</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,10 +30,6 @@
         <repository>
             <id>sk89q-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
-        </repository>
-        <repository>
-            <id>lunar</id>
-            <url>https://maven.moonsworth.com/repository/lunarclient-public/</url>
         </repository>
     </repositories>
 
@@ -72,12 +68,6 @@
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-legacy</artifactId>
             <version>6.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.lunarclient</groupId>
-            <artifactId>bukkitapi</artifactId>
-            <version>1.0-20200729.212152-7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

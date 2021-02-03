@@ -19,19 +19,19 @@ public class StaffMode {
     }
 
     public void toggleStaffMode(Player player, boolean status, boolean silent) {
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         // Error handling.
-        if (kitUser.isInStaffMode() == status) {
+        if (playerData.isInStaffMode() == status) {
             MiscUtils.messagePlayer(player, "&cSomething is very wrong with StaffMode.");
             return;
         }
 
-        // Changes staff mode status in the KitUser class.
-        kitUser.setStaffMode(status);
+        // Changes the staff mode status.
+        playerData.setStaffMode(status);
 
         // Enables staff mode.
-        if (kitUser.isInStaffMode()) {
+        if (playerData.isInStaffMode()) {
             if (!silent) {
                 MiscUtils.messagePlayer(player, "&aStaff mode has been enabled.");
             }
@@ -46,7 +46,7 @@ public class StaffMode {
 
             player.setGameMode(GameMode.CREATIVE);
 
-            kitUser.setKit(null);
+            playerData.setKit(null);
             player.getInventory().clear();
             player.getInventory().setArmorContents(null);
             player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));

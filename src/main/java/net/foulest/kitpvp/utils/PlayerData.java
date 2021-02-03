@@ -1,17 +1,10 @@
 package net.foulest.kitpvp.utils;
 
-import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.object.LCCooldown;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
-import org.bukkit.Location;
+import net.foulest.kitpvp.utils.lunar.LunarClientAPI;
+import net.foulest.kitpvp.utils.lunar.objects.LCCooldown;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -29,9 +22,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-public class KitUser {
+public class PlayerData {
 
-    static final Set<KitUser> instances = new HashSet<>();
+    static final Set<PlayerData> instances = new HashSet<>();
     private final Player player;
     private final Map<String, Long> cooldowns = new HashMap<>();
     private final KitPvP kitPvP = KitPvP.getInstance();
@@ -55,74 +48,22 @@ public class KitUser {
     private boolean pendingNoFallRemoval;
     private String clientBrand;
 
-    private KitUser(Player player) {
+    private PlayerData(Player player) {
         this.player = player;
         this.kit = null;
 
         instances.add(this);
     }
 
-    public static KitUser getInstance(Player player) {
-        for (KitUser users : instances) {
-            if (users != null && users.getPlayer() != null && users.getPlayer().isOnline()
-                    && users.getPlayer().getName().equalsIgnoreCase(player.getName())) {
-                return users;
+    public static PlayerData getInstance(Player player) {
+        for (PlayerData playerData : instances) {
+            if (playerData != null && playerData.getPlayer() != null && playerData.getPlayer().isOnline()
+                    && playerData.getPlayer().getName().equalsIgnoreCase(player.getName())) {
+                return playerData;
             }
         }
 
-        return new KitUser(player);
-    }
-
-    public boolean isInRegion() {
-        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
-        RegionManager regionManager = worldGuard.getRegionManager(player.getLocation().getWorld());
-        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation());
-
-        for (ProtectedRegion region : set) {
-            return region != null;
-        }
-
-        return false;
-    }
-
-    public boolean isInRegion(Location loc) {
-        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
-        RegionManager regionManager = worldGuard.getRegionManager(loc.getWorld());
-        ApplicableRegionSet set = regionManager.getApplicableRegions(loc);
-
-        for (ProtectedRegion region : set) {
-            return region != null;
-        }
-
-        return false;
-    }
-
-    public boolean isInSafezone() {
-        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
-        RegionManager regionManager = worldGuard.getRegionManager(player.getLocation().getWorld());
-        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation());
-
-        if (isInRegion()) {
-            for (ProtectedRegion region : set) {
-                return region.getFlag(DefaultFlag.PVP) == StateFlag.State.DENY;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isInSafezone(Location loc) {
-        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
-        RegionManager regionManager = worldGuard.getRegionManager(loc.getWorld());
-        ApplicableRegionSet set = regionManager.getApplicableRegions(loc);
-
-        if (isInRegion()) {
-            for (ProtectedRegion region : set) {
-                return region.getFlag(DefaultFlag.PVP) == StateFlag.State.DENY;
-            }
-        }
-
-        return false;
+        return new PlayerData(player);
     }
 
     public Player getPlayer() {
@@ -201,7 +142,7 @@ public class KitUser {
     public void clearCooldowns() {
         cooldowns.clear();
 
-        if (hasKit() && isOnLunar()) {
+        if (hasKit() && lunarAPI.isRunningLunarClient(player)) {
             lunarAPI.clearCooldown(player, new LCCooldown("Ability", 0L, TimeUnit.SECONDS,
                     getKit().getDisplayItem().getType()));
         }
@@ -215,7 +156,7 @@ public class KitUser {
     public void setCooldown(String kitName, Material icon, int cooldownTime, boolean notify) {
         cooldowns.put(kitName, System.currentTimeMillis() + cooldownTime * 1000L);
 
-        if (hasKit() && isOnLunar()) {
+        if (hasKit() && lunarAPI.isRunningLunarClient(player)) {
             lunarAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
         }
 
@@ -224,6 +165,7 @@ public class KitUser {
                 public void run() {
                     if (player != null) {
                         MiscUtils.messagePlayer(player, MiscUtils.colorize("&aYour ability cooldown has expired."));
+                        cooldowns.remove(kit.getName());
                     }
                 }
             }.runTaskLater(kitPvP, cooldownTime * 20L);
@@ -247,8 +189,6 @@ public class KitUser {
     }
 
     public void load() throws SQLException {
-        isLoaded = true;
-
         if (!mySQL.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
             mySQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak)" +
                     " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ")");
@@ -278,6 +218,8 @@ public class KitUser {
         setDeaths((Integer) mySQL.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setKillstreak((Integer) mySQL.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setTopKillstreak((Integer) mySQL.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+
+        isLoaded = true;
     }
 
     public void saveAll() {
@@ -383,14 +325,6 @@ public class KitUser {
         return isLoaded;
     }
 
-    public String getClientBrand() {
-        return clientBrand;
-    }
-
-    public void setClientBrand(String brand) {
-        clientBrand = brand;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -462,19 +396,15 @@ public class KitUser {
         player.setExp(getExpDecimal());
     }
 
-    public boolean isOnLunar() {
-        return getClientBrand().contains("lunarclient:") && lunarAPI.isRunningLunarClient(player);
-    }
-
     public boolean isTeleportingToSpawn() {
         return teleportingToSpawn != null;
     }
 
-    public BukkitTask getTeleportingToSpawnTask() {
-        return teleportingToSpawn;
-    }
-
     public void setTeleportingToSpawn(BukkitTask task) {
         teleportingToSpawn = task;
+    }
+
+    public BukkitTask getTeleportingToSpawnTask() {
+        return teleportingToSpawn;
     }
 }

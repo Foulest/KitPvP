@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
@@ -14,7 +14,7 @@ public class StatsCmd {
     public void onCommand(CommandArgs args) {
         Player player;
         Player sender = args.getPlayer();
-        KitUser kitUser;
+        PlayerData playerData;
 
         if (args.length() > 1) {
             MiscUtils.messagePlayer(sender, "&cUsage: /stats [player]");
@@ -22,19 +22,19 @@ public class StatsCmd {
         }
 
         if (args.length() == 0) {
-            kitUser = KitUser.getInstance(sender);
+            playerData = PlayerData.getInstance(sender);
 
             MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &aYour Stats");
-            MiscUtils.messagePlayer(sender, " &fKills: &e" + kitUser.getKills());
-            MiscUtils.messagePlayer(sender, " &fDeaths: &e" + kitUser.getDeaths());
-            MiscUtils.messagePlayer(sender, " &fK/D Ratio: &e" + kitUser.getKDRText());
+            MiscUtils.messagePlayer(sender, " &fKills: &e" + playerData.getKills());
+            MiscUtils.messagePlayer(sender, " &fDeaths: &e" + playerData.getDeaths());
+            MiscUtils.messagePlayer(sender, " &fK/D Ratio: &e" + playerData.getKDRText());
             MiscUtils.messagePlayer(sender, "");
-            MiscUtils.messagePlayer(sender, " &fStreak: &e" + kitUser.getKillstreak());
-            MiscUtils.messagePlayer(sender, " &fHighest Streak: &e" + kitUser.getTopKillstreak());
+            MiscUtils.messagePlayer(sender, " &fStreak: &e" + playerData.getKillstreak());
+            MiscUtils.messagePlayer(sender, " &fHighest Streak: &e" + playerData.getTopKillstreak());
             MiscUtils.messagePlayer(sender, "");
-            MiscUtils.messagePlayer(sender, " &fLevel: &e" + kitUser.getLevel() + " &7(" + kitUser.getExpPercent() + "%)");
-            MiscUtils.messagePlayer(sender, " &fCoins: &6" + kitUser.getCoins());
+            MiscUtils.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
+            MiscUtils.messagePlayer(sender, " &fCoins: &6" + playerData.getCoins());
             MiscUtils.messagePlayer(sender, " &fBounty: &cWIP");
             MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &fEvents Won: &cWIP");
@@ -55,19 +55,19 @@ public class StatsCmd {
                 return;
             }
 
-            kitUser = KitUser.getInstance(player);
+            playerData = PlayerData.getInstance(player);
 
             MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &a" + player.getName() + " Stats");
-            MiscUtils.messagePlayer(sender, " &fKills: &e" + kitUser.getKills());
-            MiscUtils.messagePlayer(sender, " &fDeaths: &e" + kitUser.getDeaths());
-            MiscUtils.messagePlayer(sender, " &fK/D Ratio: &e" + kitUser.getKDRText());
+            MiscUtils.messagePlayer(sender, " &fKills: &e" + playerData.getKills());
+            MiscUtils.messagePlayer(sender, " &fDeaths: &e" + playerData.getDeaths());
+            MiscUtils.messagePlayer(sender, " &fK/D Ratio: &e" + playerData.getKDRText());
             MiscUtils.messagePlayer(sender, "");
-            MiscUtils.messagePlayer(sender, " &fStreak: &e" + kitUser.getKillstreak());
-            MiscUtils.messagePlayer(sender, " &fHighest Streak: &e" + kitUser.getTopKillstreak());
+            MiscUtils.messagePlayer(sender, " &fStreak: &e" + playerData.getKillstreak());
+            MiscUtils.messagePlayer(sender, " &fHighest Streak: &e" + playerData.getTopKillstreak());
             MiscUtils.messagePlayer(sender, "");
-            MiscUtils.messagePlayer(sender, " &fLevel: &e" + kitUser.getLevel() + " &7(" + kitUser.getExpPercent() + "%)");
-            MiscUtils.messagePlayer(sender, " &fCoins: &6" + kitUser.getCoins());
+            MiscUtils.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
+            MiscUtils.messagePlayer(sender, " &fCoins: &6" + playerData.getCoins());
             MiscUtils.messagePlayer(sender, " &fBounty: &cWIP");
             MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &fEvents Won: &cWIP");

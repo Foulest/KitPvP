@@ -123,3 +123,13 @@ g
 7src/main/java/net/foulest/kitpvp/utils/KitUpgrades.java,9\b\9b62e67a34ccf43d5cfe4ec7b697d766f585b77c
 h
 8src/main/java/net/foulest/kitpvp/utils/SkullCreator.java,0\a\0a417f5f4eae3b31042ba025bee5149afa9e5da3
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+h
+8src/main/java/net/foulest/kitpvp/cmds/ArmorColorCmd.java,f\d\fdfe36b536170dfe4f17070db4533ea10d35f61f
+:
+
+KitPvP.iml,b\3\b33350a895fa2e8d94f4fe00a8971dc67bbcc9b8

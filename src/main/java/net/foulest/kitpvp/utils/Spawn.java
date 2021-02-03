@@ -35,15 +35,15 @@ public class Spawn {
      * @param player The player to teleport.
      */
     public void teleport(Player player) {
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         if (location == null) {
             MiscUtils.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");
             return;
         }
 
-        kitUser.clearCooldowns();
-        kitUser.setKit(null);
+        playerData.clearCooldowns();
+        playerData.setKit(null);
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
@@ -92,5 +92,7 @@ public class Spawn {
         float yaw = ConfigManager.get().getInt("spawn.yaw");
         float pitch = ConfigManager.get().getInt("spawn.pitch");
         location = new Location(world, x, y, z, yaw, pitch);
+
+        Regions.getInstance().cacheRegions();
     }
 }

@@ -1,11 +1,10 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -18,24 +17,17 @@ public class BalanceCmd {
         CommandSender sender = args.getSender();
 
         if (args.length() != 1) {
-            MiscUtils.messagePlayer(sender, "&fCoins: &6" + KitUser.getInstance(player).getCoins());
+            MiscUtils.messagePlayer(sender, "&fCoins: &6" + PlayerData.getInstance(player).getCoins());
             return;
         }
 
         Player target = Bukkit.getPlayer(args.getArgs(0));
 
         if (target == null) {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args.getArgs(0));
-
-            if (!offlinePlayer.hasPlayedBefore()) {
-                MiscUtils.messagePlayer(sender, "&cPlayer not found.");
-                return;
-            }
-
-            MiscUtils.messagePlayer(sender, "&f" + offlinePlayer.getName() + "'s Coins: &6" + KitUser.getInstance(offlinePlayer.getPlayer()).getCoins());
+            MiscUtils.messagePlayer(sender, "&cPlayer not found.");
             return;
         }
 
-        MiscUtils.messagePlayer(args.getSender(), "&f" + target.getName() + "'s Coins: &6" + KitUser.getInstance(target).getCoins());
+        MiscUtils.messagePlayer(args.getSender(), "&f" + target.getName() + "'s Coins: &6" + PlayerData.getInstance(target).getCoins());
     }
 }

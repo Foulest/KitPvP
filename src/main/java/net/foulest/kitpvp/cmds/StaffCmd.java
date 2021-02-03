@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.StaffMode;
 import net.foulest.kitpvp.utils.command.Command;
@@ -19,13 +19,13 @@ public class StaffCmd {
         }
 
         Player player = args.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         if (args.length() > 0) {
             MiscUtils.messagePlayer(player, "&cUsage: /staff");
             return;
         }
 
-        staffMode.toggleStaffMode(player, !kitUser.isInStaffMode(), false);
+        staffMode.toggleStaffMode(player, !playerData.isInStaffMode(), false);
     }
 }

@@ -57,7 +57,7 @@ public class KitSelector {
 
     // Populates the GUI's inventory.
     private void populateInventory(Player player, int page) {
-        KitUser user = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
 
         // Sets non-present items to glass.
@@ -84,7 +84,7 @@ public class KitSelector {
         }
 
         for (Kit kits : checkedKits) {
-            if (user.ownsKit(kits)) {
+            if (playerData.ownsKit(kits)) {
                 inv.addItem(createKitItem(kits));
             }
         }

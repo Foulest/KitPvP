@@ -36,6 +36,6 @@ public class ArmorColorCmd {
         player.getInventory().setChestplate(chestplate);
         player.updateInventory();
 
-        MiscUtils.messagePlayer(sender, "&aColor " + args.getArgs(0) + " has been applied.");
+        MiscUtils.messagePlayer(sender, "&aColor 0x" + args.getArgs(0) + " has been applied.");
     }
 }

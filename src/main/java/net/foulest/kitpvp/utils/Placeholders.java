@@ -20,12 +20,12 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.0.3";
+        return "1.0.4";
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        KitUser user = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         // Placeholder: %kitpvp_kills%
         if (identifier.equals("kills")) {
@@ -33,7 +33,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getKills();
+            return "" + playerData.getKills();
         }
 
         // Placeholder: %kitpvp_deaths%
@@ -42,7 +42,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getDeaths();
+            return "" + playerData.getDeaths();
         }
 
         // Placeholder: %kitpvp_kdr%
@@ -51,7 +51,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0.0";
             }
 
-            return user.getKDRText();
+            return playerData.getKDRText();
         }
 
         // Placeholder: %kitpvp_killstreak%
@@ -60,7 +60,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getKillstreak();
+            return "" + playerData.getKillstreak();
         }
 
         // Placeholder: %kitpvp_top_killstreak%
@@ -69,7 +69,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getTopKillstreak();
+            return "" + playerData.getTopKillstreak();
         }
 
         // Placeholder: %kitpvp_coins%
@@ -78,7 +78,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getCoins();
+            return "" + playerData.getCoins();
         }
 
         // Placeholder: %kitpvp_level%
@@ -87,7 +87,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getLevel();
+            return "" + playerData.getLevel();
         }
 
         // Placeholder: %kitpvp_experience%
@@ -96,7 +96,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getExperience();
+            return "" + playerData.getExperience();
         }
 
         // Placeholder: %kitpvp_experience_percent%
@@ -105,7 +105,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            return "" + user.getExpPercent() + "%";
+            return "" + playerData.getExpPercent() + "%";
         }
 
         // Placeholder: %kitpvp_combattag%
@@ -115,11 +115,11 @@ public class Placeholders extends PlaceholderExpansion {
 
         // Placeholder: %kitpvp_activekit%
         if (identifier.equals("activekit")) {
-            if (player == null || user.getKit() == null) {
+            if (player == null || playerData.getKit() == null) {
                 return "None";
             }
 
-            return user.getKit().getName();
+            return playerData.getKit().getName();
         }
 
         return null;

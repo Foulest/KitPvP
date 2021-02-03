@@ -26,6 +26,7 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,7 +42,6 @@ public class EventListener implements Listener {
     private final MySQL mySQL = MySQL.getInstance();
     private final KitManager kitManager = KitManager.getInstance();
     private final CombatLog combatLog = CombatLog.getInstance();
-    private final BrandListener brandListener = BrandListener.getInstance();
     private final StaffMode staffMode = StaffMode.getInstance();
 
     public static EventListener getInstance() {
@@ -51,9 +51,7 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
-
-        brandListener.addChannel(player, "MC|BRAND");
+        PlayerData playerData = PlayerData.getInstance(player);
 
         player.setHealth(20);
         player.setGameMode(GameMode.ADVENTURE);
@@ -62,15 +60,16 @@ public class EventListener implements Listener {
         player.getInventory().setArmorContents(null);
 
         try {
-            kitUser.load();
+            playerData.load();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-        if (kitUser.isInStaffMode()) {
+        if (playerData.isInStaffMode()) {
             staffMode.toggleStaffMode(player, false, true);
         }
 
+        // TODO: FIX, NOT HIDING ALREADY VANISHED STAFF ON JOIN
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasMetadata("vanished") && !player.hasPermission("kitpvp.staff")) {
                 player.hidePlayer(p);
@@ -78,44 +77,32 @@ public class EventListener implements Listener {
         }
 
         for (Kit kit : kitManager.getKits()) {
-            if (kit.getCost() == 0 && !kitUser.ownsKit(kit)) {
-                kitUser.addOwnedKit(kit);
+            if (kit.getCost() == 0 && !playerData.ownsKit(kit)) {
+                playerData.addOwnedKit(kit);
             }
         }
 
         spawn.teleport(player);
-        player.getInventory().setHeldItemSlot(0);
-        player.setGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         if (player.hasMetadata("noFall")) {
             player.removeMetadata("noFall", kitPvP);
-            kitUser.setPendingNoFallRemoval(false);
+            playerData.setPendingNoFallRemoval(false);
         }
 
         if (combatLog.isInCombat(player)) {
-            if (combatLog.getLastAttacker(player) != null) {
-                KitUser killer = KitUser.getInstance(combatLog.getLastAttacker(player));
-
-                killer.getPlayer().playSound(killer.getPlayer().getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
-                killer.addKill();
-                killer.addKillstreak();
-                MiscUtils.messagePlayer(killer.getPlayer(), "&a&lKILL! &7You killed &f" + player.getName() + "&7.");
-            }
-
-            combatLog.remove(player);
-            kitUser.addDeath();
+            DeathListener.handleDeath(player, true);
         }
 
-        kitUser.clearCooldowns();
-        kitUser.resetKillStreak();
-        kitUser.saveAll();
-        kitUser.unload();
+        playerData.clearCooldowns();
+        playerData.resetKillStreak();
+        playerData.saveAll();
+        playerData.unload();
     }
 
     @EventHandler
@@ -125,7 +112,7 @@ public class EventListener implements Listener {
         event.getDrops().clear();
         event.setDroppedExp(0);
 
-        DeathListener.handleDeath(player);
+        DeathListener.handleDeath(player, false);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -156,9 +143,9 @@ public class EventListener implements Listener {
     public void onBowShoot(EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            KitUser kitUser = KitUser.getInstance(player);
+            PlayerData playerData = PlayerData.getInstance(player);
 
-            if (kitUser.isInSafezone()) {
+            if (Regions.getInstance().isInSafezone(player)) {
                 event.setCancelled(true);
                 player.updateInventory();
             }
@@ -184,7 +171,11 @@ public class EventListener implements Listener {
                 MiscUtils.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &c"
                         + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + " &ehealth.");
 
-                Bukkit.getScheduler().runTaskLater(kitPvP, () -> ((CraftPlayer) receiver).getHandle().getDataWatcher().watch(9, (byte) 0), 100L);
+                new BukkitRunnable() {
+                    public void run() {
+                        ((CraftPlayer) receiver).getHandle().getDataWatcher().watch(9, (byte) 0);
+                    }
+                }.runTaskLater(kitPvP, 100L);
             }
         }
     }
@@ -264,12 +255,12 @@ public class EventListener implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            KitUser kitUser = KitUser.getInstance(player);
+            PlayerData playerData = PlayerData.getInstance(player);
 
-            if (kitUser.isTeleportingToSpawn()) {
-                kitUser.getTeleportingToSpawnTask().cancel();
+            if (playerData.isTeleportingToSpawn()) {
+                playerData.getTeleportingToSpawnTask().cancel();
                 MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you took damage."));
-                kitUser.setTeleportingToSpawn(null);
+                playerData.setTeleportingToSpawn(null);
             }
         }
     }
@@ -277,10 +268,10 @@ public class EventListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
-        // Prevents users in staff mode from moving inventory items.
-        if (kitUser.isInStaffMode()) {
+        // Prevents players in staff mode from moving inventory items.
+        if (playerData.isInStaffMode()) {
             event.setCancelled(true);
             player.updateInventory();
             return;
@@ -288,22 +279,22 @@ public class EventListener implements Listener {
 
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
-                && (!kitUser.hasKit() || !(event.getClickedInventory().getName() == null
+                && (!playerData.hasKit() || !(event.getClickedInventory().getName() == null
                 || event.getClickedInventory().getName().equals("container.inventory")))
-                && kitUser.isInSafezone()) {
+                && Regions.getInstance().isInSafezone(player)) {
             event.setCancelled(true);
             player.updateInventory();
             return;
         }
 
-        // ???
+        // Null/meta check.
         if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()
                 || event.getCurrentItem().getItemMeta() == null) {
             return;
         }
 
-        // Prevents users in kits from moving their armor.
-        if (kitUser.hasKit() && event.getSlotType() == InventoryType.SlotType.ARMOR) {
+        // Prevents players in kits from moving their armor.
+        if (playerData.hasKit() && event.getSlotType() == InventoryType.SlotType.ARMOR) {
             event.setCancelled(true);
             player.updateInventory();
             return;
@@ -326,13 +317,13 @@ public class EventListener implements Listener {
             if (kitManager.valueOf(itemName) != null) {
                 Kit kit = kitManager.valueOf(itemName);
 
-                if ((KitUser.getInstance(player).getCoins() - kit.getCost()) < 0) {
+                if ((PlayerData.getInstance(player).getCoins() - kit.getCost()) < 0) {
                     MiscUtils.messagePlayer(player, "&cYou do not have enough coins to purchase " + kit.getName() + ".");
                     return;
                 }
 
-                KitUser.getInstance(player).addOwnedKit(kit);
-                KitUser.getInstance(player).removeCoins(kit.getCost());
+                PlayerData.getInstance(player).addOwnedKit(kit);
+                PlayerData.getInstance(player).removeCoins(kit.getCost());
                 mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getId() + " )");
                 MiscUtils.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
@@ -373,7 +364,7 @@ public class EventListener implements Listener {
                     break;
             }
 
-        } else if (!kitUser.hasKit()) {
+        } else if (!playerData.hasKit()) {
             event.setCancelled(true);
             player.updateInventory();
         }
@@ -403,7 +394,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
         if (event.getAction().toString().contains("RIGHT") && block != null
                 && block.getState() instanceof InventoryHolder) {
@@ -421,7 +412,7 @@ public class EventListener implements Listener {
                     break;
 
                 case FISHING_ROD:
-                    if (kitUser.isInSafezone()) {
+                    if (Regions.getInstance().isInSafezone(player)) {
                         event.setCancelled(true);
                     }
                     break;
@@ -437,11 +428,11 @@ public class EventListener implements Listener {
 
                 case WATCH:
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Previous Kit")
-                            && kitUser.hasPreviousKit() && !kitUser.hasKit()) {
+                            && playerData.hasPreviousKit() && !playerData.hasKit()) {
                         event.setCancelled(true);
                         player.updateInventory();
-                        kitUser.getPreviousKit().apply(player);
-                        MiscUtils.messagePlayer(player, "&aYou equipped the " + kitUser.getPreviousKit().getName() + " kit.");
+                        playerData.getPreviousKit().apply(player);
+                        MiscUtils.messagePlayer(player, "&aYou equipped the " + playerData.getPreviousKit().getName() + " kit.");
                         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
                         player.updateInventory();
                         player.closeInventory();
@@ -454,15 +445,15 @@ public class EventListener implements Listener {
                         player.updateInventory();
                         MiscUtils.messagePlayer(player, "");
                         MiscUtils.messagePlayer(player, " &aYour Stats");
-                        MiscUtils.messagePlayer(player, " &fKills: &e" + kitUser.getKills());
-                        MiscUtils.messagePlayer(player, " &fDeaths: &e" + kitUser.getDeaths());
-                        MiscUtils.messagePlayer(player, " &fK/D Ratio: &e" + kitUser.getKDRText());
+                        MiscUtils.messagePlayer(player, " &fKills: &e" + playerData.getKills());
+                        MiscUtils.messagePlayer(player, " &fDeaths: &e" + playerData.getDeaths());
+                        MiscUtils.messagePlayer(player, " &fK/D Ratio: &e" + playerData.getKDRText());
                         MiscUtils.messagePlayer(player, "");
-                        MiscUtils.messagePlayer(player, " &fStreak: &e" + kitUser.getKillstreak());
-                        MiscUtils.messagePlayer(player, " &fHighest Streak: &e" + kitUser.getTopKillstreak());
+                        MiscUtils.messagePlayer(player, " &fStreak: &e" + playerData.getKillstreak());
+                        MiscUtils.messagePlayer(player, " &fHighest Streak: &e" + playerData.getTopKillstreak());
                         MiscUtils.messagePlayer(player, "");
-                        MiscUtils.messagePlayer(player, " &fLevel: &e" + kitUser.getLevel() + " &7(" + kitUser.getExpPercent() + "%)");
-                        MiscUtils.messagePlayer(player, " &fCoins: &6" + kitUser.getCoins());
+                        MiscUtils.messagePlayer(player, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
+                        MiscUtils.messagePlayer(player, " &fCoins: &6" + playerData.getCoins());
                         MiscUtils.messagePlayer(player, " &fBounty: &cWIP");
                         MiscUtils.messagePlayer(player, "");
                         MiscUtils.messagePlayer(player, " &fEvents Won: &cWIP");
@@ -495,7 +486,7 @@ public class EventListener implements Listener {
 
                         if (Bukkit.getOnlinePlayers().size() > 1) {
                             for (Player p : Bukkit.getOnlinePlayers()) {
-                                if (!KitUser.getInstance(p).isInStaffMode()) {
+                                if (!PlayerData.getInstance(p).isInStaffMode()) {
                                     potentialPlayers.add(p);
                                 }
                             }
@@ -537,7 +528,7 @@ public class EventListener implements Listener {
             }
         }
 
-        if (kitUser.isInStaffMode()) {
+        if (playerData.isInStaffMode()) {
             event.setCancelled(true);
             player.updateInventory();
         }
@@ -546,9 +537,9 @@ public class EventListener implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
-        if (!kitUser.isLoaded()) {
+        if (!playerData.isLoaded()) {
             event.setCancelled(true);
         }
     }
@@ -556,13 +547,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
         double deltaY = event.getTo().getY() - event.getFrom().getY();
         double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
         boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
 
-        // Locks the user in place if they aren't loaded.
-        if (!kitUser.isLoaded()) {
+        // Locks the player in place if they aren't loaded.
+        if (!playerData.isLoaded()) {
             event.setTo(event.getFrom());
             return;
         }
@@ -573,21 +564,21 @@ public class EventListener implements Listener {
         }
 
         // Cancels pending teleportation when moving.
-        if (kitUser.isTeleportingToSpawn()) {
+        if (playerData.isTeleportingToSpawn()) {
             MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
-            kitUser.getTeleportingToSpawnTask().cancel();
-            kitUser.setTeleportingToSpawn(null);
+            playerData.getTeleportingToSpawnTask().cancel();
+            playerData.setTeleportingToSpawn(null);
         }
 
         // Kills the player if they leave the map/fall into the void.
         if (player.getLocation().getY() < 0 && player.getGameMode() != GameMode.CREATIVE) {
-            DeathListener.handleDeath(player);
+            DeathListener.handleDeath(player, false);
             return;
         }
 
         // Teleports the player back to spawn if they leave without a kit.
-        if (!kitUser.hasKit() && player.getGameMode() != GameMode.CREATIVE && !player.isDead()
-                && !kitUser.isInSafezone(event.getTo())) {
+        if (!playerData.hasKit() && player.getGameMode() != GameMode.CREATIVE && !player.isDead()
+                && !Regions.getInstance().isInSafezone(player)) {
             spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
             player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
@@ -596,8 +587,8 @@ public class EventListener implements Listener {
         }
 
         // Denies entry into spawn while combat tagged.
-        // Also heals the user whilst in a safe zone.
-        if (kitUser.isInSafezone(event.getTo())) {
+        // Also heals the player whilst in a safe zone.
+        if (Regions.getInstance().isInSafezone(player)) {
             if (combatLog.isInCombat(player)) {
                 event.setTo(event.getFrom());
                 MiscUtils.messagePlayer(player, "&cYou can't enter spawn while combat tagged.");
@@ -611,17 +602,20 @@ public class EventListener implements Listener {
             }
         }
 
-        // Removes the user's noFall metadata.
-        if (!kitUser.isInSafezone(event.getTo()) && player.hasMetadata("noFall") && !kitUser.isPendingNoFallRemoval()) {
-            kitUser.setPendingNoFallRemoval(true);
+        // Removes the player's noFall metadata.
+        if (player.hasMetadata("noFall") && !playerData.isPendingNoFallRemoval()
+                && !Regions.getInstance().isInSafezone(player)) {
+            playerData.setPendingNoFallRemoval(true);
 
-            Bukkit.getScheduler().runTaskLater(kitPvP, () -> {
-                kitUser.setPendingNoFallRemoval(false);
+            new BukkitRunnable() {
+                public void run() {
+                    playerData.setPendingNoFallRemoval(false);
 
-                if (player.hasMetadata("noFall") && !kitUser.isInSafezone()) {
-                    player.removeMetadata("noFall", kitPvP);
+                    if (player.hasMetadata("noFall") && !Regions.getInstance().isInSafezone(player)) {
+                        player.removeMetadata("noFall", kitPvP);
+                    }
                 }
-            }, 30L);
+            }.runTaskLater(kitPvP, 30L);
         }
     }
 
@@ -638,7 +632,7 @@ public class EventListener implements Listener {
         if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             Player player = (Player) event.getEntity();
 
-            DeathListener.handleDeath(player);
+            DeathListener.handleDeath(player, false);
         }
     }
 

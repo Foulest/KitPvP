@@ -23,7 +23,7 @@ public class KitUpgrades {
 
     // Populates the GUI's inventory.
     private void populateInventory(Player player) {
-        KitUser user = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
 
         // Sets non-present items to glass.

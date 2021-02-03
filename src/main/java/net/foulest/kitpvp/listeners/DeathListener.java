@@ -1,6 +1,5 @@
 package net.foulest.kitpvp.listeners;
 
-import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
@@ -19,13 +18,14 @@ import java.util.List;
 
 public class DeathListener implements Listener {
 
-    private static final KitPvP kitPvP = KitPvP.getInstance();
     private static final KitListener kitListener = KitListener.getInstance();
     private static final Spawn spawn = Spawn.getInstance();
     private static final CombatLog combatLog = CombatLog.getInstance();
 
-    public static void handleDeath(Player player) {
-        KitUser receiver = KitUser.getInstance(player);
+    public static void handleDeath(Player player, boolean onPlayerQuit) {
+        CraftPlayer craftPlayer = (CraftPlayer) player;
+        PacketPlayInClientCommand packet = new PacketPlayInClientCommand();
+        PlayerData receiver = PlayerData.getInstance(player);
         Kit currentKit = receiver.getKit();
         Vector vec = new Vector();
 
@@ -73,7 +73,7 @@ public class DeathListener implements Listener {
 
         // Runs specific code if the player is killed by another player.
         if (combatLog.getLastAttacker(player) != null) {
-            KitUser damager = KitUser.getInstance(combatLog.getLastAttacker(player));
+            PlayerData damager = PlayerData.getInstance(combatLog.getLastAttacker(player));
 
             // Adds a kill to the damager.
             damager.addKill();
@@ -130,29 +130,25 @@ public class DeathListener implements Listener {
         // Removes the player from a Vampire's drained effects list.
         kitListener.drainedEffects.remove(player.getUniqueId());
 
-        // Removes knockback before teleporting the player to spawn.
-        Bukkit.getScheduler().runTaskLater(kitPvP, () -> player.setVelocity(vec), 1L);
-
         // Prevents the player from reaching the respawn screen using NMS.
-        Bukkit.getScheduler().runTask(kitPvP, () -> {
-            CraftPlayer craftPlayer = (CraftPlayer) player;
-            PacketPlayInClientCommand packet = new PacketPlayInClientCommand();
-
+        if (!onPlayerQuit) {
             try {
                 Field a = PacketPlayInClientCommand.class.getDeclaredField("a");
                 a.setAccessible(true);
                 a.set(packet, PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN);
+                (craftPlayer.getHandle()).playerConnection.a(packet);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            (craftPlayer.getHandle()).playerConnection.a(packet);
-        });
+            // Removes knockback before teleporting the player to spawn.
+            player.setVelocity(vec);
 
-        // Teleports the player to spawn.
-        spawn.teleport(player);
-        player.getInventory().setHeldItemSlot(0);
-        player.playSound(player.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
+            // Teleports the player to spawn.
+            spawn.teleport(player);
+            player.getInventory().setHeldItemSlot(0);
+            player.playSound(player.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
+        }
 
         // Resets the player's killstreak.
         receiver.resetKillStreak();

@@ -1,8 +1,9 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.utils.KitSelector;
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import net.foulest.kitpvp.utils.kits.KitManager;
@@ -15,9 +16,9 @@ public class KitsCmd {
     @Command(name = "kits", aliases = "kit", usage = "/kits", description = "Shows available kits.", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
-        KitUser kitUser = KitUser.getInstance(player);
+        PlayerData playerData = PlayerData.getInstance(player);
 
-        if (!kitUser.isInSafezone()) {
+        if (!Regions.getInstance().isInSafezone(player)) {
             MiscUtils.messagePlayer(player, "&cYou must be in spawn to use this command.");
             return;
         }

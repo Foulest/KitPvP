@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitUser;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
@@ -35,19 +35,19 @@ public class PayCmd {
 
             Player player = args.getPlayer();
             Player sender = (Player) args.getSender();
-            KitUser targetUser = KitUser.getInstance(target);
-            KitUser senderUser = KitUser.getInstance(sender);
-            int oldAmount = targetUser.getCoins();
-            int check = senderUser.getCoins() - Integer.parseInt(amount);
+            PlayerData targetData = PlayerData.getInstance(target);
+            PlayerData senderData = PlayerData.getInstance(sender);
+            int oldAmount = targetData.getCoins();
+            int check = senderData.getCoins() - Integer.parseInt(amount);
 
             if (check <= 0) {
-                MiscUtils.messagePlayer(senderUser.getPlayer(), "&cYou don't have enough coins.");
+                MiscUtils.messagePlayer(sender, "&cYou don't have enough coins.");
                 return;
             }
 
-            targetUser.setCoins((Integer.parseInt(amount) + oldAmount));
-            senderUser.removeCoins(Integer.parseInt(amount));
-            targetUser.saveStats();
+            targetData.setCoins((Integer.parseInt(amount) + oldAmount));
+            senderData.removeCoins(Integer.parseInt(amount));
+            targetData.saveStats();
 
             if ((args.getSender() instanceof Player) && target == args.getSender()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
