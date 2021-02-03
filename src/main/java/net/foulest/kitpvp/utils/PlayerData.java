@@ -249,7 +249,6 @@ public class PlayerData {
         isLoaded = false;
         ownedKits.clear();
         kit = null;
-        previousKit = null;
         teleportingToSpawn = null;
         instances.remove(this);
     }

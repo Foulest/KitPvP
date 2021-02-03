@@ -85,12 +85,19 @@ public class KitListener implements Listener {
     @EventHandler
     public void onEskimoAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        Entity entityPlayer = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
         List<Location> eskimoLocations = getEskimoLocations(player.getLocation());
 
         if (kitManager.hasRequiredKit(player, "Eskimo") && event.getAction().toString().contains("RIGHT")
                 && player.getItemInHand().getType() == Material.PACKED_ICE && !playerData.hasCooldown(player, "Eskimo")
                 && !Regions.getInstance().isInSafezone(player)) {
+
+            if (!entityPlayer.isOnGround()) {
+                MiscUtils.messagePlayer(player, "&cYou need to be on the ground.");
+                playerData.setCooldown("Eskimo", kitManager.valueOf("Eskimo").getDisplayItem().getType(), 5, true);
+                return;
+            }
 
             ArrayList<BlockState> pendingRollback = new ArrayList<>();
 
@@ -109,7 +116,6 @@ public class KitListener implements Listener {
 
             MiscUtils.messagePlayer(player, "&aYour ability has been used.");
             playerData.setCooldown("Eskimo", kitManager.valueOf("Eskimo").getDisplayItem().getType(), 30, true);
-            player.setMetadata("noFall", new FixedMetadataValue(kitPvP, true));
         }
     }
 
