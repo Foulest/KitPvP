@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,11 +18,6 @@ public class Spiderman implements Kit {
     @Override
     public String getName() {
         return "Spiderman";
-    }
-
-    @Override
-    public int getId() {
-        return 15;
     }
 
     @Override
@@ -56,18 +52,8 @@ public class Spiderman implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Traps players in cobwebs.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 6.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Traps players in cobwebs."));
     }
 
     @Override

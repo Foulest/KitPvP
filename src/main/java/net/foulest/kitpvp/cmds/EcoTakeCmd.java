@@ -10,7 +10,8 @@ import org.bukkit.entity.Player;
 
 public class EcoTakeCmd {
 
-    @Command(name = "ecotake", description = "Takes from the balance of a player.", usage = "/ecotake <player> <amount>", permission = "kitpvp.ecotake")
+    @Command(name = "ecotake", description = "Takes from the balance of a player.", usage = "/ecotake <player> <amount>",
+            permission = "kitpvp.ecotake")
     public void onCommand(CommandArgs args) {
         if (args.length() != 2) {
             MiscUtils.messagePlayer(args.getSender(), "&cUsage: /ecotake <player> <amount>");

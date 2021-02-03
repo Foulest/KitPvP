@@ -1,19 +1,21 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.KitSelector;
-import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
+import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
+import net.foulest.kitpvp.utils.kits.KitSelector;
 import org.bukkit.entity.Player;
 
 public class KitsCmd {
 
     private final KitManager kitManager = KitManager.getInstance();
 
-    @Command(name = "kits", aliases = "kit", usage = "/kits", description = "Shows available kits.", inGameOnly = true)
+    @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
+            description = "Selects a kit or opens the Kit Selector.", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
@@ -33,12 +35,14 @@ public class KitsCmd {
             return;
         }
 
-        if (kitManager.valueOf(args.getArgs(0)) == null) {
+        Kit kit = kitManager.valueOf(args.getArgs(0));
+
+        if (kit == null) {
             MiscUtils.messagePlayer(player, "&cCould not find the kit you wanted; opening the Kit Selector.");
             new KitSelector(player);
             return;
         }
 
-        kitManager.valueOf(args.getArgs(0)).apply(player);
+        kit.apply(player);
     }
 }

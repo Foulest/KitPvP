@@ -1,7 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.bukkit.Bukkit;
@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 public class StatsCmd {
 
-    @SuppressWarnings("deprecation")
     @Command(name = "stats", description = "Shows a player's statistics.", usage = "/stats", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player;
@@ -36,9 +35,7 @@ public class StatsCmd {
             MiscUtils.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
             MiscUtils.messagePlayer(sender, " &fCoins: &6" + playerData.getCoins());
             MiscUtils.messagePlayer(sender, " &fBounty: &cWIP");
-            MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &fEvents Won: &cWIP");
-            MiscUtils.messagePlayer(sender, " &fMost Used Kit: &cWIP");
             MiscUtils.messagePlayer(sender, "");
         }
 
@@ -69,9 +66,7 @@ public class StatsCmd {
             MiscUtils.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
             MiscUtils.messagePlayer(sender, " &fCoins: &6" + playerData.getCoins());
             MiscUtils.messagePlayer(sender, " &fBounty: &cWIP");
-            MiscUtils.messagePlayer(sender, "");
             MiscUtils.messagePlayer(sender, " &fEvents Won: &cWIP");
-            MiscUtils.messagePlayer(sender, " &fMost Used Kit: &cWIP");
             MiscUtils.messagePlayer(sender, "");
         }
     }

@@ -1,7 +1,8 @@
-package net.foulest.kitpvp.utils;
+package net.foulest.kitpvp.utils.kits;
 
-import net.foulest.kitpvp.utils.kits.Kit;
-import net.foulest.kitpvp.utils.kits.KitManager;
+import net.foulest.kitpvp.utils.ItemBuilder;
+import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -86,11 +87,21 @@ public class KitShop {
         } catch (IllegalArgumentException ignored) {
         }
 
+        List<Kit> kitsOrderedByPrice = new ArrayList<>();
+
         for (Kit kits : checkedKits) {
             if (!playerData.ownsKit(kits)) {
-                inv.addItem(createKitItem(kits));
-                paidKits++;
+                if (kitsOrderedByPrice.isEmpty() || kits.getCost() > kitsOrderedByPrice.get(0).getCost()) {
+                    kitsOrderedByPrice.add(0, kits);
+                } else {
+                    kitsOrderedByPrice.add(kits);
+                }
             }
+        }
+
+        for (Kit kits : kitsOrderedByPrice) {
+            inv.addItem(createKitItem(kits));
+            paidKits++;
         }
 
         return paidKits != 0;
@@ -101,12 +112,14 @@ public class KitShop {
     }
 
     private ItemStack createKitItem(Kit kit) {
-        List<String> lore = new ArrayList<>();
-        lore.add("&7Attack: &f" + kit.getAttack());
-        lore.add("&7Defense: &f" + kit.getDefense());
-        lore.add("&7Cost: &f" + kit.getCost() + " coins");
-        lore.add("");
-        lore.add("&f" + kit.getDescription());
+        List<String> lore = kit.getLore();
+
+        if (kit.getCost() == 0) {
+            lore.add(1, "&7Cost: &fFree");
+        } else {
+            lore.add(1, "&7Cost: &f" + kit.getCost() + " coins");
+        }
+
         lore.add("");
         lore.add("&aClick to purchase this kit.");
         return new ItemBuilder(kit.getDisplayItem()).name("&c" + kit.getName()).lore(lore).build();

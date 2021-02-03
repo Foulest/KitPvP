@@ -12,7 +12,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class ArmorColorCmd {
 
-    @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.", permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
+    @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
+            permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         CommandSender sender = args.getSender();

@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,11 +20,6 @@ public class Kangaroo implements Kit {
     @Override
     public String getName() {
         return "Kangaroo";
-    }
-
-    @Override
-    public int getId() {
-        return 9;
     }
 
     @Override
@@ -60,18 +56,8 @@ public class Kangaroo implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Hop around like a Kangaroo.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 5.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Hop around like a Kangaroo."));
     }
 
     @Override

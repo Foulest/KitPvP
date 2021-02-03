@@ -8,20 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Tank implements Kit {
 
     @Override
     public String getName() {
         return "Tank";
-    }
-
-    @Override
-    public int getId() {
-        return 18;
     }
 
     @Override
@@ -56,18 +49,8 @@ public class Tank implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Slow but very resistant.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 4.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 9.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Slow but very resistant."));
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +19,6 @@ public class Pyro implements Kit {
     @Override
     public String getName() {
         return "Pyro";
-    }
-
-    @Override
-    public int getId() {
-        return 14;
     }
 
     @Override
@@ -59,18 +55,8 @@ public class Pyro implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Burn other players alive.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 5.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Set other players ablaze."));
     }
 
     @Override

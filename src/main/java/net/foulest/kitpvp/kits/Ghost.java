@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,11 +18,6 @@ public class Ghost implements Kit {
     @Override
     public String getName() {
         return "Ghost";
-    }
-
-    @Override
-    public int getId() {
-        return 6;
     }
 
     @Override
@@ -54,18 +50,8 @@ public class Ghost implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Permanent invisibility.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 9.5;
-    }
-
-    @Override
-    public double getDefense() {
-        return 0.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Permanent invisibility."));
     }
 
     @Override

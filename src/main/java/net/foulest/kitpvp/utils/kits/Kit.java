@@ -14,8 +14,6 @@ public interface Kit {
 
     String getName();
 
-    int getId();
-
     ItemStack getDisplayItem();
 
     List<ItemStack> getItems();
@@ -24,11 +22,7 @@ public interface Kit {
 
     PotionEffect[] getPotionEffects();
 
-    String getDescription();
-
-    double getAttack();
-
-    double getDefense();
+    List<String> getLore();
 
     int getCost();
 
@@ -65,9 +59,13 @@ public interface Kit {
             }
         }
 
-        // Sets the player's soup.
+        // Sets the player's healing item.
         for (int i = 0; i < player.getInventory().getSize(); ++i) {
-            player.getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").build());
+            if (playerData.isUsingSoup()) {
+                player.getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").build());
+            } else {
+                player.getInventory().addItem(new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing").build());
+            }
         }
 
         // Sets the player's kit items.

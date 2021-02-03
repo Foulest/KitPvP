@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,11 +17,6 @@ public class Summoner implements Kit {
     @Override
     public String getName() {
         return "Summoner";
-    }
-
-    @Override
-    public int getId() {
-        return 16;
     }
 
     @Override
@@ -55,18 +51,8 @@ public class Summoner implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Summon your very own Iron Golem.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 4.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 5.5;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Summon your very own Iron Golem."));
     }
 
     @Override

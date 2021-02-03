@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.Messenger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,7 +38,6 @@ public class KitPvP extends JavaPlugin {
     public void onEnable() {
         instance = this;
         framework = new CommandFramework(this);
-        Messenger messenger = getServer().getMessenger();
 
         // Registers placeholders with PlaceholderAPI.
         new Placeholders().register();
@@ -78,8 +76,9 @@ public class KitPvP extends JavaPlugin {
         try (Connection connection = hikari.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerStats (uuid VARCHAR(36), coins INT, " +
-                    "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, soup BOOLEAN)");
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitId INT)");
+                    "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, usingSoup BOOLEAN, " +
+                    "previousKit VARCHAR(36))");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitName VARCHAR(36))");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -90,22 +89,17 @@ public class KitPvP extends JavaPlugin {
         // Loads the plugin's commands.
         loadCommands(new BalanceCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(), new EcoSetCmd(),
                 new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(), new KitShopCmd(),
-                new StaffCmd(), new EcoTakeCmd(), new ArmorColorCmd());
+                new StaffCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
+                new PotionsCmd());
 
         // Loads the plugin's kits.
-        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
-                new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(), new Ninja(), new Pyro(),
-                new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(), new Vampire(), new Zen());
+        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Eskimo(), new Fisherman(), new Ghost(),
+                new Tamer(), new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(),
+                new Ninja(), new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(),
+                new Vampire(), new Zen());
 
         // Loads the spawn.
         Spawn.getInstance().load();
-
-        // Loads online players' data.
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData.getInstance(player).load();
-            Spawn.getInstance().teleport(player);
-            player.getInventory().setHeldItemSlot(0);
-        }
     }
 
     @Override
@@ -147,20 +141,24 @@ public class KitPvP extends JavaPlugin {
         ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").build();
         player.getInventory().setItem(1, shopSelector);
 
-        if (playerData.hasPreviousKit()) {
-            ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
-            player.getInventory().setItem(2, previousKit);
-        }
+        ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
+        player.getInventory().setItem(2, previousKit);
 
         ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").build();
         player.getInventory().setItem(4, yourStats);
+
+        ItemStack healingItem;
+        if (playerData.isUsingSoup()) {
+            healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
+        } else {
+            healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
+        }
+        player.getInventory().setItem(6, healingItem);
 
         if (player.hasPermission("kitpvp.staff")) {
             ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
             player.getInventory().setItem(8, staffMode);
         }
-
-        player.updateInventory();
     }
 
     /**

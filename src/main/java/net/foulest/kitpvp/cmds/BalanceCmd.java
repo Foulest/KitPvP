@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 
 public class BalanceCmd {
 
-    @SuppressWarnings("deprecation")
-    @Command(name = "balance", aliases = {"bal", "money", "coins"}, description = "Shows your current balance.", usage = "/balance", inGameOnly = true)
+    @Command(name = "balance", aliases = {"bal", "money", "coins"}, description = "Shows your current balance.",
+            usage = "/balance", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         CommandSender sender = args.getSender();

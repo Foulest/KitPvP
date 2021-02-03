@@ -7,20 +7,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Knight implements Kit {
 
     @Override
     public String getName() {
         return "Knight";
-    }
-
-    @Override
-    public int getId() {
-        return 10;
     }
 
     @Override
@@ -53,18 +46,8 @@ public class Knight implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7No perks or abilities.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 6.5;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7No perks or abilities."));
     }
 
     @Override

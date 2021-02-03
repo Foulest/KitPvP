@@ -37,16 +37,6 @@ public class KitManager {
         return null;
     }
 
-    public Kit valueOfId(int id) {
-        for (Kit kit : kits) {
-            if (kit.getId() == id) {
-                return kit;
-            }
-        }
-
-        return null;
-    }
-
     public boolean hasRequiredKit(Player player, String required) {
         PlayerData playerData = PlayerData.getInstance(player);
         return playerData.hasKit() && valueOf(required) != null && playerData.getKit().getName().equals(valueOf(required).getName());

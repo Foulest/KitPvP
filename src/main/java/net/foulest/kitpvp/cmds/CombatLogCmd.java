@@ -10,7 +10,8 @@ public class CombatLogCmd {
 
     private final CombatLog combatLog = CombatLog.getInstance();
 
-    @Command(name = "combatlog", aliases = {"combattag", "ct", "combat", "combattime"}, description = "Displays your current combat tag timer.", usage = "/combatlog", inGameOnly = true)
+    @Command(name = "combatlog", aliases = {"combattag", "ct", "combat", "combattime"},
+            description = "Displays your current combat tag timer.", usage = "/combatlog", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 

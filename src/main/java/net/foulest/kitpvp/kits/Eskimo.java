@@ -13,16 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Zen implements Kit {
+public class Eskimo implements Kit {
 
     @Override
     public String getName() {
-        return "Zen";
+        return "Eskimo";
     }
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.SLIME_BALL));
+        return new ItemStack(Objects.requireNonNull(Material.PACKED_ICE));
     }
 
     @Override
@@ -33,19 +33,19 @@ public class Zen implements Kit {
     @Override
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
-        ItemStack special = new ItemBuilder(Material.SLIME_BALL).name("&aTeleporter &7(Right Click)")
-                .lore("&7Teleport to the nearest player.").build();
+        ItemStack special = new ItemBuilder(Material.PACKED_ICE).name("&aIce Dome &7(Right Click)")
+                .lore("&7Creates an ice dome around you.").unbreakable(true).build();
         return Arrays.asList(sword, special);
     }
 
     @Override
     public ItemStack[] getArmor() {
-        String base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMT"
-                + "g2ZDMxZTRkZDE2OWI0YzFjNjRkNDg1YjhlODRjN2IxY2NlYTdmNmZhYzg4ZTI1YTA4ZDJiN2ZmYmI4NDBhOCJ9fX0=";
+        String base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYj"
+                + "gyNTJiZTQ3ZWUzM2UzYzA1ZDE4NGVlOWE0YjE0YjM0MjUyZWYwN2QxNjdlY2M3OWU3M2FkMmRlZjcyIn19fQ==";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fZen's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x3E7F2B)).unbreakable(true).build(),
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fEskimo's Head").unbreakable(true).build(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x62A5B6)).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
         };
@@ -53,7 +53,7 @@ public class Zen implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Teleports to the nearest player."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Hooks players to your location."));
     }
 
     @Override

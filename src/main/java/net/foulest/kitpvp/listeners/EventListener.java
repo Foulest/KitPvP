@@ -4,6 +4,8 @@ import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
+import net.foulest.kitpvp.utils.kits.KitSelector;
+import net.foulest.kitpvp.utils.kits.KitShop;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -326,7 +328,7 @@ public class EventListener implements Listener {
 
                 PlayerData.getInstance(player).addOwnedKit(kit);
                 PlayerData.getInstance(player).removeCoins(kit.getCost());
-                mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getId() + " )");
+                mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getName() + " )");
                 MiscUtils.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
                 player.closeInventory();
@@ -356,8 +358,10 @@ public class EventListener implements Listener {
                     break;
 
                 default:
-                    if (kitManager.valueOf(itemName) != null) {
-                        kitManager.valueOf(itemName).apply(player);
+                    Kit kit = kitManager.valueOf(itemName);
+
+                    if (kit != null) {
+                        kit.apply(player);
                         MiscUtils.messagePlayer(player, "&aYou equipped the " + kitManager.valueOf(itemName).getName() + " kit.");
                         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
                         player.updateInventory();
@@ -419,10 +423,46 @@ public class EventListener implements Listener {
                     }
                     break;
 
-                case MUSHROOM_SOUP:
-                    if (player.getHealth() < player.getMaxHealth()) {
+                case POTION:
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Use Potions")) {
                         event.setCancelled(true);
                         player.updateInventory();
+
+                        playerData.setUsingSoup(false);
+                        playerData.saveStats();
+                        MiscUtils.messagePlayer(player, "&aYou are now using Potions.");
+
+                        ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
+                        player.getInventory().setItem(6, healingItem);
+                        break;
+                    }
+
+                    if (Regions.getInstance().isInSafezone(player)) {
+                        event.setCancelled(true);
+                    }
+                    break;
+
+                case MUSHROOM_SOUP:
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Use Soup")) {
+                        event.setCancelled(true);
+                        player.updateInventory();
+
+                        playerData.setUsingSoup(true);
+                        playerData.saveStats();
+                        MiscUtils.messagePlayer(player, "&aYou are now using Soup.");
+
+                        ItemStack healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
+                        player.getInventory().setItem(6, healingItem);
+                        break;
+                    }
+
+                    if (Regions.getInstance().isInSafezone(player)) {
+                        event.setCancelled(true);
+                        break;
+                    }
+
+                    if (player.getHealth() < player.getMaxHealth()) {
+                        event.setCancelled(true);
                         player.setHealth(Math.min(player.getHealth() + 7, player.getMaxHealth()));
                         player.setItemInHand(new ItemBuilder(Material.BOWL).name("&fBowl").build());
                     }
@@ -432,7 +472,6 @@ public class EventListener implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Previous Kit")
                             && playerData.hasPreviousKit() && !playerData.hasKit()) {
                         event.setCancelled(true);
-                        player.updateInventory();
                         playerData.getPreviousKit().apply(player);
                         MiscUtils.messagePlayer(player, "&aYou equipped the " + playerData.getPreviousKit().getName() + " kit.");
                         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
@@ -585,13 +624,11 @@ public class EventListener implements Listener {
             return;
         }
 
-        // Teleports the player back to spawn if they leave without a kit.
+        // Equips the player's previously used kit when they leave spawn without a kit equipped.
         if (!playerData.hasKit() && player.getGameMode() != GameMode.CREATIVE && !player.isDead()
                 && !Regions.getInstance().isInSafezone(player)) {
-            spawn.teleport(player);
-            player.getInventory().setHeldItemSlot(0);
-            player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-            MiscUtils.messagePlayer(player, "&cYou can't leave spawn without selecting a kit.");
+            playerData.getPreviousKit().apply(player);
+            MiscUtils.messagePlayer(player, "&cYour spawn protection has been removed.");
             return;
         }
 

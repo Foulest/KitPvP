@@ -11,7 +11,8 @@ import org.bukkit.entity.Player;
 
 public class PayCmd {
 
-    @Command(name = "pay", description = "Send coins to another player.", usage = "/pay <player> <amount>", inGameOnly = true)
+    @Command(name = "pay", description = "Send coins to another player.", usage = "/pay <player> <amount>",
+            inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player target = Bukkit.getPlayer(args.getArgs(0));
 

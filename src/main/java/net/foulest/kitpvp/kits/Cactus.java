@@ -9,20 +9,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Cactus implements Kit {
 
     @Override
     public String getName() {
         return "Cactus";
-    }
-
-    @Override
-    public int getId() {
-        return 3;
     }
 
     @Override
@@ -56,18 +49,8 @@ public class Cactus implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Inflict knockback and poison.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 4.25;
-    }
-
-    @Override
-    public double getDefense() {
-        return 3.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Inflict knockback and poison."));
     }
 
     @Override

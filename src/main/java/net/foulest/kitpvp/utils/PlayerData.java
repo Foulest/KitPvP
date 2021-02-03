@@ -40,6 +40,7 @@ public class PlayerData {
     private int deaths;
     private int killstreak;
     private int topKillstreak;
+    private boolean usingSoup;
     private boolean inStaffMode;
     private boolean isLoaded;
     private boolean pendingNoFallRemoval;
@@ -186,12 +187,13 @@ public class PlayerData {
 
     public void load() throws SQLException {
         if (!mySQL.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
-            mySQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak)" +
-                    " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ")");
+            mySQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak," +
+                    " topKillstreak, usingSoup, previousKit)" + " VALUES ('" + player.getUniqueId().toString()
+                    + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + true + ", 'Knight')");
         }
 
         if (!mySQL.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
-            mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ('" + player.getUniqueId().toString() + "', " + 10 + ")");
+            mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
         } else {
             ResultSet result;
 
@@ -200,7 +202,7 @@ public class PlayerData {
                 result = select.executeQuery();
 
                 while (result.next()) {
-                    ownedKits.add(kitManager.valueOfId(result.getInt("kitId")));
+                    ownedKits.add(kitManager.valueOf(result.getString("kitName")));
                 }
 
             } catch (SQLException e) {
@@ -214,6 +216,8 @@ public class PlayerData {
         setDeaths((Integer) mySQL.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setKillstreak((Integer) mySQL.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setTopKillstreak((Integer) mySQL.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setUsingSoup((Boolean) mySQL.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setPreviousKit(KitManager.getInstance().valueOf((String) mySQL.get("previousKit", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())));
 
         isLoaded = true;
     }
@@ -227,7 +231,7 @@ public class PlayerData {
                     continue;
                 }
 
-                mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ('" + player.getUniqueId().toString() + "', " + kits.getId() + ");");
+                mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
             }
         }
 
@@ -237,7 +241,8 @@ public class PlayerData {
     public void saveStats() {
         mySQL.update("UPDATE PlayerStats SET coins=" + getCoins() + ", experience=" + getExperience()
                 + ", kills=" + getKills() + ", deaths=" + getDeaths() + ", killstreak=" + getKillstreak()
-                + ", topKillstreak=" + getTopKillstreak() + " WHERE uuid='" + player.getUniqueId().toString() + "'");
+                + ", topKillstreak=" + getTopKillstreak() + ", usingSoup=" + isUsingSoup()
+                + ", previousKit='" + getPreviousKit().getName() + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
     }
 
     public void unload() {
@@ -403,4 +408,13 @@ public class PlayerData {
     public BukkitTask getTeleportingToSpawnTask() {
         return teleportingToSpawn;
     }
+
+    public boolean isUsingSoup() {
+        return usingSoup;
+    }
+
+    public void setUsingSoup(boolean status) {
+        usingSoup = status;
+    }
+
 }

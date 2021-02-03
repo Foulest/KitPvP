@@ -10,7 +10,8 @@ import org.bukkit.entity.Player;
 
 public class EcoSetCmd {
 
-    @Command(name = "ecoset", description = "Sets the balance of a player.", usage = "/ecoset <player> <amount>", permission = "kitpvp.ecoset")
+    @Command(name = "ecoset", description = "Sets the balance of a player.", usage = "/ecoset <player> <amount>",
+            permission = "kitpvp.ecoset")
     public void onCommand(CommandArgs args) {
         if (args.length() != 2) {
             MiscUtils.messagePlayer(args.getSender(), "&cUsage: /ecoset <player> <amount>");

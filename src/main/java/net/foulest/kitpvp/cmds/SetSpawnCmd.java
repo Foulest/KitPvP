@@ -10,7 +10,8 @@ public class SetSpawnCmd {
 
     private final Spawn spawn = Spawn.getInstance();
 
-    @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.", permission = "kitpvp.setspawn", inGameOnly = true)
+    @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
+            permission = "kitpvp.setspawn", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 

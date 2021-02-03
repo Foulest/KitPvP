@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,11 +17,6 @@ public class Mage implements Kit {
     @Override
     public String getName() {
         return "Mage";
-    }
-
-    @Override
-    public int getId() {
-        return 11;
     }
 
     @Override
@@ -55,18 +51,8 @@ public class Mage implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Gives you random potion effects.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 5.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Gives you random potion effects."));
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +19,6 @@ public class Archer implements Kit {
     @Override
     public String getName() {
         return "Archer";
-    }
-
-    @Override
-    public int getId() {
-        return 1;
     }
 
     @Override
@@ -60,18 +56,8 @@ public class Archer implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Master of long-ranged combat.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 3.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Master of long-ranged combat."));
     }
 
     @Override

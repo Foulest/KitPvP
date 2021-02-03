@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +19,6 @@ public class Hulk implements Kit {
     @Override
     public String getName() {
         return "Hulk";
-    }
-
-    @Override
-    public int getId() {
-        return 7;
     }
 
     @Override
@@ -59,18 +55,8 @@ public class Hulk implements Kit {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Deals players immense knockback.";
-    }
-
-    @Override
-    public double getAttack() {
-        return 5.0;
-    }
-
-    @Override
-    public double getDefense() {
-        return 5.0;
+    public List<String> getLore() {
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Deals players immense knockback."));
     }
 
     @Override
