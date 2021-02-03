@@ -1,2 +1,10 @@
 # KitPvP
-KitPvP plugin that was used on my network.
+KitPvP plugin that is currently being developed for my server, **kitpvp.io**.
+
+Join the Discord: https://discord.kitpvp.io
+
+# Dependencies
+- MySQL Database (storage)
+- PlaceholderAPI (placeholders)
+- WorldEdit (regions)
+- WorldGuard (regions)
