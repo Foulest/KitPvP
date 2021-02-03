@@ -18,7 +18,6 @@ public class KitsCmd {
             description = "Selects a kit or opens the Kit Selector.", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
 
         if (!Regions.getInstance().isInSafezone(player)) {
             MiscUtils.messagePlayer(player, "&cYou must be in spawn to use this command.");

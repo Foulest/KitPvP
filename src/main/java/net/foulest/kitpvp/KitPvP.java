@@ -93,7 +93,7 @@ public class KitPvP extends JavaPlugin {
                 new PotionsCmd());
 
         // Loads the plugin's kits.
-        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Eskimo(), new Fisherman(), new Ghost(),
+        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), /*new Eskimo(),*/ new Fisherman(), new Ghost(),
                 new Tamer(), new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(),
                 new Ninja(), new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(),
                 new Vampire(), new Zen());

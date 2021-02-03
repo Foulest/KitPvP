@@ -45,7 +45,7 @@ public class Eskimo implements Kit {
 
         return new ItemStack[]{
                 new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fEskimo's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x62A5B6)).unbreakable(true).build(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x4373B2)).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
         };

@@ -81,6 +81,38 @@ public class KitListener implements Listener {
         }
     }
 
+    // TODO: Fix the rollback system, some blocks aren't being rolled back
+    @EventHandler
+    public void onEskimoAbility(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = PlayerData.getInstance(player);
+        List<Location> eskimoLocations = getEskimoLocations(player.getLocation());
+
+        if (kitManager.hasRequiredKit(player, "Eskimo") && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.PACKED_ICE && !playerData.hasCooldown(player, "Eskimo")
+                && !Regions.getInstance().isInSafezone(player)) {
+
+            ArrayList<BlockState> pendingRollback = new ArrayList<>();
+
+            for (Location location : eskimoLocations) {
+                pendingRollback.add(location.getBlock().getState());
+                location.getBlock().setType(Material.PACKED_ICE);
+            }
+
+            new BukkitRunnable() {
+                public void run() {
+                    for (BlockState block : pendingRollback) {
+                        rollback(block);
+                    }
+                }
+            }.runTaskLater(kitPvP, 140L);
+
+            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown("Eskimo", kitManager.valueOf("Eskimo").getDisplayItem().getType(), 30, true);
+            player.setMetadata("noFall", new FixedMetadataValue(kitPvP, true));
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onCactusHit(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
@@ -804,6 +836,67 @@ public class KitListener implements Listener {
         return list;
     }
 
+    // TODO: Add all the locations correctly
+    public List<Location> getEskimoLocations(Location location) {
+        ArrayList<Location> list = new ArrayList<>();
+
+        list.add(location.clone().add(-3.0, 0.0, 0.0));
+        list.add(location.clone().add(-3.0, 0.0, 1.0));
+        list.add(location.clone().add(-3.0, 0.0, -1.0));
+        list.add(location.clone().add(3.0, 0.0, 0.0));
+        list.add(location.clone().add(3.0, 0.0, 1.0));
+        list.add(location.clone().add(3.0, 0.0, -1.0));
+        list.add(location.clone().add(-3.0, 1.0, 0.0));
+        list.add(location.clone().add(-3.0, 1.0, 1.0));
+        list.add(location.clone().add(-3.0, 1.0, -1.0));
+        list.add(location.clone().add(3.0, 1.0, 0.0));
+        list.add(location.clone().add(3.0, 1.0, 1.0));
+        list.add(location.clone().add(3.0, 1.0, -1.0));
+
+        list.add(location.clone().add(-2.0, 0.0, 2.0));
+        list.add(location.clone().add(-2.0, 0.0, -2.0));
+        list.add(location.clone().add(2.0, 0.0, 2.0));
+        list.add(location.clone().add(2.0, 0.0, -2.0));
+        list.add(location.clone().add(-2.0, 1.0, 2.0));
+        list.add(location.clone().add(-2.0, 1.0, -2.0));
+        list.add(location.clone().add(2.0, 1.0, 2.0));
+        list.add(location.clone().add(2.0, 1.0, -2.0));
+
+        list.add(location.clone().add(0.0, 0.0, -3.0));
+        list.add(location.clone().add(1.0, 0.0, -3.0));
+        list.add(location.clone().add(-1.0, 0.0, -3.0));
+        list.add(location.clone().add(0.0, 0.0, 3.0));
+        list.add(location.clone().add(1.0, 0.0, 3.0));
+        list.add(location.clone().add(-1.0, 0.0, 3.0));
+        list.add(location.clone().add(0.0, 1.0, -3.0));
+        list.add(location.clone().add(1.0, 1.0, -3.0));
+        list.add(location.clone().add(-1.0, 1.0, -3.0));
+        list.add(location.clone().add(0.0, 1.0, 3.0));
+        list.add(location.clone().add(1.0, 1.0, 3.0));
+        list.add(location.clone().add(-1.0, 1.0, 3.0));
+
+        list.add(location.clone().add(-3.0, 1.0, 0.0));
+        list.add(location.clone().add(0.0, 1.0, -3.0));
+        list.add(location.clone().add(3.0, 1.0, 0.0));
+        list.add(location.clone().add(0.0, 1.0, 3.0));
+
+        list.add(location.clone().add(-2.0, 2.0, 0.0));
+        list.add(location.clone().add(0.0, 2.0, -2.0));
+        list.add(location.clone().add(2.0, 2.0, 0.0));
+        list.add(location.clone().add(0.0, 2.0, 2.0));
+
+        list.add(location.clone().add(-1.0, 3.0, 0.0));
+        list.add(location.clone().add(-1.0, 3.0, 1.0));
+        list.add(location.clone().add(-1.0, 3.0, -1.0));
+        list.add(location.clone().add(0.0, 3.0, 0.0));
+        list.add(location.clone().add(0.0, 3.0, 1.0));
+        list.add(location.clone().add(0.0, 3.0, -1.0));
+        list.add(location.clone().add(1.0, 3.0, 0.0));
+        list.add(location.clone().add(1.0, 3.0, 1.0));
+        list.add(location.clone().add(1.0, 3.0, -1.0));
+        return list;
+    }
+
     public List<Location> getRoomLocations(Location location) {
         location.add(0.0, 9.0, 0.0);
 
@@ -843,6 +936,7 @@ public class KitListener implements Listener {
         return list;
     }
 
+    // TODO: Fix the rollback system, some blocks aren't being rolled back
     public void rollback(BlockState blockState) {
         if (blockState instanceof Sign) {
             Sign sign = (Sign) blockState;

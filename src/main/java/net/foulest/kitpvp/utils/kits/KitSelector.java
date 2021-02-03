@@ -87,6 +87,8 @@ public class KitSelector {
             if (playerData.ownsKit(kits) && (kitsOrderedByPrice.isEmpty()
                     || kits.getCost() > kitsOrderedByPrice.get(0).getCost())) {
                 kitsOrderedByPrice.add(0, kits);
+            } else if (kits.getCost() == 0) {
+                kitsOrderedByPrice.add(kits);
             }
         }
 
