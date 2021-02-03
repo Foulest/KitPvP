@@ -4,14 +4,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.kits.*;
-import net.foulest.kitpvp.listeners.*;
+import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.listeners.DeathListener;
+import net.foulest.kitpvp.listeners.EventListener;
+import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.command.CommandFramework;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
-import net.foulest.kitpvp.utils.lunar.LunarClientAPI;
-import net.foulest.kitpvp.utils.lunar.events.LCPacketReceivedEvent;
-import net.foulest.kitpvp.utils.lunar.nethandler.LCPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,11 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.UUID;
 
 public class KitPvP extends JavaPlugin {
 
@@ -79,22 +77,12 @@ public class KitPvP extends JavaPlugin {
         // Creates missing tables in the MySQL database.
         try (Connection connection = hikari.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerStats (uuid VARCHAR(36), coins int, " +
-                    "experience int, kills int, deaths int, killstreak int, topKillstreak int)");
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitId int)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerStats (uuid VARCHAR(36), coins INT, " +
+                    "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, soup BOOLEAN)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitId INT)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        // LUNAR
-        messenger.registerOutgoingPluginChannel(this, LunarClientAPI.getMessageChannel());
-
-        // LUNAR
-        messenger.registerIncomingPluginChannel(this, LunarClientAPI.getMessageChannel(), (channel, player, bytes) -> {
-            LCPacket packet = LCPacket.handle(bytes, player);
-            Bukkit.getPluginManager().callEvent(new LCPacketReceivedEvent(player, packet));
-            packet.process(LunarClientAPI.getInstance().netHandlerServer);
-        });
 
         // Loads the plugin's listeners.
         loadListeners(new DeathListener(), new EventListener(), new KitListener());

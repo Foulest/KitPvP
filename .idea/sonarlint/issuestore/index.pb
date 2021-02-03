@@ -73,8 +73,6 @@ g
 7src/main/java/net/foulest/kitpvp/utils/KitSelector.java,d\1\d1ebd2b9d9e6e06bd8e580d02bd5bade1cbbb903
 c
 3src/main/java/net/foulest/kitpvp/utils/KitShop.java,8\7\875c3f874ac224516c49bee6538778ba9c6d1c27
-c
-3src/main/java/net/foulest/kitpvp/utils/KitUser.java,f\3\f36e5443bc9ba8fdd45b1081a900932b45c15f66
 h
 8src/main/java/net/foulest/kitpvp/utils/Placeholders.java,e\e\eeff56242394e360c620b54ce1aecb2bf7b99c03
 a
@@ -117,10 +115,6 @@ c
 3src/main/java/net/foulest/kitpvp/cmds/StaffCmd.java,6\b\6bef7683b5e5365cd00021962cca43534937c54e
 e
 5src/main/java/net/foulest/kitpvp/utils/StaffMode.java,7\5\75348bcef2a7b10b23774c2358014ac07c409f42
-m
-=src/main/java/net/foulest/kitpvp/listeners/BrandListener.java,3\8\388cf466cc0c85d156468bfa109b9512aa0d77f7
-g
-7src/main/java/net/foulest/kitpvp/utils/KitUpgrades.java,9\b\9b62e67a34ccf43d5cfe4ec7b697d766f585b77c
 h
 8src/main/java/net/foulest/kitpvp/utils/SkullCreator.java,0\a\0a417f5f4eae3b31042ba025bee5149afa9e5da3
 :
@@ -133,3 +127,9 @@ h
 :
 
 KitPvP.iml,b\3\b33350a895fa2e8d94f4fe00a8971dc67bbcc9b8
+h
+8src/main/java/net/foulest/kitpvp/utils/KitEnchanter.java,3\2\329e53c6294ae0a3566bfbfb659222daac18de59
+c
+3src/main/java/net/foulest/kitpvp/utils/Regions.java,4\1\411fff6f7eb1b22ebb7c37d76fc741032a93d6a7
+f
+6src/main/java/net/foulest/kitpvp/utils/PlayerData.java,d\b\db816547da968012918b4b2a1984d3be243ba2ea

@@ -1,18 +1,14 @@
 package net.foulest.kitpvp.listeners;
 
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MiscUtils;
-import net.foulest.kitpvp.utils.lunar.LunarClientAPI;
-import net.foulest.kitpvp.utils.lunar.objects.LCCooldown;
-import org.bukkit.Material;
+import net.foulest.kitpvp.utils.PlayerData;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class CombatLog {
 
@@ -20,7 +16,7 @@ public class CombatLog {
     private final Map<Player, BukkitTask> combatScheduler = new HashMap<>();
     private final Map<Player, Integer> combatHandler = new HashMap<>();
     private final Map<Player, Player> lastAttacker = new HashMap<>();
-    private final LunarClientAPI lunarAPI = LunarClientAPI.getInstance();
+//    private final LunarClientAPI lunarClientAPI = LunarClientAPI.getInstance();
     private final KitPvP kitPvP = KitPvP.getInstance();
 
     public static CombatLog getInstance() {
@@ -31,13 +27,13 @@ public class CombatLog {
         PlayerData damagerData = PlayerData.getInstance(damager);
         PlayerData receiverData = PlayerData.getInstance(receiver);
 
-        // Displays Lunar Client combat tag cooldowns.
-        if (lunarAPI.isRunningLunarClient(damager)) {
-            lunarAPI.sendCooldown(damager, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
-        }
-        if (lunarAPI.isRunningLunarClient(receiver)) {
-            lunarAPI.sendCooldown(receiver, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
-        }
+//        // Displays Lunar Client combat tag cooldowns.
+//        if (lunarClientAPI.isRunningLunarClient(damager)) {
+//            lunarClientAPI.sendCooldown(damager, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
+//        }
+//        if (lunarClientAPI.isRunningLunarClient(receiver)) {
+//            lunarClientAPI.sendCooldown(receiver, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
+//        }
 
         // Handles combat tagging for the damager.
         if (!isInCombat(damager)) {
@@ -108,19 +104,18 @@ public class CombatLog {
     }
 
     public void remove(Player player) {
-        PlayerData playerData = PlayerData.getInstance(player);
-
-        // Clears Combat Tag data.
         combatHandler.remove(player);
+
         if (combatScheduler.containsKey(player)) {
             combatScheduler.get(player).cancel();
+            combatScheduler.remove(player);
         }
-        combatScheduler.remove(player);
+
         lastAttacker.remove(player);
 
-        // Clears Lunar Client combat tag cooldowns.
-        if (lunarAPI.isRunningLunarClient(player)) {
-            lunarAPI.clearCooldown(player, new LCCooldown("Combat Tag", 0L, TimeUnit.SECONDS, Material.IRON_SWORD));
-        }
+//        // Clears Lunar Client combat tag cooldowns.
+//        if (lunarClientAPI.isRunningLunarClient(player)) {
+//            lunarClientAPI.clearCooldown(player, new LCCooldown("Combat Tag", 0L, TimeUnit.SECONDS, Material.IRON_SWORD));
+//        }
     }
 }

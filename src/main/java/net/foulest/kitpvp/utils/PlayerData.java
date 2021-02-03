@@ -3,8 +3,6 @@ package net.foulest.kitpvp.utils;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
-import net.foulest.kitpvp.utils.lunar.LunarClientAPI;
-import net.foulest.kitpvp.utils.lunar.objects.LCCooldown;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -19,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class PlayerData {
@@ -29,7 +26,7 @@ public class PlayerData {
     private final Map<String, Long> cooldowns = new HashMap<>();
     private final KitPvP kitPvP = KitPvP.getInstance();
     private final MySQL mySQL = MySQL.getInstance();
-    private final LunarClientAPI lunarAPI = LunarClientAPI.getInstance();
+    //    private final LunarClientAPI lunarClientAPI = LunarClientAPI.getInstance();
     private final KitManager kitManager = KitManager.getInstance();
     private final List<Kit> ownedKits = new ArrayList<>();
     private BukkitTask abilityCooldownNotifier;
@@ -46,7 +43,6 @@ public class PlayerData {
     private boolean inStaffMode;
     private boolean isLoaded;
     private boolean pendingNoFallRemoval;
-    private String clientBrand;
 
     private PlayerData(Player player) {
         this.player = player;
@@ -142,10 +138,10 @@ public class PlayerData {
     public void clearCooldowns() {
         cooldowns.clear();
 
-        if (hasKit() && lunarAPI.isRunningLunarClient(player)) {
-            lunarAPI.clearCooldown(player, new LCCooldown("Ability", 0L, TimeUnit.SECONDS,
-                    getKit().getDisplayItem().getType()));
-        }
+//        if (hasKit() && lunarClientAPI.isRunningLunarClient(player)) {
+//            lunarClientAPI.clearCooldown(player, new LCCooldown("Ability", 0L, TimeUnit.SECONDS,
+//                    getKit().getDisplayItem().getType()));
+//        }
 
         if (abilityCooldownNotifier != null) {
             abilityCooldownNotifier.cancel();
@@ -156,9 +152,9 @@ public class PlayerData {
     public void setCooldown(String kitName, Material icon, int cooldownTime, boolean notify) {
         cooldowns.put(kitName, System.currentTimeMillis() + cooldownTime * 1000L);
 
-        if (hasKit() && lunarAPI.isRunningLunarClient(player)) {
-            lunarAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
-        }
+//        if (hasKit() && lunarClientAPI.isRunningLunarClient(player)) {
+//            lunarClientAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
+//        }
 
         if (notify) {
             abilityCooldownNotifier = new BukkitRunnable() {

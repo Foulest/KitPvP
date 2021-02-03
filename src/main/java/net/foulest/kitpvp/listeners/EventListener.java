@@ -35,6 +35,9 @@ import java.util.Random;
 
 public class EventListener implements Listener {
 
+    // TODO: Cancel footstep sounds in lobby with packets @retrooper
+    // TODO: Add vanish item to Staff Mode hotbar @Foulest
+
     private static final EventListener instance = new EventListener();
     private final Random random = new Random();
     private final Spawn spawn = Spawn.getInstance();
@@ -69,7 +72,7 @@ public class EventListener implements Listener {
             staffMode.toggleStaffMode(player, false, true);
         }
 
-        // TODO: FIX, NOT HIDING ALREADY VANISHED STAFF ON JOIN
+        // TODO: Broken, doesn't hide already vanished staff @retrooper
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasMetadata("vanished") && !player.hasPermission("kitpvp.staff")) {
                 player.hidePlayer(p);
@@ -143,7 +146,6 @@ public class EventListener implements Listener {
     public void onBowShoot(EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            PlayerData playerData = PlayerData.getInstance(player);
 
             if (Regions.getInstance().isInSafezone(player)) {
                 event.setCancelled(true);
@@ -492,10 +494,17 @@ public class EventListener implements Listener {
                             }
                         }
 
-                        if (potentialPlayers.size() > 1) {
-                            Player randomPlayer = potentialPlayers.get(random.nextInt(potentialPlayers.size() - 1) + 1);
+                        if (!potentialPlayers.isEmpty()) {
+                            Player randomPlayer;
+
+                            if (potentialPlayers.size() == 1) {
+                                randomPlayer = potentialPlayers.get(0);
+                            } else {
+                                randomPlayer = potentialPlayers.get(random.nextInt(potentialPlayers.size() - 1) + 1);
+                            }
+
                             player.teleport(randomPlayer);
-                            MiscUtils.messagePlayer(player, "&aTeleporting to " + randomPlayer.getName() + "...");
+                            MiscUtils.messagePlayer(player, "&eTeleporting to &a" + randomPlayer.getName() + "&e...");
                         } else {
                             MiscUtils.messagePlayer(player, "&cNot enough players online to use this feature.");
                         }

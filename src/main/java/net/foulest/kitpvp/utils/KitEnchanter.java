@@ -7,13 +7,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class KitUpgrades {
+public class KitEnchanter {
 
-    public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Upgrades");
+    public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Enchanter");
     private final Inventory inv;
     private final KitManager kitManager = KitManager.getInstance();
 
-    public KitUpgrades(Player player) {
+    public KitEnchanter(Player player) {
         inv = Bukkit.createInventory(player, 36, INVENTORY_NAME);
 
         populateInventory(player);
@@ -35,20 +35,11 @@ public class KitUpgrades {
         }
 
         // TODO: Add the kit upgrade items (enchants, potions, etc.)
+
+
     }
 
     public Inventory getInventory() {
         return inv;
     }
-
-//    private ItemStack createKitItem(Kit kit) {
-//        List<String> lore = new ArrayList<>();
-//        lore.add("&7Attack: &f" + kit.getAttack());
-//        lore.add("&7Defense: &f" + kit.getDefense());
-//        lore.add("");
-//        lore.add("&f" + kit.getDescription());
-//        lore.add("");
-//        lore.add("&aClick to equip this kit.");
-//        return new ItemBuilder(kit.getDisplayItem()).name("&a" + kit.getName()).lore(lore).build();
-//    }
 }
