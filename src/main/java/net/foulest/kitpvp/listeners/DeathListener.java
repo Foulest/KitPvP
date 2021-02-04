@@ -88,20 +88,10 @@ public class DeathListener implements Listener {
                 // Sends all online players a killstreak message in chat.
                 MiscUtils.broadcastMessage("&a" + damager.getName() + " &eis on a &a" + damagerData.getKillstreak() + " &ekillstreak!");
 
-                // Refills the damager's inventory with their healing item.
-                for (int i = 0; i < 36; ++i) {
-                    if (damagerData.isUsingSoup()) {
-                        damager.getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").build());
-                    } else {
-                        damager.getInventory().addItem(new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing").build());
-                    }
-                }
-
                 // Re-adds the damager's kit items.
-                List<ItemStack> kitItems = damagerData.getKit().getItems();
-                for (int i = 0; i < kitItems.size(); ++i) {
-                    damager.getInventory().setItem(i, kitItems.get(i));
-                }
+                damager.getInventory().clear();
+                damagerData.getKit().apply(damager);
+                damager.updateInventory();
             }
 
             // Gives the damager coins and experience.
@@ -115,8 +105,8 @@ public class DeathListener implements Listener {
             damagerData.saveStats();
 
             // Prints kill messages to both the damager and receiver.
-            MiscUtils.messagePlayer(receiver.getPlayer(), "&cYou were killed by &e" + damager.getName()
-                    + " &con &e" + damager.getHealth() + " health.");
+            MiscUtils.messagePlayer(receiver.getPlayer(), "&eYou were killed by &c" + damager.getName()
+                    + " &eon &6" + String.format("%.01f", damager.getHealth()) + "❤&e.");
             MiscUtils.messagePlayer(damager, "&eYou killed &a" + receiver.getPlayer().getName()
                     + "&e for &a" + coinsGiven + " coins &eand &a" + experienceGiven + " exp&e.");
         } else {

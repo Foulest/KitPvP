@@ -67,7 +67,19 @@ public class EventListener implements Listener {
         try {
             playerData.load();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            // ignored
+        }
+
+        if (!playerData.isLoaded()) {
+            try {
+                playerData.load();
+            } catch (SQLException ex) {
+                // ignored
+            }
+
+            if (!playerData.isLoaded()) {
+                player.kickPlayer("Disconnected");
+            }
         }
 
         if (playerData.isInStaffMode()) {
@@ -172,8 +184,8 @@ public class EventListener implements Listener {
 
                 combatLog.markForCombat(damager, receiver);
 
-                MiscUtils.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &c"
-                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + " &ehealth.");
+                MiscUtils.messagePlayer(damager, "&e" + receiver.getName() + " &cis on &e"
+                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + " &chealth.");
 
                 new BukkitRunnable() {
                     public void run() {
@@ -439,6 +451,7 @@ public class EventListener implements Listener {
 
                     if (Regions.getInstance().isInSafezone(player)) {
                         event.setCancelled(true);
+                        player.updateInventory();
                     }
                     break;
 

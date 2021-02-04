@@ -32,7 +32,7 @@ public class Spiderman implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.WEB).name("&aWeb Slinger &7(Right Click)")
                 .lore("&7Traps players in cobwebs.").build();
         return Arrays.asList(sword, special);
@@ -53,7 +53,7 @@ public class Spiderman implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Traps players in cobwebs."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Traps players in cobwebs."));
     }
 
     @Override

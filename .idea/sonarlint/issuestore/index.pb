@@ -69,10 +69,6 @@ i
 9src/main/java/net/foulest/kitpvp/utils/ConfigManager.java,8\8\887719ed22170e8b119712b21aa9bee35432654d
 g
 7src/main/java/net/foulest/kitpvp/utils/ItemBuilder.java,c\d\cdcaf49ae28939064580e85c525485628471437c
-g
-7src/main/java/net/foulest/kitpvp/utils/KitSelector.java,d\1\d1ebd2b9d9e6e06bd8e580d02bd5bade1cbbb903
-c
-3src/main/java/net/foulest/kitpvp/utils/KitShop.java,8\7\875c3f874ac224516c49bee6538778ba9c6d1c27
 h
 8src/main/java/net/foulest/kitpvp/utils/Placeholders.java,e\e\eeff56242394e360c620b54ce1aecb2bf7b99c03
 a
@@ -127,9 +123,21 @@ h
 :
 
 KitPvP.iml,b\3\b33350a895fa2e8d94f4fe00a8971dc67bbcc9b8
-h
-8src/main/java/net/foulest/kitpvp/utils/KitEnchanter.java,3\2\329e53c6294ae0a3566bfbfb659222daac18de59
 c
 3src/main/java/net/foulest/kitpvp/utils/Regions.java,4\1\411fff6f7eb1b22ebb7c37d76fc741032a93d6a7
 f
 6src/main/java/net/foulest/kitpvp/utils/PlayerData.java,d\b\db816547da968012918b4b2a1984d3be243ba2ea
+m
+=src/main/java/net/foulest/kitpvp/utils/kits/KitEnchanter.java,f\3\f3f5f717d0c3b70f4e682d70d40329fb0f5fd863
+a
+1src/main/java/net/foulest/kitpvp/kits/Eskimo.java,b\9\b9fde2c05e939db7a691e0d37ace9b8e2c82834e
+l
+<src/main/java/net/foulest/kitpvp/utils/kits/KitSelector.java,7\1\71691c1a7d54e68d9a038728ab94dc25425f0858
+h
+8src/main/java/net/foulest/kitpvp/utils/kits/KitShop.java,8\6\86f448e1938fc01fdc7c032d117e24c5a7665788
+j
+:src/main/java/net/foulest/kitpvp/cmds/KitEnchanterCmd.java,b\0\b0b67b3b7ed6e9dfe64069228a35f7ecd23d600a
+b
+2src/main/java/net/foulest/kitpvp/cmds/SoupCmd.java,3\7\37edcdba81b9282defeb96b46da79861b6301c26
+e
+5src/main/java/net/foulest/kitpvp/cmds/PotionsCmd.java,0\a\0a5150a2116f066b1819719c15389c0886e66d38

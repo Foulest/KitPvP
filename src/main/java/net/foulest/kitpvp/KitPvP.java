@@ -198,6 +198,4 @@ public class KitPvP extends JavaPlugin {
             KitManager.getInstance().registerKit(kit);
         }
     }
-
-
 }

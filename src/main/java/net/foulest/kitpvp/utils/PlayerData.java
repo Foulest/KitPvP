@@ -157,6 +157,7 @@ public class PlayerData {
 //            lunarClientAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
 //        }
 
+        // TODO: Fix, this doesn't notify
         if (notify) {
             abilityCooldownNotifier = new BukkitRunnable() {
                 public void run() {
@@ -206,7 +207,7 @@ public class PlayerData {
                 }
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                // ignored
             }
         }
 

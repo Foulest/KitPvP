@@ -28,15 +28,13 @@ public class Pyro implements Kit {
 
     @Override
     public PotionEffect[] getPotionEffects() {
-        return new PotionEffect[]{
-                new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false)
-        };
+        return new PotionEffect[0];
     }
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack weapon = new ItemBuilder(Material.STONE_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).build();
-        ItemStack bow = new ItemBuilder(Material.BOW).enchant(Enchantment.ARROW_DAMAGE, 1).enchant(Enchantment.ARROW_FIRE, 1).unbreakable(true).build();
+        ItemStack weapon = new ItemBuilder(Material.WOOD_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).build();
+        ItemStack bow = new ItemBuilder(Material.BOW).enchant(Enchantment.ARROW_FIRE, 1).unbreakable(true).build();
         ItemStack arrow = new ItemBuilder(Material.ARROW).amount(16).build();
         return Arrays.asList(weapon, bow, arrow);
     }
