@@ -8,3 +8,5 @@ Join the Discord: https://discord.kitpvp.io
 - PlaceholderAPI (placeholders)
 - WorldEdit (regions)
 - WorldGuard (regions)
+- LunarClientAPI (you can remove it)
+- FStaff (private, you can remove it)
