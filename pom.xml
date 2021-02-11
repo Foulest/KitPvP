@@ -6,7 +6,7 @@
 
     <groupId>net.foulest</groupId>
     <artifactId>KitPvP</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +30,10 @@
         <repository>
             <id>sk89q-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
+        </repository>
+        <repository>
+            <id>lunar</id>
+            <url>https://maven.moonsworth.com/repository/lunarclient-public/</url>
         </repository>
     </repositories>
 
@@ -74,6 +78,19 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lunarclient</groupId>
+            <artifactId>bukkitapi</artifactId>
+            <version>1.0-20200729.212152-7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.foulest.fstaff</groupId>
+            <artifactId>FStaff</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/FStaff-1.0.0.jar</systemPath>
         </dependency>
     </dependencies>
 

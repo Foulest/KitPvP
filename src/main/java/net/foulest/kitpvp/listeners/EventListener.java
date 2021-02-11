@@ -31,23 +31,15 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class EventListener implements Listener {
 
-    // TODO: Cancel footstep sounds in lobby with packets @retrooper
-    // TODO: Add vanish item to Staff Mode hotbar @Foulest
-
     private static final EventListener instance = new EventListener();
-    private final Random random = new Random();
     private final Spawn spawn = Spawn.getInstance();
     private final KitPvP kitPvP = KitPvP.getInstance();
     private final MySQL mySQL = MySQL.getInstance();
     private final KitManager kitManager = KitManager.getInstance();
     private final CombatLog combatLog = CombatLog.getInstance();
-    private final StaffMode staffMode = StaffMode.getInstance();
 
     public static EventListener getInstance() {
         return instance;
@@ -68,29 +60,6 @@ public class EventListener implements Listener {
             playerData.load();
         } catch (SQLException ex) {
             // ignored
-        }
-
-        if (!playerData.isLoaded()) {
-            try {
-                playerData.load();
-            } catch (SQLException ex) {
-                // ignored
-            }
-
-            if (!playerData.isLoaded()) {
-                player.kickPlayer("Disconnected");
-            }
-        }
-
-        if (playerData.isInStaffMode()) {
-            staffMode.toggleStaffMode(player, false, true);
-        }
-
-        // TODO: Broken, doesn't hide already vanished staff @retrooper
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.hasMetadata("vanished") && !player.hasPermission("kitpvp.staff")) {
-                player.hidePlayer(p);
-            }
         }
 
         for (Kit kit : kitManager.getKits()) {
@@ -150,8 +119,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (event.getBlock().getType() == Material.LADDER && !(player != null
-                && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+                && player.getGameMode() == GameMode.CREATIVE && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -184,8 +152,8 @@ public class EventListener implements Listener {
 
                 combatLog.markForCombat(damager, receiver);
 
-                MiscUtils.messagePlayer(damager, "&e" + receiver.getName() + " &cis on &e"
-                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + " &chealth.");
+                MiscUtils.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &6"
+                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + " ❤&e.");
 
                 new BukkitRunnable() {
                     public void run() {
@@ -286,13 +254,6 @@ public class EventListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        // Prevents players in staff mode from moving inventory items.
-        if (playerData.isInStaffMode()) {
-            event.setCancelled(true);
-            player.updateInventory();
-            return;
-        }
-
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
                 && (!playerData.hasKit() || !(event.getClickedInventory().getName() == null
@@ -340,7 +301,7 @@ public class EventListener implements Listener {
 
                 PlayerData.getInstance(player).addOwnedKit(kit);
                 PlayerData.getInstance(player).removeCoins(kit.getCost());
-                mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getName() + " )");
+                mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kit.getName() + "')");
                 MiscUtils.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
                 player.closeInventory();
@@ -522,53 +483,6 @@ public class EventListener implements Listener {
                     }
                     break;
 
-                case EYE_OF_ENDER:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Staff Mode")) {
-                        event.setCancelled(true);
-                        player.updateInventory();
-                        staffMode.toggleStaffMode(player, true, false);
-                    }
-                    break;
-
-                case COMPASS:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Random Teleport")) {
-                        event.setCancelled(true);
-                        player.updateInventory();
-                        List<Player> potentialPlayers = new ArrayList<>();
-
-                        if (Bukkit.getOnlinePlayers().size() > 1) {
-                            for (Player p : Bukkit.getOnlinePlayers()) {
-                                if (!PlayerData.getInstance(p).isInStaffMode()) {
-                                    potentialPlayers.add(p);
-                                }
-                            }
-                        }
-
-                        if (!potentialPlayers.isEmpty()) {
-                            Player randomPlayer;
-
-                            if (potentialPlayers.size() == 1) {
-                                randomPlayer = potentialPlayers.get(0);
-                            } else {
-                                randomPlayer = potentialPlayers.get(random.nextInt(potentialPlayers.size() - 1) + 1);
-                            }
-
-                            player.teleport(randomPlayer);
-                            MiscUtils.messagePlayer(player, "&eTeleporting to &a" + randomPlayer.getName() + "&e...");
-                        } else {
-                            MiscUtils.messagePlayer(player, "&cNot enough players online to use this feature.");
-                        }
-                    }
-                    break;
-
-                case BED:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Staff Mode")) {
-                        event.setCancelled(true);
-                        player.updateInventory();
-                        staffMode.toggleStaffMode(player, false, false);
-                    }
-                    break;
-
                 case ENDER_CHEST:
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Kit Shop")) {
                         event.setCancelled(true);
@@ -585,11 +499,6 @@ public class EventListener implements Listener {
                     }
                     break;
             }
-        }
-
-        if (playerData.isInStaffMode()) {
-            event.setCancelled(true);
-            player.updateInventory();
         }
     }
 
@@ -630,14 +539,15 @@ public class EventListener implements Listener {
         }
 
         // Kills the player if they leave the map/fall into the void.
-        if (player.getLocation().getY() < 0 && player.getGameMode() != GameMode.CREATIVE) {
+        if (player.getLocation().getY() < 0 && player.getGameMode() != GameMode.CREATIVE
+                && !player.hasMetadata("staffMode")) {
             DeathListener.handleDeath(player, false);
             return;
         }
 
         // Equips the player's previously used kit when they leave spawn without a kit equipped.
         if (!playerData.hasKit() && player.getGameMode() != GameMode.CREATIVE && !player.isDead()
-                && !Regions.getInstance().isInSafezone(player)) {
+                && !Regions.getInstance().isInSafezone(player) && !player.hasMetadata("staffMode")) {
             playerData.getPreviousKit().apply(player);
             MiscUtils.messagePlayer(player, "&cYour spawn protection has been removed.");
             return;
@@ -735,8 +645,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL
-                && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+                && player.getGameMode() == GameMode.CREATIVE && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }

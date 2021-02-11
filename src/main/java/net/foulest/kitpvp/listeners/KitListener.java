@@ -197,13 +197,6 @@ public class KitListener implements Listener {
     @EventHandler
     public void onGhostMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        double deltaY = event.getTo().getY() - event.getFrom().getY();
-        double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
-        boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
-
-        if (!playerMoved) {
-            return;
-        }
 
         if (kitManager.hasRequiredKit(player, "Ghost") && !player.isSneaking()
                 && !Regions.getInstance().isInSafezone(player)) {
@@ -250,20 +243,19 @@ public class KitListener implements Listener {
     public void onHulkAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-        List<Entity> targetList = new ArrayList<>();
+        List<Player> playerList = new ArrayList<>();
 
         if (kitManager.hasRequiredKit(player, "Hulk") && event.getAction().toString().contains("RIGHT")
                 && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
                 && !playerData.hasCooldown(player, "Hulk") && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
-                if (entity instanceof IronGolem || entity instanceof Wolf || entity instanceof ThrownPotion
-                        || (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity))) {
-                    targetList.add(entity);
+                if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
+                    playerList.add((Player) entity);
                 }
             }
 
-            if (targetList.isEmpty()) {
+            if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
                 MiscUtils.messagePlayer(player, "&cAbility failed; no targets found nearby.");
                 playerData.setCooldown("Hulk", playerData.getKit().getDisplayItem().getType(), 5, true);
@@ -272,57 +264,19 @@ public class KitListener implements Listener {
 
             player.getWorld().createExplosion(player.getLocation(), 0.0f, false);
 
-            for (Entity entityInList : targetList) {
-                if (entityInList instanceof Player) {
-                    Player playerInList = (Player) entityInList;
-                    PlayerData playerInListData = PlayerData.getInstance(playerInList);
+            for (Player playerInList : playerList) {
+                PlayerData playerInListData = PlayerData.getInstance(playerInList);
 
-                    if (playerInListData.hasKit() && !Regions.getInstance().isInSafezone(playerInList)) {
-                        playerInList.getWorld().createExplosion(playerInList.getLocation(), 0.0f, false);
-                        playerInList.damage(10, player);
+                if (playerInListData.hasKit() && !Regions.getInstance().isInSafezone(playerInList)) {
+                    playerInList.damage(10, player);
 
-                        Vector direction = playerInList.getEyeLocation().getDirection();
-                        direction.multiply(-4);
-                        direction.setY(1.0);
-                        playerInList.setVelocity(direction);
-                        return;
-                    }
-                }
+                    playerInList.getWorld().createExplosion(playerInList.getLocation(), 0.0f, false);
 
-                if (entityInList instanceof IronGolem) {
-                    IronGolem golemInList = (IronGolem) entityInList;
-
-                    golemInList.getWorld().createExplosion(golemInList.getLocation(), 0.0f, false);
-                    golemInList.damage(10, player);
-
-                    Vector direction = golemInList.getEyeLocation().getDirection();
+                    Vector direction = playerInList.getEyeLocation().getDirection();
                     direction.multiply(-4);
                     direction.setY(1.0);
-                    golemInList.setVelocity(direction);
+                    playerInList.setVelocity(direction);
                     return;
-                }
-
-                if (entityInList instanceof Wolf) {
-                    Wolf wolfInList = (Wolf) entityInList;
-
-                    wolfInList.getWorld().createExplosion(wolfInList.getLocation(), 0.0f, false);
-                    wolfInList.damage(10, player);
-
-                    Vector direction = wolfInList.getEyeLocation().getDirection();
-                    direction.multiply(-4);
-                    direction.setY(1.0);
-                    wolfInList.setVelocity(direction);
-                }
-
-                if (entityInList instanceof ThrownPotion) {
-                    ThrownPotion potionInList = (ThrownPotion) entityInList;
-
-                    potionInList.getWorld().createExplosion(potionInList.getLocation(), 0.0f, false);
-
-                    Vector direction = potionInList.getVelocity();
-                    direction.multiply(-4);
-                    direction.setY(1.0);
-                    potionInList.setVelocity(direction);
                 }
             }
 
@@ -521,7 +475,7 @@ public class KitListener implements Listener {
                 PlayerData receiverData = PlayerData.getInstance(receiver);
 
                 if (kitManager.hasRequiredKit(damager, "Spiderman")) {
-                    if (!receiverData.hasKit() || !Regions.getInstance().isInSafezone(receiver)) {
+                    if (!receiverData.hasKit() || Regions.getInstance().isInSafezone(receiver)) {
                         damager.playSound(damager.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
                         MiscUtils.messagePlayer(damager, "&cYou can't use your ability on players in spawn.");
                         damagerData.setCooldown("Spiderman", damagerData.getKit().getDisplayItem().getType(), 15, true);

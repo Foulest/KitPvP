@@ -86,7 +86,6 @@ public class KitShop {
         } catch (IllegalArgumentException ignored) {
         }
 
-        // TODO: SORT ALPHABETICALLY
         for (Kit kits : checkedKits) {
             if (!playerData.ownsKit(kits)) {
                 inv.addItem(createKitItem(kits));

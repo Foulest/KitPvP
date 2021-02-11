@@ -8,10 +8,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
@@ -32,7 +34,7 @@ public class DeathListener implements Listener {
         Vector vec = new Vector();
 
         // Cancels deaths while in staff mode.
-        if (receiverData.isInStaffMode()) {
+        if (receiver.hasMetadata("staffMode")) {
             return;
         }
 
@@ -140,7 +142,11 @@ public class DeathListener implements Listener {
             }
 
             // Removes knockback before teleporting the player to spawn.
-            receiver.setVelocity(vec);
+            new BukkitRunnable() {
+                public void run() {
+                    receiver.setVelocity(vec);
+                }
+            }.runTaskLater(kitPvP, 1L);
 
             // Teleports the player to spawn.
             spawn.teleport(receiver);

@@ -4,10 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.kits.*;
-import net.foulest.kitpvp.listeners.CombatLog;
-import net.foulest.kitpvp.listeners.DeathListener;
-import net.foulest.kitpvp.listeners.EventListener;
-import net.foulest.kitpvp.listeners.KitListener;
+import net.foulest.kitpvp.listeners.*;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.command.CommandFramework;
 import net.foulest.kitpvp.utils.kits.Kit;
@@ -85,12 +82,12 @@ public class KitPvP extends JavaPlugin {
         }
 
         // Loads the plugin's listeners.
-        loadListeners(new DeathListener(), new EventListener(), new KitListener());
+        loadListeners(new DeathListener(), new EventListener(), new KitListener(), new StaffModeListener());
 
         // Loads the plugin's commands.
         loadCommands(new BalanceCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(), new EcoSetCmd(),
                 new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(), new KitShopCmd(),
-                new StaffCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
+                new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
                 new PotionsCmd());
 
         // Loads the plugin's kits.
@@ -101,6 +98,13 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the spawn.
         Spawn.getInstance().load();
+
+        // Loads online players' user data.
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerData.getInstance(player).load();
+            Spawn.getInstance().teleport(player);
+            player.getInventory().setHeldItemSlot(0);
+        }
     }
 
     @Override
@@ -158,7 +162,7 @@ public class KitPvP extends JavaPlugin {
                 }
                 player.getInventory().setItem(6, healingItem);
 
-                if (player.hasPermission("kitpvp.staff")) {
+                if (player.hasPermission("fstaff.staff")) {
                     ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
                     player.getInventory().setItem(8, staffMode);
                 }

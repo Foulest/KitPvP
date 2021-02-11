@@ -107,10 +107,6 @@ c
 3src/main/java/net/foulest/kitpvp/cmds/StatsCmd.java,9\c\9ca3d9d58de522a7362f3125f7ca2c95ec8303f6
 a
 1src/main/java/net/foulest/kitpvp/utils/MySQL.java,f\8\f8f57524da35f617c8011ba241efd04ec34cfb69
-c
-3src/main/java/net/foulest/kitpvp/cmds/StaffCmd.java,6\b\6bef7683b5e5365cd00021962cca43534937c54e
-e
-5src/main/java/net/foulest/kitpvp/utils/StaffMode.java,7\5\75348bcef2a7b10b23774c2358014ac07c409f42
 h
 8src/main/java/net/foulest/kitpvp/utils/SkullCreator.java,0\a\0a417f5f4eae3b31042ba025bee5149afa9e5da3
 :
@@ -141,3 +137,5 @@ b
 2src/main/java/net/foulest/kitpvp/cmds/SoupCmd.java,3\7\37edcdba81b9282defeb96b46da79861b6301c26
 e
 5src/main/java/net/foulest/kitpvp/cmds/PotionsCmd.java,0\a\0a5150a2116f066b1819719c15389c0886e66d38
+q
+Asrc/main/java/net/foulest/kitpvp/listeners/StaffModeListener.java,d\1\d1f7d2981c5f184c45b7b67600960d28279168f0
