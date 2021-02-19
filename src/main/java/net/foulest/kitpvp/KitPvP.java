@@ -21,6 +21,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class KitPvP extends JavaPlugin {
 
     private static KitPvP instance;
@@ -77,6 +82,7 @@ public class KitPvP extends JavaPlugin {
                     "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, usingSoup BOOLEAN, " +
                     "previousKit VARCHAR(36))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitName VARCHAR(36))");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Bounties (uuid VARCHAR(36), bounty INT, benefactor VARCHAR(36))");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -85,16 +91,16 @@ public class KitPvP extends JavaPlugin {
         loadListeners(new DeathListener(), new EventListener(), new KitListener(), new StaffModeListener());
 
         // Loads the plugin's commands.
-        loadCommands(new BalanceCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(), new EcoSetCmd(),
-                new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(), new KitShopCmd(),
-                new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
+        loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(),
+                new EcoSetCmd(), new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
+                new KitShopCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
                 new PotionsCmd());
 
         // Loads the plugin's kits.
-        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), /*new Eskimo(), */new Fisherman(), new Ghost(),
-                new Tamer(), new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(),
-                new Ninja(), new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(),
-                new Vampire(), new Zen());
+        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
+                new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(), new Ninja(),
+                new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(), new Vampire(),
+                new Zen());
 
         // Loads the spawn.
         Spawn.getInstance().load();
@@ -136,8 +142,10 @@ public class KitPvP extends JavaPlugin {
 
     public void giveDefaultItems(Player player) {
         PlayerData playerData = PlayerData.getInstance(player);
+        String staffPerm = "fstaff.staff";
 
         new BukkitRunnable() {
+            @Override
             public void run() {
                 player.getInventory().clear();
                 player.getInventory().setArmorContents(null);
@@ -162,7 +170,10 @@ public class KitPvP extends JavaPlugin {
                 }
                 player.getInventory().setItem(6, healingItem);
 
-                if (player.hasPermission("fstaff.staff")) {
+                ItemStack bounties = new ItemBuilder(Material.GOLD_INGOT).name("&aBounties &7(Right Click)").build();
+                player.getInventory().setItem(7, bounties);
+
+                if (player.hasPermission(staffPerm)) {
                     ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
                     player.getInventory().setItem(8, staffMode);
                 }

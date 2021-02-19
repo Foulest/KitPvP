@@ -1,7 +1,6 @@
 package net.foulest.kitpvp.utils.command;
 
-import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.MessageUtil;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -20,8 +19,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Command Framework - CommandFramework <br>
- * The main command framework class used for controlling the framework.
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
  */
 @SuppressWarnings("SameReturnValue")
 public class CommandFramework implements CommandExecutor {
@@ -79,13 +79,13 @@ public class CommandFramework implements CommandExecutor {
                 Object methodObject = commandMap.get(cmdLabel).getValue();
                 Command command = method.getAnnotation(Command.class);
 
-                if (!command.permission().equals("") && !sender.hasPermission(command.permission())) {
-                    MiscUtils.messagePlayer(sender, "&cNo permission.");
+                if (!("").equals(command.permission()) && !sender.hasPermission(command.permission())) {
+                    MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return true;
                 }
 
                 if (command.inGameOnly() && !(sender instanceof Player)) {
-                    MiscUtils.messagePlayer(sender, "&cOnly players may execute this command.");
+                    MessageUtil.messagePlayer(sender, "&cOnly players may execute this command.");
                     return true;
                 }
 
@@ -117,7 +117,7 @@ public class CommandFramework implements CommandExecutor {
                 Command command = method.getAnnotation(Command.class);
 
                 if (method.getParameterTypes().length > 1 || method.getParameterTypes()[0] != CommandArgs.class) {
-                    MiscUtils.LOG.severe("Unable to register command " + method.getName() + ". Unexpected method arguments");
+                    MessageUtil.log("&c[KitPvP] Unable to register command " + method.getName() + ". Unexpected method arguments");
                     continue;
                 }
 
@@ -130,12 +130,12 @@ public class CommandFramework implements CommandExecutor {
                 Completer comp = method.getAnnotation(Completer.class);
 
                 if (method.getParameterTypes().length != 1 || method.getParameterTypes()[0] != CommandArgs.class) {
-                    MiscUtils.LOG.severe("Unable to register tab completer " + method.getName() + ". Unexpected method arguments");
+                    MessageUtil.log("&c[KitPvP] Unable to register tab completer " + method.getName() + ". Unexpected method arguments");
                     continue;
                 }
 
                 if (method.getReturnType() != List.class) {
-                    MiscUtils.LOG.severe("Unable to register tab completer " + method.getName() + ". Unexpected return type");
+                    MessageUtil.log("&c[KitPvP] Unable to register tab completer " + method.getName() + ". Unexpected return type");
                     continue;
                 }
 
@@ -150,7 +150,7 @@ public class CommandFramework implements CommandExecutor {
 
     public void registerCommand(Command command, String label, Method m, Object obj) {
         commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
-        commandMap.put(this.plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
+        commandMap.put(plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
 
         String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
 
@@ -159,11 +159,11 @@ public class CommandFramework implements CommandExecutor {
             map.register(plugin.getName(), cmd);
         }
 
-        if (!command.description().equalsIgnoreCase("") && cmdLabel.equals(label)) {
+        if (!("").equalsIgnoreCase(command.description()) && cmdLabel.equalsIgnoreCase(label)) {
             map.getCommand(cmdLabel).setDescription(command.description());
         }
 
-        if (!command.usage().equalsIgnoreCase("") && cmdLabel.equals(label)) {
+        if (!("").equalsIgnoreCase(command.usage()) && cmdLabel.equalsIgnoreCase(label)) {
             map.getCommand(cmdLabel).setUsage(command.usage());
         }
     }
@@ -201,7 +201,7 @@ public class CommandFramework implements CommandExecutor {
                     completer.addCompleter(label, m, obj);
 
                 } else {
-                    MiscUtils.LOG.severe("Unable to register tab completer " + m.getName()
+                    MessageUtil.log("&c[KitPvP] Unable to register tab completer " + m.getName()
                             + ". A tab completer is already registered for that command!");
                 }
 

@@ -6,13 +6,18 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class KitManager {
 
-    private static final KitManager instance = new KitManager();
+    private static final KitManager INSTANCE = new KitManager();
     private final List<Kit> kits = new ArrayList<>();
 
     public static KitManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public void registerKit(Kit kit) {

@@ -1,14 +1,19 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
-import net.foulest.kitpvp.utils.kits.KitSelector;
+import net.foulest.kitpvp.utils.menus.KitSelector;
 import org.bukkit.entity.Player;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class KitsCmd {
 
     private final KitManager kitManager = KitManager.getInstance();
@@ -19,12 +24,12 @@ public class KitsCmd {
         Player player = args.getPlayer();
 
         if (!Regions.getInstance().isInSafezone(player)) {
-            MiscUtils.messagePlayer(player, "&cYou must be in spawn to use this command.");
+            MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
             return;
         }
 
         if (args.length() > 1) {
-            MiscUtils.messagePlayer(player, "&cUsage: /kit [name]");
+            MessageUtil.messagePlayer(player, "&cUsage: /kit [name]");
             return;
         }
 
@@ -36,7 +41,7 @@ public class KitsCmd {
         Kit kit = kitManager.valueOf(args.getArgs(0));
 
         if (kit == null) {
-            MiscUtils.messagePlayer(player, "&cCould not find the kit you wanted; opening the Kit Selector.");
+            MessageUtil.messagePlayer(player, "&cCould not find the kit you wanted; opening the Kit Selector.");
             new KitSelector(player);
             return;
         }

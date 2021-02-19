@@ -11,6 +11,11 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class Ninja implements Kit {
 
     @Override

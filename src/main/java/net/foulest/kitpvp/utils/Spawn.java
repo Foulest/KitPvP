@@ -9,15 +9,20 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.logging.Logger;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class Spawn {
 
-    private static final Spawn instance = new Spawn();
+    private static final Spawn INSTANCE = new Spawn();
     private final Logger log = Logger.getLogger("Minecraft");
     private final KitPvP kitPvP = KitPvP.getInstance();
     private Location location;
 
     public static Spawn getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public Location getLocation() {
@@ -38,7 +43,7 @@ public class Spawn {
         PlayerData playerData = PlayerData.getInstance(player);
 
         if (location == null) {
-            MiscUtils.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");
+            MessageUtil.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");
             return;
         }
 
@@ -53,8 +58,10 @@ public class Spawn {
 
         player.setHealth(20);
         player.teleport(location);
+
+        // Might fix the yaw bug.
         player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(),
-                player.getLocation().getZ(), location.getYaw(), location.getPitch())); // Might fix the yaw bug.
+                player.getLocation().getZ(), location.getYaw(), location.getPitch()));
     }
 
     /**

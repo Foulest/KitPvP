@@ -6,18 +6,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
-public class MiscUtils {
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
+public final class MessageUtil {
 
-    public static final Logger LOG = Logger.getLogger("Minecraft");
-    public static final Random random = new Random();
+    public static final Random RANDOM = new Random();
 
-    private MiscUtils() {
+    private MessageUtil() {
     }
 
     public static void messagePlayer(CommandSender sender, String message) {
         sender.sendMessage(colorize(message));
+    }
+
+    public static void log(String message) {
+        Bukkit.getConsoleSender().sendMessage(colorize(message));
     }
 
     public static void broadcastMessage(String message) {

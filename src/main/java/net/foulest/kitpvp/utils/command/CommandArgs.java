@@ -4,9 +4,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- * CommandArgs
- * Command Framework
- * This class is passed to the command methods and contains various utilities as well as the command info.
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
  */
 public class CommandArgs {
 

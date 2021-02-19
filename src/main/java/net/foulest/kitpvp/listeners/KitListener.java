@@ -1,7 +1,8 @@
 package net.foulest.kitpvp.listeners;
 
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.kits.*;
+import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.Regions;
 import net.foulest.kitpvp.utils.kits.Kit;
@@ -27,16 +28,26 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class KitListener implements Listener {
 
-    private static final KitListener instance = new KitListener();
-    public final Map<UUID, Collection<PotionEffect>> drainedEffects = new HashMap<>();
-    public final Map<UUID, Location> imprisonedPlayers = new HashMap<>();
-    private final KitPvP kitPvP = KitPvP.getInstance();
-    private final KitManager kitManager = KitManager.getInstance();
+    protected static final Map<UUID, Collection<PotionEffect>> DRAINED_EFFECTS = new HashMap<>();
+    protected static final Map<UUID, Location> IMPRISONED_PLAYERS = new HashMap<>();
+    private static final String HUNGER_NAME = "HUNGER";
+    private static final String SATURATION_NAME = "SATURATION";
+    private static final String PRISON_METADATA = "prison";
+    private static final String SPIDERMAN_METADATA = "spiderman";
+    private static final String NO_FALL_METADATA = "noFall";
+    private static final String RIGHT_CLICK = "RIGHT";
+    private static final KitListener INSTANCE = new KitListener();
+    private static final KitPvP KITPVP = KitPvP.getInstance();
 
     public static KitListener getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     @EventHandler
@@ -45,14 +56,16 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Location> roomLocations = getRoomLocations(player.getLocation());
 
-        if (kitManager.hasRequiredKit(player, "Burrower") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.BRICK && !playerData.hasCooldown(player, "Burrower")
+        if (playerData.getKit() instanceof Burrower
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.BRICK
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             for (Location loc : roomLocations) {
                 if (loc.getBlock().getType() != Material.AIR) {
-                    MiscUtils.messagePlayer(player, "&cThere's not enough space above you to burrow.");
-                    playerData.setCooldown("Burrower", kitManager.valueOf("Burrower").getDisplayItem().getType(), 5, true);
+                    MessageUtil.messagePlayer(player, "&cThere's not enough space above you to burrow.");
+                    playerData.setCooldown(new Burrower(), new Burrower().getDisplayItem().getType(), 5, true);
                     return;
                 }
             }
@@ -68,54 +81,17 @@ public class KitListener implements Listener {
             player.teleport(player.getLocation().add(0.0, 10.0, 0.0));
 
             new BukkitRunnable() {
+                @Override
                 public void run() {
                     for (BlockState block : pendingRollback) {
                         rollback(block);
                     }
                 }
-            }.runTaskLater(kitPvP, 140L);
+            }.runTaskLater(KITPVP, 140L);
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Burrower", kitManager.valueOf("Burrower").getDisplayItem().getType(), 30, true);
-            player.setMetadata("noFall", new FixedMetadataValue(kitPvP, true));
-        }
-    }
-
-    // TODO: Fix the rollback system, some blocks aren't being rolled back
-    @EventHandler
-    public void onEskimoAbility(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        Entity entityPlayer = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
-        List<Location> eskimoLocations = getEskimoLocations(player.getLocation());
-
-        if (kitManager.hasRequiredKit(player, "Eskimo") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.PACKED_ICE && !playerData.hasCooldown(player, "Eskimo")
-                && !Regions.getInstance().isInSafezone(player)) {
-
-            if (!entityPlayer.isOnGround()) {
-                MiscUtils.messagePlayer(player, "&cYou need to be on the ground.");
-                playerData.setCooldown("Eskimo", kitManager.valueOf("Eskimo").getDisplayItem().getType(), 5, true);
-                return;
-            }
-
-            ArrayList<BlockState> pendingRollback = new ArrayList<>();
-
-            for (Location location : eskimoLocations) {
-                pendingRollback.add(location.getBlock().getState());
-                location.getBlock().setType(Material.PACKED_ICE);
-            }
-
-            new BukkitRunnable() {
-                public void run() {
-                    for (BlockState block : pendingRollback) {
-                        rollback(block);
-                    }
-                }
-            }.runTaskLater(kitPvP, 140L);
-
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Eskimo", kitManager.valueOf("Eskimo").getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
+            player.setMetadata(NO_FALL_METADATA, new FixedMetadataValue(KITPVP, true));
         }
     }
 
@@ -127,9 +103,12 @@ public class KitListener implements Listener {
             PlayerData damagerData = PlayerData.getInstance(damager);
             PlayerData receiverData = PlayerData.getInstance(receiver);
 
-            if (damagerData.getKit().getName().equals("Cactus") && receiverData.hasKit()
+            if (damagerData.getKit() instanceof Cactus
+                    && receiverData.hasKit()
                     && !Regions.getInstance().isInSafezone(damager)
-                    && !Regions.getInstance().isInSafezone(receiver)) {
+                    && !Regions.getInstance().isInSafezone(receiver)
+                    && damager.getItemInHand().getType() == Material.CACTUS) {
+
                 receiver.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 80, 0, false, false));
             }
         }
@@ -141,8 +120,10 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Dragon") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.FIREBALL && !playerData.hasCooldown(player, "Dragon")
+        if (playerData.getKit() instanceof Dragon
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.FIREBALL
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
@@ -162,8 +143,8 @@ public class KitListener implements Listener {
                 }
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Dragon", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
         }
     }
 
@@ -172,17 +153,19 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Fisherman") && event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY)
-                && !playerData.hasCooldown(player, "Fisherman") && !Regions.getInstance().isInSafezone(player)) {
+        if (playerData.getKit() instanceof Fisherman
+                && event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY)
+                && !playerData.hasCooldown(true)
+                && !Regions.getInstance().isInSafezone(player)) {
 
             if (event.getCaught() instanceof Player) {
                 Player receiver = (Player) event.getCaught();
                 PlayerData receiverData = PlayerData.getInstance(receiver);
 
                 if (receiverData.hasKit() && !Regions.getInstance().isInSafezone(receiver)) {
-                    MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-                    playerData.setCooldown("Fisherman", playerData.getKit().getDisplayItem().getType(), 30, true);
-                    imprisonedPlayers.remove(receiver.getUniqueId());
+                    MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+                    playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
+                    IMPRISONED_PLAYERS.remove(receiver.getUniqueId());
                     event.getCaught().teleport(player.getLocation());
                 } else {
                     event.setCancelled(true);
@@ -197,9 +180,12 @@ public class KitListener implements Listener {
     @EventHandler
     public void onGhostMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Ghost") && !player.isSneaking()
+        if (playerData.getKit() instanceof Ghost
+                && !player.isSneaking()
                 && !Regions.getInstance().isInSafezone(player)) {
+
             for (Entity entity : player.getNearbyEntities(6, 3, 6)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
                     ((Player) entity).playSound(player.getLocation(), Sound.CHICKEN_WALK, 0.01f, 0.5f);
@@ -213,12 +199,14 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Tamer") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.BONE && !playerData.hasCooldown(player, "Tamer")
+        if (playerData.getKit() instanceof Tamer
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.BONE
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Tamer", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
             ArrayList<Wolf> list = new ArrayList<>();
 
             for (int i = 0; i < 3; ++i) {
@@ -230,12 +218,13 @@ public class KitListener implements Listener {
             }
 
             new BukkitRunnable() {
+                @Override
                 public void run() {
                     for (Wolf wolf : list) {
                         wolf.remove();
                     }
                 }
-            }.runTaskLater(kitPvP, 200L);
+            }.runTaskLater(KITPVP, 200L);
         }
     }
 
@@ -245,9 +234,11 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Hulk") && event.getAction().toString().contains("RIGHT")
+        if (playerData.getKit() instanceof Hulk
+                && event.getAction().toString().contains(RIGHT_CLICK)
                 && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
-                && !playerData.hasCooldown(player, "Hulk") && !Regions.getInstance().isInSafezone(player)) {
+                && !playerData.hasCooldown(true)
+                && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -257,8 +248,8 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no targets found nearby.");
-                playerData.setCooldown("Hulk", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no targets found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
@@ -280,8 +271,8 @@ public class KitListener implements Listener {
                 }
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Hulk", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
         }
     }
 
@@ -290,13 +281,15 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Imprisoner") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.DISPENSER && !playerData.hasCooldown(player, "Imprisoner")
+        if (playerData.getKit() instanceof Imprisoner
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.DISPENSER
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Imprisoner", playerData.getKit().getDisplayItem().getType(), 30, true);
-            player.launchProjectile(Snowball.class).setMetadata("prison", new FixedMetadataValue(kitPvP, true));
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
+            player.launchProjectile(Snowball.class).setMetadata(PRISON_METADATA, new FixedMetadataValue(KITPVP, true));
         }
     }
 
@@ -313,15 +306,17 @@ public class KitListener implements Listener {
                     Player receiver = (Player) event.getEntity();
                     PlayerData receiverData = PlayerData.getInstance(damager);
 
-                    if (kitManager.hasRequiredKit(damager, "Imprisoner") && snowball.hasMetadata("prison")
-                            && !imprisonedPlayers.containsKey(receiver.getUniqueId()) && receiverData.hasKit()
+                    if (damagerData.getKit() instanceof Imprisoner
+                            && snowball.hasMetadata(PRISON_METADATA)
+                            && !IMPRISONED_PLAYERS.containsKey(receiver.getUniqueId())
+                            && receiverData.hasKit()
                             && !Regions.getInstance().isInSafezone(receiver)) {
 
                         List<Block> cageBlocks = getCageBlocks(receiver.getLocation().add(0.0, 9.0, 0.0));
                         for (Block cageBlock : cageBlocks) {
                             if (cageBlock.getType() != Material.AIR) {
-                                MiscUtils.messagePlayer(damager, "&cThere's not enough space above the target.");
-                                damagerData.setCooldown("Imprisoner", damagerData.getKit().getDisplayItem().getType(), 5, true);
+                                MessageUtil.messagePlayer(damager, "&cThere's not enough space above the target.");
+                                damagerData.setCooldown(damagerData.getKit(), damagerData.getKit().getDisplayItem().getType(), 5, true);
                                 return;
                             }
                         }
@@ -347,17 +342,18 @@ public class KitListener implements Listener {
                         prisonLoc.setZ(prisonLoc.getBlockZ() + 0.5);
                         receiver.teleport(prisonLoc);
 
-                        imprisonedPlayers.put(receiver.getUniqueId(), prisonLoc);
+                        IMPRISONED_PLAYERS.put(receiver.getUniqueId(), prisonLoc);
 
                         new BukkitRunnable() {
+                            @Override
                             public void run() {
-                                imprisonedPlayers.remove(receiver.getUniqueId());
+                                IMPRISONED_PLAYERS.remove(receiver.getUniqueId());
 
                                 for (BlockState block : pendingRollback) {
                                     rollback(block);
                                 }
                             }
-                        }.runTaskLater(kitPvP, 80L);
+                        }.runTaskLater(KITPVP, 80L);
                     }
                 }
             }
@@ -370,9 +366,12 @@ public class KitListener implements Listener {
         Entity entityPlayer = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Kangaroo") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.FIREWORK && !playerData.hasCooldown(player, "Kangaroo")
-                && entityPlayer.isOnGround() && !Regions.getInstance().isInSafezone(player)) {
+        if (playerData.getKit() instanceof Kangaroo
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.FIREWORK
+                && !playerData.hasCooldown(true)
+                && entityPlayer.isOnGround()
+                && !Regions.getInstance().isInSafezone(player)) {
 
             Vector direction = player.getEyeLocation().getDirection();
 
@@ -384,8 +383,8 @@ public class KitListener implements Listener {
             }
 
             player.setVelocity(direction);
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Kangaroo", playerData.getKit().getDisplayItem().getType(), 20, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 20, true);
         }
     }
 
@@ -395,28 +394,30 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Mage") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.GLOWSTONE_DUST && !playerData.hasCooldown(player, "Mage")
+        if (playerData.getKit() instanceof Mage
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.GLOWSTONE_DUST
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
-            if (drainedEffects.containsKey(player.getUniqueId())) {
-                MiscUtils.messagePlayer(player, "&cAbility failed; your effects are still drained.");
+            if (DRAINED_EFFECTS.containsKey(player.getUniqueId())) {
+                MessageUtil.messagePlayer(player, "&cAbility failed; your effects are still drained.");
                 return;
             }
 
-            int effect = MiscUtils.random.nextInt(21);
-            int amplifier = MiscUtils.random.nextInt(3);
-            int duration = Math.max(5, (MiscUtils.random.nextInt(30) + 1)) * 20;
+            int effect = MessageUtil.RANDOM.nextInt(21);
+            int amplifier = MessageUtil.RANDOM.nextInt(3);
+            int duration = Math.max(5, (MessageUtil.RANDOM.nextInt(30) + 1)) * 20;
 
-            if (PotionEffectType.getById(effect).getName().equals("HUNGER")
-                    || PotionEffectType.getById(effect).getName().equals("SATURATION")) {
+            if ((HUNGER_NAME).equals(PotionEffectType.getById(effect).getName())
+                    || (SATURATION_NAME).equals(PotionEffectType.getById(effect).getName())) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, amplifier, false, false));
             } else {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.getById(effect), duration, amplifier, false, false));
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Mage", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
         }
     }
 
@@ -429,12 +430,14 @@ public class KitListener implements Listener {
             Player receiver = (Player) event.getRightClicked();
             PlayerData receiverData = PlayerData.getInstance(receiver);
 
-            if (kitManager.hasRequiredKit(damager, "Monk")
+            if (damagerData.getKit() instanceof Monk
                     && damager.getItemInHand().getType() == Material.BLAZE_ROD
-                    && !damagerData.hasCooldown(damager, "Monk") && receiverData.hasKit()
-                    && !Regions.getInstance().isInSafezone(damager) && !Regions.getInstance().isInSafezone(receiver)) {
+                    && !damagerData.hasCooldown(true)
+                    && receiverData.hasKit()
+                    && !Regions.getInstance().isInSafezone(damager)
+                    && !Regions.getInstance().isInSafezone(receiver)) {
 
-                int random = MiscUtils.random.nextInt(9);
+                int random = MessageUtil.RANDOM.nextInt(9);
                 int heldItemSlot = receiver.getInventory().getHeldItemSlot();
                 ItemStack itemInHand = receiver.getItemInHand();
 
@@ -442,8 +445,8 @@ public class KitListener implements Listener {
                 receiver.getInventory().setItem(random, itemInHand);
                 receiver.updateInventory();
 
-                MiscUtils.messagePlayer(damager, "&aYour ability has been used.");
-                damagerData.setCooldown("Monk", damagerData.getKit().getDisplayItem().getType(), 30, true);
+                MessageUtil.messagePlayer(damager, "&aYour ability has been used.");
+                damagerData.setCooldown(damagerData.getKit(), damagerData.getKit().getDisplayItem().getType(), 30, true);
             }
         }
     }
@@ -453,13 +456,15 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (kitManager.hasRequiredKit(player, "Spiderman") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.WEB && !playerData.hasCooldown(player, "Spiderman")
+        if (playerData.getKit() instanceof Spiderman
+                && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.WEB
+                && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Spiderman", playerData.getKit().getDisplayItem().getType(), 15, true);
-            player.launchProjectile(Snowball.class).setMetadata("spiderman", new FixedMetadataValue(kitPvP, true));
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 15, true);
+            player.launchProjectile(Snowball.class).setMetadata(SPIDERMAN_METADATA, new FixedMetadataValue(KITPVP, true));
         }
     }
 
@@ -474,15 +479,15 @@ public class KitListener implements Listener {
                 PlayerData damagerData = PlayerData.getInstance(damager);
                 PlayerData receiverData = PlayerData.getInstance(receiver);
 
-                if (kitManager.hasRequiredKit(damager, "Spiderman")) {
+                if (damagerData.getKit() instanceof Spiderman) {
                     if (!receiverData.hasKit() || Regions.getInstance().isInSafezone(receiver)) {
                         damager.playSound(damager.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                        MiscUtils.messagePlayer(damager, "&cYou can't use your ability on players in spawn.");
-                        damagerData.setCooldown("Spiderman", damagerData.getKit().getDisplayItem().getType(), 15, true);
+                        MessageUtil.messagePlayer(damager, "&cYou can't use your ability on players in spawn.");
+                        damagerData.setCooldown(damagerData.getKit(), damagerData.getKit().getDisplayItem().getType(), 15, true);
                         return;
                     }
 
-                    if (snowball.hasMetadata("spiderman")) {
+                    if (snowball.hasMetadata(SPIDERMAN_METADATA)) {
                         ArrayList<BlockState> blockStates = new ArrayList<>();
                         Block block = receiver.getLocation().getBlock();
 
@@ -512,14 +517,15 @@ public class KitListener implements Listener {
                         }
 
                         new BukkitRunnable() {
+                            @Override
                             public void run() {
                                 for (BlockState blockState : blockStates) {
                                     rollback(blockState);
                                 }
                             }
-                        }.runTaskLater(kitPvP, 120L);
+                        }.runTaskLater(KITPVP, 120L);
 
-                        MiscUtils.messagePlayer(damager, "&aYour ability has been used.");
+                        MessageUtil.messagePlayer(damager, "&aYour ability has been used.");
                     }
                 }
             }
@@ -532,8 +538,8 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Summoner") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.IRON_BLOCK && !playerData.hasCooldown(player, "Summoner")
+        if (playerData.getKit() instanceof Summoner && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.IRON_BLOCK && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(15, 5, 15)) {
@@ -544,14 +550,14 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no players found nearby.");
-                playerData.setCooldown("Summoner", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
             IronGolem ironGolem = (IronGolem) player.getWorld().spawnEntity(player.getLocation(), EntityType.IRON_GOLEM);
 
-            ironGolem.setMetadata(player.getName(), new FixedMetadataValue(kitPvP, true));
+            ironGolem.setMetadata(player.getName(), new FixedMetadataValue(KITPVP, true));
             ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 99999, 1, false, false));
             ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 50, false, false));
 
@@ -564,13 +570,14 @@ public class KitListener implements Listener {
             }
 
             new BukkitRunnable() {
+                @Override
                 public void run() {
                     ironGolem.remove();
                 }
-            }.runTaskLater(kitPvP, 200L);
+            }.runTaskLater(KITPVP, 200L);
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Summoner", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
         }
     }
 
@@ -580,8 +587,8 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Thor") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.IRON_AXE && !playerData.hasCooldown(player, "Thor")
+        if (playerData.getKit() instanceof Thor && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.IRON_AXE && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(6, 6, 6)) {
@@ -592,8 +599,8 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no players found nearby.");
-                playerData.setCooldown("Thor", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
@@ -607,8 +614,8 @@ public class KitListener implements Listener {
                 }
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Thor", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
         }
     }
 
@@ -618,8 +625,8 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Timelord") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.WATCH && !playerData.hasCooldown(player, "Timelord")
+        if (playerData.getKit() instanceof Timelord && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.WATCH && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(6, 6, 6)) {
@@ -630,8 +637,8 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no players found nearby.");
-                playerData.setCooldown("Timelord", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
@@ -647,8 +654,8 @@ public class KitListener implements Listener {
                 }
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Timelord", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
             player.playSound(player.getLocation(), Sound.WITHER_SHOOT, 1, 1);
         }
     }
@@ -660,8 +667,8 @@ public class KitListener implements Listener {
         List<Player> playerList = new ArrayList<>();
         List<PotionEffect> playerEffects = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Vampire") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.REDSTONE && !playerData.hasCooldown(player, "Vampire")
+        if (playerData.getKit() instanceof Vampire && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.REDSTONE && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
@@ -677,8 +684,8 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no players found nearby.");
-                playerData.setCooldown("Vampire", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
@@ -687,21 +694,21 @@ public class KitListener implements Listener {
             }
 
             if (playerEffects.isEmpty()) {
-                MiscUtils.messagePlayer(player, "&cAbility failed; no effects found to drain.");
-                playerData.setCooldown("Vampire", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no effects found to drain.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
             for (Player playerInList : playerList) {
-                drainedEffects.put(playerInList.getUniqueId(), playerInList.getActivePotionEffects());
-                MiscUtils.messagePlayer(playerInList, "&cYour effects have been drained by a Vampire!");
+                DRAINED_EFFECTS.put(playerInList.getUniqueId(), playerInList.getActivePotionEffects());
+                MessageUtil.messagePlayer(playerInList, "&cYour effects have been drained by a Vampire!");
 
-                for (PotionEffect potionEffect : drainedEffects.get(playerInList.getUniqueId())) {
+                for (PotionEffect potionEffect : DRAINED_EFFECTS.get(playerInList.getUniqueId())) {
                     if (potionEffect.getType() != PotionEffectType.INCREASE_DAMAGE) {
                         playerInList.playSound(playerInList.getLocation(), Sound.CAT_HISS, 1, 1);
                         playerInList.removePotionEffect(potionEffect.getType());
                         player.addPotionEffect(potionEffect);
-                        MiscUtils.messagePlayer(player, ("&aYou drained the " + potionEffect.getType().getName() + " effect from " + playerInList.getName() + "."));
+                        MessageUtil.messagePlayer(player, ("&aYou drained the " + potionEffect.getType().getName() + " effect from " + playerInList.getName() + "."));
                     }
                 }
 
@@ -709,29 +716,30 @@ public class KitListener implements Listener {
                 Kit currentKit = playerDataInList.getKit();
 
                 new BukkitRunnable() {
+                    @Override
                     public void run() {
                         if (player.isOnline() && !player.getActivePotionEffects().isEmpty()) {
                             for (PotionEffect effect : player.getActivePotionEffects()) {
                                 player.removePotionEffect(effect.getType());
                             }
-                            MiscUtils.messagePlayer(player, "&cYour drained effects were removed.");
+                            MessageUtil.messagePlayer(player, "&cYour drained effects were removed.");
                         }
 
-                        if (playerInList.isOnline() && !drainedEffects.get(playerInList.getUniqueId()).isEmpty()
+                        if (playerInList.isOnline() && !DRAINED_EFFECTS.get(playerInList.getUniqueId()).isEmpty()
                                 && playerDataInList.hasKit() && currentKit == playerDataInList.getKit()) {
-                            for (PotionEffect effect : drainedEffects.get(playerInList.getUniqueId())) {
+                            for (PotionEffect effect : DRAINED_EFFECTS.get(playerInList.getUniqueId())) {
                                 playerInList.addPotionEffect(effect);
                             }
-                            MiscUtils.messagePlayer(playerInList, "&aYour drained effects were restored.");
+                            MessageUtil.messagePlayer(playerInList, "&aYour drained effects were restored.");
                         }
 
-                        drainedEffects.remove(playerInList.getUniqueId());
+                        DRAINED_EFFECTS.remove(playerInList.getUniqueId());
                     }
-                }.runTaskLater(kitPvP, 200L);
+                }.runTaskLater(KITPVP, 200L);
             }
 
-            MiscUtils.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown("Vampire", playerData.getKit().getDisplayItem().getType(), 30, true);
+            MessageUtil.messagePlayer(player, "&aYour ability has been used.");
+            playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
             player.playSound(player.getLocation(), Sound.CAT_HISS, 1, 1);
         }
     }
@@ -744,7 +752,7 @@ public class KitListener implements Listener {
             PlayerData damagerData = PlayerData.getInstance(damager);
             PlayerData receiverData = PlayerData.getInstance(receiver);
 
-            if (damagerData.getKit().getName().equals("Vampire") && receiverData.hasKit()
+            if (damagerData.getKit() instanceof Vampire && receiverData.hasKit()
                     && !Regions.getInstance().isInSafezone(damager) && !Regions.getInstance().isInSafezone(receiver)) {
                 damager.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 0, false, false));
             }
@@ -757,8 +765,8 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (kitManager.hasRequiredKit(player, "Zen") && event.getAction().toString().contains("RIGHT")
-                && player.getItemInHand().getType() == Material.SLIME_BALL && !playerData.hasCooldown(player, "Zen")
+        if (playerData.getKit() instanceof Zen && event.getAction().toString().contains(RIGHT_CLICK)
+                && player.getItemInHand().getType() == Material.SLIME_BALL && !playerData.hasCooldown(true)
                 && !Regions.getInstance().isInSafezone(player)) {
 
             Player closest = null;
@@ -772,8 +780,8 @@ public class KitListener implements Listener {
 
             if (playerList.isEmpty()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
-                MiscUtils.messagePlayer(player, "&cAbility failed; no players found nearby.");
-                playerData.setCooldown("Zen", playerData.getKit().getDisplayItem().getType(), 5, true);
+                MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
             }
 
@@ -791,15 +799,15 @@ public class KitListener implements Listener {
             }
 
             if (closest != null) {
-                imprisonedPlayers.remove(player.getUniqueId());
+                IMPRISONED_PLAYERS.remove(player.getUniqueId());
                 player.getWorld().playEffect(player.getLocation(), Effect.ENDER_SIGNAL, 1);
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
                 player.teleport(closest.getLocation());
                 player.getWorld().playEffect(player.getLocation(), Effect.ENDER_SIGNAL, 1);
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
                 closest.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 0, false, false));
-                MiscUtils.messagePlayer(player, "&aYou teleported to " + closest.getDisplayName() + ".");
-                playerData.setCooldown("Zen", playerData.getKit().getDisplayItem().getType(), 30, true);
+                MessageUtil.messagePlayer(player, "&aYou teleported to " + closest.getDisplayName() + ".");
+                playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 30, true);
             }
         }
     }
@@ -837,71 +845,10 @@ public class KitListener implements Listener {
         return list;
     }
 
-    // TODO: Add all the locations correctly
-    public List<Location> getEskimoLocations(Location location) {
-        ArrayList<Location> list = new ArrayList<>();
-
-        list.add(location.clone().add(-3.0, 0.0, 0.0));
-        list.add(location.clone().add(-3.0, 0.0, 1.0));
-        list.add(location.clone().add(-3.0, 0.0, -1.0));
-        list.add(location.clone().add(3.0, 0.0, 0.0));
-        list.add(location.clone().add(3.0, 0.0, 1.0));
-        list.add(location.clone().add(3.0, 0.0, -1.0));
-        list.add(location.clone().add(-3.0, 1.0, 0.0));
-        list.add(location.clone().add(-3.0, 1.0, 1.0));
-        list.add(location.clone().add(-3.0, 1.0, -1.0));
-        list.add(location.clone().add(3.0, 1.0, 0.0));
-        list.add(location.clone().add(3.0, 1.0, 1.0));
-        list.add(location.clone().add(3.0, 1.0, -1.0));
-
-        list.add(location.clone().add(-2.0, 0.0, 2.0));
-        list.add(location.clone().add(-2.0, 0.0, -2.0));
-        list.add(location.clone().add(2.0, 0.0, 2.0));
-        list.add(location.clone().add(2.0, 0.0, -2.0));
-        list.add(location.clone().add(-2.0, 1.0, 2.0));
-        list.add(location.clone().add(-2.0, 1.0, -2.0));
-        list.add(location.clone().add(2.0, 1.0, 2.0));
-        list.add(location.clone().add(2.0, 1.0, -2.0));
-
-        list.add(location.clone().add(0.0, 0.0, -3.0));
-        list.add(location.clone().add(1.0, 0.0, -3.0));
-        list.add(location.clone().add(-1.0, 0.0, -3.0));
-        list.add(location.clone().add(0.0, 0.0, 3.0));
-        list.add(location.clone().add(1.0, 0.0, 3.0));
-        list.add(location.clone().add(-1.0, 0.0, 3.0));
-        list.add(location.clone().add(0.0, 1.0, -3.0));
-        list.add(location.clone().add(1.0, 1.0, -3.0));
-        list.add(location.clone().add(-1.0, 1.0, -3.0));
-        list.add(location.clone().add(0.0, 1.0, 3.0));
-        list.add(location.clone().add(1.0, 1.0, 3.0));
-        list.add(location.clone().add(-1.0, 1.0, 3.0));
-
-        list.add(location.clone().add(-3.0, 1.0, 0.0));
-        list.add(location.clone().add(0.0, 1.0, -3.0));
-        list.add(location.clone().add(3.0, 1.0, 0.0));
-        list.add(location.clone().add(0.0, 1.0, 3.0));
-
-        list.add(location.clone().add(-2.0, 2.0, 0.0));
-        list.add(location.clone().add(0.0, 2.0, -2.0));
-        list.add(location.clone().add(2.0, 2.0, 0.0));
-        list.add(location.clone().add(0.0, 2.0, 2.0));
-
-        list.add(location.clone().add(-1.0, 3.0, 0.0));
-        list.add(location.clone().add(-1.0, 3.0, 1.0));
-        list.add(location.clone().add(-1.0, 3.0, -1.0));
-        list.add(location.clone().add(0.0, 3.0, 0.0));
-        list.add(location.clone().add(0.0, 3.0, 1.0));
-        list.add(location.clone().add(0.0, 3.0, -1.0));
-        list.add(location.clone().add(1.0, 3.0, 0.0));
-        list.add(location.clone().add(1.0, 3.0, 1.0));
-        list.add(location.clone().add(1.0, 3.0, -1.0));
-        return list;
-    }
-
     public List<Location> getRoomLocations(Location location) {
         location.add(0.0, 9.0, 0.0);
 
-        ArrayList<Location> list = new ArrayList<>(this.getPlatform(location));
+        ArrayList<Location> list = new ArrayList<>(getPlatform(location));
 
         for (int i = 0; i < 3; ++i) {
             location.add(0.0, 1.0, 0.0);
@@ -923,7 +870,7 @@ public class KitListener implements Listener {
             list.add(location.clone().add(2.0, 0.0, 1.0));
         }
 
-        list.addAll(this.getPlatform(location.add(0.0, 1.0, 0.0)));
+        list.addAll(getPlatform(location.add(0.0, 1.0, 0.0)));
         return list;
     }
 
@@ -937,7 +884,6 @@ public class KitListener implements Listener {
         return list;
     }
 
-    // TODO: Fix the rollback system, some blocks aren't being rolled back
     public void rollback(BlockState blockState) {
         if (blockState instanceof Sign) {
             Sign sign = (Sign) blockState;

@@ -1,8 +1,10 @@
-package net.foulest.kitpvp.utils.kits;
+package net.foulest.kitpvp.utils.menus;
 
 import net.foulest.kitpvp.utils.ItemBuilder;
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.PlayerData;
+import net.foulest.kitpvp.utils.kits.Kit;
+import net.foulest.kitpvp.utils.kits.KitManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,11 +15,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class KitShop {
 
-    public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Shop");
-    private static final Map<Player, Integer> page = new HashMap<>();
+    public static final String INVENTORY_NAME = MessageUtil.colorize("Kit Shop");
+    private static final Map<Player, Integer> PAGE = new HashMap<>();
     private final Inventory inv;
     private final KitManager kitManager = KitManager.getInstance();
 
@@ -36,19 +43,25 @@ public class KitShop {
 
         if (populateInventory(player, page)) {
             player.openInventory(inv);
-            KitShop.page.put(player, page);
+            KitShop.PAGE.put(player, page);
         } else {
-            MiscUtils.messagePlayer(player, "&cYou own all of the kits.");
+            MessageUtil.messagePlayer(player, "&cYou own all of the kits.");
         }
     }
 
-    // Ensures that we use enough slots to hold all the kit items.
+    /**
+     * Ensures that we use enough slots to hold all the kit items.
+     */
     private int ensureSize(int size) {
-        if (size >= 36) {
-            return 36;
+        int maxSize = 36;
+        int halfMaxSize = 18;
+        int rowSize = 9;
+
+        if (size >= maxSize) {
+            return maxSize;
         }
 
-        if ((size + 18) % 9 == 0) {
+        if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
 
@@ -56,15 +69,16 @@ public class KitShop {
     }
 
     private boolean populateInventory(Player player, int page) {
-        int paidKits = 0;
         PlayerData playerData = PlayerData.getInstance(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
+        int paidKits = 0;
+        int rowSize = 9;
 
         // Sets non-present items to glass.
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < rowSize; i++) {
             inv.setItem(i, glass);
         }
-        for (int i = (inv.getSize() - 9); i < inv.getSize(); i++) {
+        for (int i = (inv.getSize() - rowSize); i < inv.getSize(); i++) {
             inv.setItem(i, glass);
         }
 
@@ -83,7 +97,8 @@ public class KitShop {
             if (!futureCheck.isEmpty()) {
                 inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").build());
             }
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ex) {
+            // ignored
         }
 
         for (Kit kits : checkedKits) {

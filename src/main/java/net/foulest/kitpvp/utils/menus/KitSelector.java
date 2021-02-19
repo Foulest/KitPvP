@@ -1,8 +1,10 @@
-package net.foulest.kitpvp.utils.kits;
+package net.foulest.kitpvp.utils.menus;
 
 import net.foulest.kitpvp.utils.ItemBuilder;
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.PlayerData;
+import net.foulest.kitpvp.utils.kits.Kit;
+import net.foulest.kitpvp.utils.kits.KitManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,10 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class KitSelector {
 
-    public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Selector");
-    private static final Map<Player, Integer> page = new HashMap<>();
+    public static final String INVENTORY_NAME = MessageUtil.colorize("Kit Selector");
+    private static final Map<Player, Integer> PAGE = new HashMap<>();
     private final Inventory inv;
     private final KitManager kitManager = KitManager.getInstance();
 
@@ -26,7 +33,7 @@ public class KitSelector {
         populateInventory(player, 0);
         player.closeInventory();
         player.openInventory(inv);
-        page.put(player, 0);
+        PAGE.put(player, 0);
     }
 
     public KitSelector(Player player, int page) {
@@ -35,43 +42,51 @@ public class KitSelector {
         populateInventory(player, page);
         player.closeInventory();
         player.openInventory(inv);
-        KitSelector.page.put(player, page);
+        KitSelector.PAGE.put(player, page);
     }
 
     public static int getPage(Player player) {
-        return page.get(player);
+        return PAGE.get(player);
     }
 
-    // Ensures that we use enough slots to hold all the kit items.
+    /**
+     * Ensures that we use enough slots to hold all the kit items.
+     */
     private int ensureSize(int size) {
-        if (size >= 36) {
-            return 36;
+        int maxSize = 36;
+        int halfMaxSize = 18;
+        int rowSize = 9;
+
+        if (size >= maxSize) {
+            return maxSize;
         }
 
-        if ((size + 18) % 9 == 0) {
+        if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
 
         return ensureSize(++size);
     }
 
-    // Populates the GUI's inventory.
+    /**
+     * Populates the GUI's inventory.
+     */
     private void populateInventory(Player player, int page) {
         PlayerData playerData = PlayerData.getInstance(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
+        int rowSize = 9;
 
         // Sets non-present items to glass.
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < rowSize; i++) {
             inv.setItem(i, glass);
         }
-        for (int i = (inv.getSize() - 9); i < inv.getSize(); i++) {
+        for (int i = (inv.getSize() - rowSize); i < inv.getSize(); i++) {
             inv.setItem(i, glass);
         }
 
         if (page > 0) {
             inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").build());
         }
-
 
         List<Kit> checkedKits = kitManager.getKits().subList(page * 36, (page * 36) + ensureKits(kitManager.getKits().size() - (page * 36)));
 
@@ -81,10 +96,11 @@ public class KitSelector {
             if (!futureCheck.isEmpty()) {
                 inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").build());
             }
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ex) {
+            // ignored
         }
 
-        // TODO: SORT ALPHABETICALLY
+        // TODO: Sort alphabetically
         for (Kit kits : checkedKits) {
             if (playerData.ownsKit(kits)) {
                 inv.addItem(createKitItem(kits));

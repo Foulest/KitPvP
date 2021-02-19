@@ -8,24 +8,29 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
-public class ConfigManager {
+public final class ConfigManager {
 
+    private static final KitPvP KITPVP = KitPvP.getInstance();
     private static File file;
     private static FileConfiguration config;
-    private static final KitPvP kitPvP = KitPvP.getInstance();
 
     private ConfigManager() {
     }
 
     public static void setup() {
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin(kitPvP.getName()).getDataFolder(), "settings.yml");
+        file = new File(Bukkit.getServer().getPluginManager().getPlugin(KITPVP.getName()).getDataFolder(), "settings.yml");
 
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException ignored) {
-                MiscUtils.LOG.warning("Couldn't create the config file.");
+                MessageUtil.log("&c[KitPvP] Couldn't create the config file.");
             }
         }
 
@@ -40,7 +45,7 @@ public class ConfigManager {
         try {
             config.save(file);
         } catch (IOException exception) {
-            MiscUtils.LOG.warning("Couldn't save the config file.");
+            MessageUtil.log("&c[KitPvP] Couldn't save the config file.");
         }
     }
 

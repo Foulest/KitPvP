@@ -10,8 +10,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Command Framework - BukkitCompleter <br>
- * An implementation of the TabCompleter class allowing for multiple tab completers per command.
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
  */
 public class BukkitCompleter implements TabCompleter {
 
@@ -29,7 +30,7 @@ public class BukkitCompleter implements TabCompleter {
             buffer.append(label.toLowerCase());
 
             for (int x = 0; x < i; x++) {
-                if (!args[x].equals("") && !args[x].equals(" ")) {
+                if (!("").equals(args[x]) && !(" ").equals(args[x])) {
                     buffer.append(".").append(args[x].toLowerCase());
                 }
             }

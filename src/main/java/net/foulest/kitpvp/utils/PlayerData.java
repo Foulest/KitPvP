@@ -21,12 +21,17 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-public class PlayerData {
+public final class PlayerData {
 
-    static final Set<PlayerData> instances = new HashSet<>();
+    static final Set<PlayerData> INSTANCES = new HashSet<>();
     private final Player player;
-    private final Map<String, Long> cooldowns = new HashMap<>();
+    private final Map<Kit, Long> cooldowns = new HashMap<>();
     private final KitPvP kitPvP = KitPvP.getInstance();
     private final MySQL mySQL = MySQL.getInstance();
     private final LunarClientAPI lunarClientAPI = LunarClientAPI.getInstance();
@@ -43,20 +48,22 @@ public class PlayerData {
     private int deaths;
     private int killstreak;
     private int topKillstreak;
+    private int bounty;
+    private UUID benefactor;
     private boolean usingSoup;
     private boolean isLoaded;
     private boolean pendingNoFallRemoval;
 
     private PlayerData(Player player) {
         this.player = player;
-        this.previousKit = KitManager.getInstance().valueOf("Knight");
-        this.kit = null;
+        previousKit = KitManager.getInstance().valueOf("Knight");
+        kit = null;
 
-        instances.add(this);
+        INSTANCES.add(this);
     }
 
     public static PlayerData getInstance(Player player) {
-        for (PlayerData playerData : instances) {
+        for (PlayerData playerData : INSTANCES) {
             if (playerData != null && playerData.getPlayer() != null && playerData.getPlayer().isOnline()
                     && playerData.getPlayer().getName().equalsIgnoreCase(player.getName())) {
                 return playerData;
@@ -87,7 +94,7 @@ public class PlayerData {
     }
 
     public void setPreviousKit(Kit kit) {
-        this.previousKit = kit;
+        previousKit = kit;
     }
 
     public boolean hasPreviousKit() {
@@ -122,20 +129,46 @@ public class PlayerData {
         this.coins = Math.max(this.coins - coins, 0);
     }
 
-    public boolean hasCooldown(Player player, String kit) {
+    public int getBounty() {
+        return bounty;
+    }
+
+    public void setBounty(int bounty) {
+        this.bounty = bounty;
+    }
+
+    public void removeBounty() {
+        bounty = 0;
+    }
+
+    public UUID getBenefactor() {
+        return benefactor;
+    }
+
+    public void setBenefactor(UUID benefactor) {
+        this.benefactor = benefactor;
+    }
+
+    public void removeBenefactor() {
+        benefactor = null;
+    }
+
+    public boolean hasCooldown(boolean sendMessage) {
         long cooldown = cooldowns.containsKey(kit) ? (cooldowns.get(kit) - System.currentTimeMillis()) : 0L;
 
         if (cooldown > 0) {
-            MiscUtils.messagePlayer(player, "&cYou are still on cooldown for %time% seconds.".replace("%time%",
-                    String.valueOf(BigDecimal.valueOf((double) cooldown / 1000)
-                            .setScale(1, RoundingMode.HALF_UP).doubleValue())));
+            if (sendMessage) {
+                MessageUtil.messagePlayer(player, "&cYou are still on cooldown for %time% seconds.".replace("%time%",
+                        String.valueOf(BigDecimal.valueOf((double) cooldown / 1000)
+                                .setScale(1, RoundingMode.HALF_UP).doubleValue())));
+            }
             return true;
         }
 
         return false;
     }
 
-    public long getCooldown(String kit) {
+    public long getCooldown() {
         return cooldowns.containsKey(kit) ? (cooldowns.get(kit) - System.currentTimeMillis()) : 0L;
     }
 
@@ -153,19 +186,19 @@ public class PlayerData {
         }
     }
 
-    public void setCooldown(String kitName, Material icon, int cooldownTime, boolean notify) {
-        cooldowns.put(kitName, System.currentTimeMillis() + cooldownTime * 1000L);
+    public void setCooldown(Kit kit, Material icon, int cooldownTime, boolean notify) {
+        cooldowns.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
 
         if (hasKit() && lunarClientAPI.isRunningLunarClient(player)) {
             lunarClientAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
         }
 
-        // TODO: Fix, this doesn't notify
         if (notify) {
             abilityCooldownNotifier = new BukkitRunnable() {
+                @Override
                 public void run() {
-                    MiscUtils.messagePlayer(player, MiscUtils.colorize("&aYour ability cooldown has expired."));
-                    cooldowns.remove(kit.getName());
+                    MessageUtil.messagePlayer(player, MessageUtil.colorize("&aYour ability cooldown has expired."));
+                    cooldowns.remove(kit);
                 }
             }.runTaskLater(kitPvP, cooldownTime * 20L);
         }
@@ -212,6 +245,11 @@ public class PlayerData {
             }
         }
 
+        if (mySQL.exists("*", "Bounties", "uuid", "=", player.getUniqueId().toString())) {
+            setBounty((Integer) mySQL.get("bounty", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
+            setBenefactor((UUID) mySQL.get("benefactor", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
+        }
+
         setCoins((Integer) mySQL.get("coins", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setExperience((Integer) mySQL.get("experience", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
         setKills((Integer) mySQL.get("kills", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
@@ -241,18 +279,24 @@ public class PlayerData {
     }
 
     public void saveStats() {
-        mySQL.update("UPDATE PlayerStats SET coins=" + getCoins() + ", experience=" + getExperience()
-                + ", kills=" + getKills() + ", deaths=" + getDeaths() + ", killstreak=" + getKillstreak()
-                + ", topKillstreak=" + getTopKillstreak() + ", usingSoup=" + isUsingSoup()
-                + ", previousKit='" + getPreviousKit().getName() + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+        mySQL.update("UPDATE PlayerStats SET coins=" + coins + ", experience=" + experience
+                + ", kills=" + kills + ", deaths=" + deaths + ", killstreak=" + killstreak
+                + ", topKillstreak=" + topKillstreak + ", usingSoup=" + usingSoup
+                + ", previousKit='" + previousKit.getName() + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+
+        if (bounty != 0 && benefactor != null) {
+            mySQL.update("UPDATE Bounties SET bounty=" + bounty + ", benefactor='" + benefactor
+                    + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+        }
     }
 
     public void unload() {
         isLoaded = false;
         ownedKits.clear();
         kit = null;
+        benefactor = null;
         teleportingToSpawn = null;
-        instances.remove(this);
+        INSTANCES.remove(this);
     }
 
     public void addDeath() {
@@ -376,11 +420,11 @@ public class PlayerData {
 
                 if (afterKill) {
                     player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
-                    MiscUtils.messagePlayer(player, "");
-                    MiscUtils.messagePlayer(player, " &b&lLevel Up");
-                    MiscUtils.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
-                    MiscUtils.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
-                    MiscUtils.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, " &b&lLevel Up");
+                    MessageUtil.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
+                    MessageUtil.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
+                    MessageUtil.messagePlayer(player, "");
                     addCoins(150);
                 }
             }
@@ -409,5 +453,4 @@ public class PlayerData {
     public void setUsingSoup(boolean status) {
         usingSoup = status;
     }
-
 }

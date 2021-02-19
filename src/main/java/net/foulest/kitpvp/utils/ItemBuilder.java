@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class ItemBuilder {
 
     private final ItemStack item;
@@ -25,7 +30,7 @@ public class ItemBuilder {
 
     public ItemBuilder name(String name) {
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(MiscUtils.colorize(name));
+        meta.setDisplayName(MessageUtil.colorize(name));
         item.setItemMeta(meta);
         return this;
     }
@@ -39,7 +44,7 @@ public class ItemBuilder {
 
     public ItemBuilder lore(String lore) {
         List<String> itemLore = item.getItemMeta().hasLore() ? item.getItemMeta().getLore() : new ArrayList<>();
-        itemLore.add(MiscUtils.colorize(lore));
+        itemLore.add(MessageUtil.colorize(lore));
         lore(itemLore);
         return this;
     }
@@ -49,7 +54,7 @@ public class ItemBuilder {
         List<String> loreList = new ArrayList<>();
 
         for (String str : lore) {
-            loreList.add(MiscUtils.colorize(str));
+            loreList.add(MessageUtil.colorize(str));
         }
 
         meta.setLore(loreList);
@@ -85,7 +90,11 @@ public class ItemBuilder {
     }
 
     public ItemBuilder enchant(Enchantment enchantment, int level) {
-        item.addUnsafeEnchantment(enchantment, level);
+        if (item.containsEnchantment(enchantment)) {
+            item.addUnsafeEnchantment(enchantment, level + item.getEnchantmentLevel(enchantment));
+        } else {
+            item.addUnsafeEnchantment(enchantment, level);
+        }
         return this;
     }
 
@@ -101,8 +110,9 @@ public class ItemBuilder {
 
     public ItemBuilder color(Color color) {
         LeatherArmorMeta meta;
+        String leatherName = "LEATHER_";
 
-        if (item.getType().toString().contains("LEATHER_")) {
+        if (item.getType().toString().contains(leatherName)) {
             meta = (LeatherArmorMeta) item.getItemMeta();
             meta.setColor(color);
             item.setItemMeta(meta);

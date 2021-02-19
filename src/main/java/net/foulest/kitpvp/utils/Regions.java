@@ -15,15 +15,20 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class Regions {
 
-    private static final Regions instance = new Regions();
+    private static final Regions INSTANCE = new Regions();
     private final WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
     private final Spawn spawn = Spawn.getInstance();
     private Map<String, ProtectedRegion> regionMap = new HashMap<>();
 
     public static Regions getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public void cacheRegions() {
@@ -31,7 +36,7 @@ public class Regions {
         RegionManager regionManager = container.get(spawn.getLocation().getWorld());
 
         if (regionManager == null) {
-            System.out.println("ERROR: No regions found.");
+            MessageUtil.log("&c[KitPvP] ERROR: No regions found.");
             return;
         }
 

@@ -4,13 +4,18 @@ import net.foulest.kitpvp.KitPvP;
 
 import java.sql.*;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class MySQL {
 
-    private static final MySQL instance = new MySQL();
+    private static final MySQL INSTANCE = new MySQL();
     private final KitPvP kitPvP = KitPvP.getInstance();
 
     public static MySQL getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public boolean exists(String scope, String table, String column, String logicGate, String data) {

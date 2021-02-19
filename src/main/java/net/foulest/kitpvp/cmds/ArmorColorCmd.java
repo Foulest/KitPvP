@@ -1,7 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.utils.ItemBuilder;
-import net.foulest.kitpvp.utils.MiscUtils;
+import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.bukkit.Color;
@@ -10,7 +10,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class ArmorColorCmd {
+
+    private static final int HEX_LENGTH = 6;
 
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
@@ -19,17 +26,17 @@ public class ArmorColorCmd {
         CommandSender sender = args.getSender();
 
         if (args.length() != 1) {
-            MiscUtils.messagePlayer(sender, "&cUsage: /armorcolor [hex]");
+            MessageUtil.messagePlayer(sender, "&cUsage: /armorcolor [hex]");
             return;
         }
 
-        if (args.getArgs(0).length() != 6) {
-            MiscUtils.messagePlayer(sender, "&cInvalid hex.");
+        if (args.getArgs(0).length() != HEX_LENGTH) {
+            MessageUtil.messagePlayer(sender, "&cInvalid hex.");
             return;
         }
 
         if (player.getInventory().getChestplate().getType() != Material.LEATHER_CHESTPLATE) {
-            MiscUtils.messagePlayer(sender, "&cYou can't color that chestplate.");
+            MessageUtil.messagePlayer(sender, "&cYou can't color that chestplate.");
             return;
         }
 
@@ -37,6 +44,6 @@ public class ArmorColorCmd {
         player.getInventory().setChestplate(chestplate);
         player.updateInventory();
 
-        MiscUtils.messagePlayer(sender, "&aColor 0x" + args.getArgs(0) + " has been applied.");
+        MessageUtil.messagePlayer(sender, "&aColor 0x" + args.getArgs(0) + " has been applied.");
     }
 }

@@ -79,8 +79,6 @@ m
 =src/main/java/net/foulest/kitpvp/listeners/EventListener.java,d\5\d57f83ac5150be46aec0aea042c11506fc29e094
 \
 ,src/main/java/net/foulest/kitpvp/KitPvP.java,e\a\eafe1104a36642baf68a213cab166f4c3c427046
-e
-5src/main/java/net/foulest/kitpvp/utils/MiscUtils.java,8\0\803662c42b3494c2b6c684fe4c4ff63091062f3b
 a
 1src/main/java/net/foulest/kitpvp/kits/Dragon.java,f\c\fcd285ae7a1e86a8d8bf6e56c25ced2129f9f615
 c
@@ -123,14 +121,6 @@ c
 3src/main/java/net/foulest/kitpvp/utils/Regions.java,4\1\411fff6f7eb1b22ebb7c37d76fc741032a93d6a7
 f
 6src/main/java/net/foulest/kitpvp/utils/PlayerData.java,d\b\db816547da968012918b4b2a1984d3be243ba2ea
-m
-=src/main/java/net/foulest/kitpvp/utils/kits/KitEnchanter.java,f\3\f3f5f717d0c3b70f4e682d70d40329fb0f5fd863
-a
-1src/main/java/net/foulest/kitpvp/kits/Eskimo.java,b\9\b9fde2c05e939db7a691e0d37ace9b8e2c82834e
-l
-<src/main/java/net/foulest/kitpvp/utils/kits/KitSelector.java,7\1\71691c1a7d54e68d9a038728ab94dc25425f0858
-h
-8src/main/java/net/foulest/kitpvp/utils/kits/KitShop.java,8\6\86f448e1938fc01fdc7c032d117e24c5a7665788
 j
 :src/main/java/net/foulest/kitpvp/cmds/KitEnchanterCmd.java,b\0\b0b67b3b7ed6e9dfe64069228a35f7ecd23d600a
 b
@@ -139,3 +129,13 @@ e
 5src/main/java/net/foulest/kitpvp/cmds/PotionsCmd.java,0\a\0a5150a2116f066b1819719c15389c0886e66d38
 q
 Asrc/main/java/net/foulest/kitpvp/listeners/StaffModeListener.java,d\1\d1f7d2981c5f184c45b7b67600960d28279168f0
+g
+7src/main/java/net/foulest/kitpvp/utils/MessageUtil.java,2\f\2f97a70a153db1ea35d41b3004ff39640ce526f4
+d
+4src/main/java/net/foulest/kitpvp/cmds/BountyCmd.java,2\d\2d0129684fb4013072477c423b91b04cf7d76d09
+m
+=src/main/java/net/foulest/kitpvp/utils/menus/KitSelector.java,c\2\c2aed3cea60263912bba645e425caabf69bd6964
+n
+>src/main/java/net/foulest/kitpvp/utils/menus/KitEnchanter.java,6\3\6359e31fc8f3705fd3cc1b4090acdc608be13484
+i
+9src/main/java/net/foulest/kitpvp/utils/menus/KitShop.java,0\1\0177d9baac5faa9833fae34f9e722816d4cf9291

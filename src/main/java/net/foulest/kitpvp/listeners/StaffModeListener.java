@@ -10,6 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class StaffModeListener implements Listener {
 
     private final Spawn spawn = Spawn.getInstance();

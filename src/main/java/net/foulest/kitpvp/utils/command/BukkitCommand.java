@@ -8,6 +8,11 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class BukkitCommand extends org.bukkit.command.Command {
 
     private final Plugin owningPlugin;
@@ -17,13 +22,15 @@ public class BukkitCommand extends org.bukkit.command.Command {
     protected BukkitCommand(String label, CommandExecutor executor, Plugin owner) {
         super(label);
         this.executor = executor;
-        this.owningPlugin = owner;
-        this.usageMessage = "";
+        owningPlugin = owner;
+        usageMessage = "";
     }
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         boolean success;
+        String newLine = "\n";
+        String commandPlaceholder = "<command>";
 
         if (!owningPlugin.isEnabled()) {
             return false;
@@ -36,7 +43,7 @@ public class BukkitCommand extends org.bukkit.command.Command {
         success = executor.onCommand(sender, this, commandLabel, args);
 
         if (!success && usageMessage.length() > 0) {
-            for (String line : usageMessage.replace("<command>", commandLabel).split("\n")) {
+            for (String line : usageMessage.replace(commandPlaceholder, commandLabel).split(newLine)) {
                 sender.sendMessage(line);
             }
         }
@@ -46,9 +53,9 @@ public class BukkitCommand extends org.bukkit.command.Command {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        Validate.notNull(sender, "Sender cannot be null");
-        Validate.notNull(args, "Arguments cannot be null");
-        Validate.notNull(alias, "Alias cannot be null");
+        Validate.notNull(sender, "Sender cannot be null.");
+        Validate.notNull(args, "Arguments cannot be null.");
+        Validate.notNull(alias, "Alias cannot be null.");
 
         List<String> completions = null;
 

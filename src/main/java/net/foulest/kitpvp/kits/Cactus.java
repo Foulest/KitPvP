@@ -11,6 +11,11 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
 public class Cactus implements Kit {
 
     @Override

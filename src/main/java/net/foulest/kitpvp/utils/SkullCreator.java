@@ -18,7 +18,12 @@ import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.UUID;
 
-public class SkullCreator {
+/**
+ * @author Foulest
+ * @created 02/18/2021
+ * @project KitPvP
+ */
+public final class SkullCreator {
 
     private static Field blockProfileField;
     private static Method metaSetProfileMethod;
