@@ -1,9 +1,9 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.menus.KitEnchanter;
 import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
+import net.foulest.kitpvp.utils.menus.KitEnchanter;
 
 /**
  * @author Foulest
@@ -12,8 +12,7 @@ import net.foulest.kitpvp.utils.command.CommandArgs;
  */
 public class KitEnchanterCmd {
 
-    // TODO: Implement this into EventListener
-    @Command(name = "enchanter", aliases = {"upgrade"}, description = "Opens the Kit Enchanter.",
+    @Command(name = "enchanter", aliases = {"kitenchanter"}, description = "Opens the Kit Enchanter.",
             usage = "/enchanter", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         if (args.length() != 0) {

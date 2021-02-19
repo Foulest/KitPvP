@@ -51,6 +51,10 @@ public final class PlayerData {
     private int bounty;
     private UUID benefactor;
     private boolean usingSoup;
+    private boolean featherFallingEnchant;
+    private boolean protectionEnchant;
+    private boolean sharpnessEnchant;
+    private boolean powerEnchant;
     private boolean isLoaded;
     private boolean pendingNoFallRemoval;
 
@@ -284,7 +288,7 @@ public final class PlayerData {
                 + ", topKillstreak=" + topKillstreak + ", usingSoup=" + usingSoup
                 + ", previousKit='" + previousKit.getName() + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
 
-        if (bounty != 0 && benefactor != null) {
+        if (bounty > 0) {
             mySQL.update("UPDATE Bounties SET bounty=" + bounty + ", benefactor='" + benefactor
                     + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
         }
@@ -419,7 +423,7 @@ public final class PlayerData {
                 level += 1;
 
                 if (afterKill) {
-                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
+                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, " &b&lLevel Up");
                     MessageUtil.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");

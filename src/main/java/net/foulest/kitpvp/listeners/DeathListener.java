@@ -87,12 +87,6 @@ public class DeathListener implements Listener {
         receiverData.setPreviousKit(currentKit);
         receiverData.addDeath();
 
-        // Removes certain metadata from the player.
-        receiver.removeMetadata(FEATHER_FALLING_METADATA, KITPVP);
-        receiver.removeMetadata(PROTECTION_METADATA, KITPVP);
-        receiver.removeMetadata(POWER_METADATA, KITPVP);
-        receiver.removeMetadata(SHARPNESS_METADATA, KITPVP);
-
         // Runs specific code if the player is killed by another player.
         if (COMBAT_LOG.getLastAttacker(receiver) != null) {
             Player damager = COMBAT_LOG.getLastAttacker(receiver);
@@ -106,7 +100,7 @@ public class DeathListener implements Listener {
             // Run specific code if the damager is on a multiple of 5 killstreak.
             if (damagerData.getKillstreak() >= MIN_KILLSTREAK && damagerData.getKillstreak() % MIN_KILLSTREAK == 0) {
                 // Sends all online players a killstreak message in chat.
-                MessageUtil.broadcastMessage("&a" + damager.getName() + " &eis on a &a" + damagerData.getKillstreak() + " &ekillstreak!");
+                MessageUtil.broadcastMessage("&6" + damager.getName() + " &eis on a &6" + damagerData.getKillstreak() + " &ekillstreak!");
 
                 // Re-adds the damager's kit items.
                 damager.getInventory().clear();
@@ -189,6 +183,38 @@ public class DeathListener implements Listener {
             SPAWN.teleport(receiver);
             receiver.getInventory().setHeldItemSlot(0);
             receiver.playSound(receiver.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
+        }
+
+        // Removes Feather Falling metadata from the player.
+        if (receiver.hasMetadata(FEATHER_FALLING_METADATA)) {
+            MessageUtil.messagePlayer(receiver, "");
+            MessageUtil.messagePlayer(receiver, "&eYour &cFeather Falling &eenchantment was removed on death.");
+            MessageUtil.messagePlayer(receiver, "");
+            receiver.removeMetadata(FEATHER_FALLING_METADATA, KITPVP);
+        }
+
+        // Removes Protection metadata from the player.
+        if (receiver.hasMetadata(PROTECTION_METADATA)) {
+            MessageUtil.messagePlayer(receiver, "");
+            MessageUtil.messagePlayer(receiver, "&eYour &cProtection &eenchantment was removed on death.");
+            MessageUtil.messagePlayer(receiver, "");
+            receiver.removeMetadata(PROTECTION_METADATA, KITPVP);
+        }
+
+        // Removes Power metadata from the player.
+        if (receiver.hasMetadata(POWER_METADATA)) {
+            MessageUtil.messagePlayer(receiver, "");
+            MessageUtil.messagePlayer(receiver, "&eYour &cPower &eenchantment was removed on death.");
+            MessageUtil.messagePlayer(receiver, "");
+            receiver.removeMetadata(POWER_METADATA, KITPVP);
+        }
+
+        // Removes Sharpness metadata from the player.
+        if (receiver.hasMetadata(SHARPNESS_METADATA)) {
+            MessageUtil.messagePlayer(receiver, "");
+            MessageUtil.messagePlayer(receiver, "&eYour &cSharpness &eenchantment was removed on death.");
+            MessageUtil.messagePlayer(receiver, "");
+            receiver.removeMetadata(SHARPNESS_METADATA, KITPVP);
         }
 
         // Resets the player's killstreak.

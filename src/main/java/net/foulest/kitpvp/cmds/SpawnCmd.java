@@ -71,7 +71,7 @@ public class SpawnCmd {
                     return;
                 }
 
-                player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, MessageUtil.colorize("&eTeleporting to spawn in &a"
                         + remainingSeconds-- + " seconds&e..."));
             }

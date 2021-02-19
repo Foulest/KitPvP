@@ -139,3 +139,5 @@ n
 >src/main/java/net/foulest/kitpvp/utils/menus/KitEnchanter.java,6\3\6359e31fc8f3705fd3cc1b4090acdc608be13484
 i
 9src/main/java/net/foulest/kitpvp/utils/menus/KitShop.java,0\1\0177d9baac5faa9833fae34f9e722816d4cf9291
+L
+.idea/dictionaries/igues.xml,0\1\019282c42870b60a7ca03cf3df2812319dd6a3f6
