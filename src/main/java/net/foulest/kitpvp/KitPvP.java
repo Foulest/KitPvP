@@ -83,6 +83,7 @@ public class KitPvP extends JavaPlugin {
                     "previousKit VARCHAR(36))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitName VARCHAR(36))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Bounties (uuid VARCHAR(36), bounty INT, benefactor VARCHAR(36))");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Enchants (uuid VARCHAR(36), enchantId INT)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -170,7 +171,7 @@ public class KitPvP extends JavaPlugin {
                 }
                 player.getInventory().setItem(6, healingItem);
 
-                ItemStack bounties = new ItemBuilder(Material.GOLD_INGOT).name("&aBounties &7(Right Click)").build();
+                ItemStack bounties = new ItemBuilder(Material.ENCHANTED_BOOK).name("&aKit Enchanter &7(Right Click)").build();
                 player.getInventory().setItem(7, bounties);
 
                 if (player.hasPermission(staffPerm)) {

@@ -401,25 +401,75 @@ public class EventListener implements Listener {
 
             switch (itemName) {
                 case "Feather Falling":
-                    // feather falling code
-                    break;
+                    if (!Regions.getInstance().isInSafezone(player)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
+                        event.setCancelled(true);
+                        return;
+                    }
 
-                case "Protection":
-                    if (playerData.getCoins() - PROTECTION_COST < 0) {
+                    if (playerData.getCoins() - FEATHER_FALLING_COST < 0) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
                         event.setCancelled(true);
-                        player.closeInventory();
                         return;
                     }
 
                     if (!playerData.hasKit()) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
                         event.setCancelled(true);
-                        player.closeInventory();
                         return;
                     }
 
-                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0f, 1.0f);
+                    if (player.hasMetadata(FEATHER_FALLING_METADATA)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou already have the Feather Falling enchantment.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0F, 1.0F);
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, "&eThe &aFeather Falling &eenchantment has been purchased.");
+                    MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
+                    MessageUtil.messagePlayer(player, "");
+
+                    playerData.removeCoins(FEATHER_FALLING_COST);
+                    player.setMetadata(FEATHER_FALLING_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.getKit().apply(player);
+                    break;
+
+                case "Protection":
+                    if (!Regions.getInstance().isInSafezone(player)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (playerData.getCoins() - PROTECTION_COST < 0) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (!playerData.hasKit()) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (player.hasMetadata(PROTECTION_METADATA)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou already have the Protection enchantment.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0F, 1.0F);
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, "&eThe &aProtection &eenchantment has been purchased.");
                     MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
@@ -431,11 +481,83 @@ public class EventListener implements Listener {
                     break;
 
                 case "Power":
-                    // power code
+                    if (!Regions.getInstance().isInSafezone(player)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (playerData.getCoins() - POWER_COST < 0) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (!playerData.hasKit()) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (player.hasMetadata(POWER_METADATA)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou already have the Power enchantment.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0F, 1.0F);
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, "&eThe &aPower &eenchantment has been purchased.");
+                    MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
+                    MessageUtil.messagePlayer(player, "");
+
+                    playerData.removeCoins(POWER_COST);
+                    player.setMetadata(POWER_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.getKit().apply(player);
                     break;
 
                 case "Sharpness":
-                    // sharpness code
+                    if (!Regions.getInstance().isInSafezone(player)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (playerData.getCoins() - SHARPNESS_COST < 0) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (!playerData.hasKit()) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (player.hasMetadata(SHARPNESS_METADATA)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou already have the Sharpness enchantment.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0F, 1.0F);
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, "&eThe &aSharpness &eenchantment has been purchased.");
+                    MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
+                    MessageUtil.messagePlayer(player, "");
+
+                    playerData.removeCoins(SHARPNESS_COST);
+                    player.setMetadata(SHARPNESS_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.getKit().apply(player);
                     break;
 
                 default:
@@ -448,6 +570,11 @@ public class EventListener implements Listener {
         }
     }
 
+    /**
+     * Prevents players from getting hungry.
+     *
+     * @param event -
+     */
     @EventHandler
     public void onFoodChange(FoodLevelChangeEvent event) {
         Player player = (Player) event.getEntity();
@@ -456,6 +583,11 @@ public class EventListener implements Listener {
         player.setSaturation(20);
     }
 
+    /**
+     * Prevents mobs from naturally spawning.
+     *
+     * @param event -
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMobSpawn(CreatureSpawnEvent event) {
         CreatureSpawnEvent.SpawnReason spawnEvent = event.getSpawnReason();
@@ -467,8 +599,13 @@ public class EventListener implements Listener {
         }
     }
 
+    /**
+     * Huge event that handles right clicks.
+     *
+     * @param event -
+     */
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
@@ -608,6 +745,12 @@ public class EventListener implements Listener {
         }
     }
 
+    /**
+     * Prevents players from chatting while not loaded.
+     * This fixes an issue that almost never happens.
+     *
+     * @param event -
+     */
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -618,6 +761,11 @@ public class EventListener implements Listener {
         }
     }
 
+    /**
+     * Handles player move events.
+     *
+     * @param event -
+     */
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();

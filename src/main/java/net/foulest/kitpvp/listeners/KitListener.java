@@ -247,7 +247,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no targets found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
@@ -481,7 +481,7 @@ public class KitListener implements Listener {
 
                 if (damagerData.getKit() instanceof Spiderman) {
                     if (!receiverData.hasKit() || Regions.getInstance().isInSafezone(receiver)) {
-                        damager.playSound(damager.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                        damager.playSound(damager.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(damager, "&cYou can't use your ability on players in spawn.");
                         damagerData.setCooldown(damagerData.getKit(), damagerData.getKit().getDisplayItem().getType(), 15, true);
                         return;
@@ -549,7 +549,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
@@ -598,7 +598,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
@@ -636,7 +636,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
@@ -683,7 +683,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;
@@ -779,7 +779,7 @@ public class KitListener implements Listener {
             }
 
             if (playerList.isEmpty()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cAbility failed; no players found nearby.");
                 playerData.setCooldown(playerData.getKit(), playerData.getKit().getDisplayItem().getType(), 5, true);
                 return;

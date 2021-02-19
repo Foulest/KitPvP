@@ -120,7 +120,17 @@ public interface Kit {
 
         // Sets the player's kit items.
         for (int i = 0; i < getItems().size(); ++i) {
-            player.getInventory().setItem(i, getItems().get(i));
+            ItemStack item = getItems().get(i);
+
+            if (item.getType().toString().toLowerCase().contains("sword") && player.hasMetadata(sharpnessMetadata)) {
+                item = new ItemBuilder(item).enchant(Enchantment.DAMAGE_ALL, 2).build();
+            }
+
+            if (item.getType().toString().toLowerCase().contains("bow") && player.hasMetadata(powerMetadata)) {
+                item = new ItemBuilder(item).enchant(Enchantment.ARROW_DAMAGE, 2).build();
+            }
+
+            player.getInventory().setItem(i, item);
         }
 
         // Sets the player's armor.
@@ -131,25 +141,25 @@ public interface Kit {
 
         if (player.hasMetadata(protectionMetadata)) {
             if (helmet != null && helmet.getType() != Material.AIR) {
-                helmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                helmet = new ItemBuilder(helmet).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
             }
 
             if (chestplate != null && chestplate.getType() != Material.AIR) {
-                chestplate.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                chestplate = new ItemBuilder(chestplate).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
             }
 
             if (leggings != null && leggings.getType() != Material.AIR) {
-                leggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                leggings = new ItemBuilder(leggings).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
             }
 
             if (boots != null && boots.getType() != Material.AIR) {
-                boots.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
             }
         }
 
         if (player.hasMetadata(featherFallingMetadata)
                 && boots != null && boots.getType() != Material.AIR) {
-            boots.addEnchantment(Enchantment.PROTECTION_FALL, 4);
+            boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_FALL, 4).build();
         }
 
         player.getInventory().setHelmet(helmet);

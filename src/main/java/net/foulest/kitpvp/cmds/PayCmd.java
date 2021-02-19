@@ -58,7 +58,7 @@ public class PayCmd {
             targetData.saveStats();
 
             if ((args.getSender() instanceof Player) && target == args.getSender()) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(target, "&cYou can't pay yourself.");
                 return;
             }
