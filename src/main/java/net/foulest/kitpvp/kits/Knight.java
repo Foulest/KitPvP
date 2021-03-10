@@ -33,7 +33,7 @@ public class Knight implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         return Collections.singletonList(sword);
     }
 
@@ -43,10 +43,10 @@ public class Knight implements Kit {
                 + "A1Mzk3M2U3YzUyMzcyYzNiMTExMzk0ZGZmOTUxOWNiYWMxZmJhM2Y2NTliMjE4NmJlZjhlZWY5ZTEwZmEyIn19fQ==";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fKnight's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fKnight's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

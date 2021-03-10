@@ -37,9 +37,9 @@ public class Vampire implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.REDSTONE).name("&aDrain Effects &7(Right Click)")
-                .lore("&7Drains players potion effects.").build();
+                .lore("&7Drains players potion effects.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -49,10 +49,10 @@ public class Vampire implements Kit {
                 + "0NDc1NmUwYjRlY2U4ZDc0NjI5NmEzZDVlMjk3ZTE0MTVmNGJhMTc2NDdmZmUyMjgzODUzODNkMTYxYTkifX19";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fVampire's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x191919)).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fVampire's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x191919)).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

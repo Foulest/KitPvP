@@ -38,7 +38,7 @@ public class EcoTakeCmd {
         PlayerData targetData = PlayerData.getInstance(target);
         int amount = Integer.parseInt(args.getArgs(1));
 
-        targetData.setCoins(Math.max(0, targetData.getCoins() - amount));
+        targetData.removeCoins(amount);
         targetData.saveStats();
 
         if (args.getSender() instanceof Player && target == args.getSender()) {

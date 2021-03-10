@@ -1,7 +1,9 @@
 package net.foulest.kitpvp.utils;
 
 import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.object.LCCooldown;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketCooldown;
+import lombok.Getter;
+import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
@@ -19,23 +21,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Foulest
  * @created 02/18/2021
  * @project KitPvP
  */
+@Getter
+@Setter
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public final class PlayerData {
 
-    static final Set<PlayerData> INSTANCES = new HashSet<>();
+    private static final Set<PlayerData> INSTANCES = new HashSet<>();
+    private static final Map<Kit, Long> COOLDOWNS = new HashMap<>();
+    private static final KitPvP KITPVP = KitPvP.getInstance();
+    private static final MySQL MYSQL = MySQL.getInstance();
+    private static final LunarClientAPI LUNAR_API = LunarClientAPI.getInstance();
+    private static final KitManager KIT_MANAGER = KitManager.getInstance();
     private final Player player;
-    private final Map<Kit, Long> cooldowns = new HashMap<>();
-    private final KitPvP kitPvP = KitPvP.getInstance();
-    private final MySQL mySQL = MySQL.getInstance();
-    private final LunarClientAPI lunarClientAPI = LunarClientAPI.getInstance();
-    private final KitManager kitManager = KitManager.getInstance();
     private final List<Kit> ownedKits = new ArrayList<>();
     private BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportingToSpawn;
@@ -60,12 +63,15 @@ public final class PlayerData {
 
     private PlayerData(Player player) {
         this.player = player;
-        previousKit = KitManager.getInstance().valueOf("Knight");
+        previousKit = KIT_MANAGER.valueOf("Knight");
         kit = null;
 
         INSTANCES.add(this);
     }
 
+    /**
+     * Returns the player's PlayerData.
+     */
     public static PlayerData getInstance(Player player) {
         for (PlayerData playerData : INSTANCES) {
             if (playerData != null && playerData.getPlayer() != null && playerData.getPlayer().isOnline()
@@ -77,88 +83,12 @@ public final class PlayerData {
         return new PlayerData(player);
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Kit getKit() {
-        return kit;
-    }
-
-    public void setKit(Kit kit) {
-        this.kit = kit;
-    }
-
-    public boolean hasKit() {
-        return kit != null;
-    }
-
-    public Kit getPreviousKit() {
-        return previousKit;
-    }
-
-    public void setPreviousKit(Kit kit) {
-        previousKit = kit;
-    }
-
-    public boolean hasPreviousKit() {
-        return previousKit != null;
-    }
-
-    public boolean ownsKit(Kit kit) {
-        return ownedKits.contains(kit);
-    }
-
-    public void addOwnedKit(Kit kit) {
-        ownedKits.add(kit);
-    }
-
-    public List<Kit> getKits() {
-        return ownedKits;
-    }
-
-    public int getCoins() {
-        return coins;
-    }
-
-    public void setCoins(int coins) {
-        this.coins = coins;
-    }
-
-    public void addCoins(int coins) {
-        this.coins += coins;
-    }
-
-    public void removeCoins(int coins) {
-        this.coins = Math.max(this.coins - coins, 0);
-    }
-
-    public int getBounty() {
-        return bounty;
-    }
-
-    public void setBounty(int bounty) {
-        this.bounty = bounty;
-    }
-
-    public void removeBounty() {
-        bounty = 0;
-    }
-
-    public UUID getBenefactor() {
-        return benefactor;
-    }
-
-    public void setBenefactor(UUID benefactor) {
-        this.benefactor = benefactor;
-    }
-
-    public void removeBenefactor() {
-        benefactor = null;
-    }
-
+    /**
+     * Checks if a player has a cooldown for
+     * the kit they have equipped.
+     */
     public boolean hasCooldown(boolean sendMessage) {
-        long cooldown = cooldowns.containsKey(kit) ? (cooldowns.get(kit) - System.currentTimeMillis()) : 0L;
+        long cooldown = COOLDOWNS.containsKey(kit) ? (COOLDOWNS.get(kit) - System.currentTimeMillis()) : 0L;
 
         if (cooldown > 0) {
             if (sendMessage) {
@@ -172,16 +102,14 @@ public final class PlayerData {
         return false;
     }
 
-    public long getCooldown() {
-        return cooldowns.containsKey(kit) ? (cooldowns.get(kit) - System.currentTimeMillis()) : 0L;
-    }
-
+    /**
+     * Clears a player's cooldowns for their kit.
+     */
     public void clearCooldowns() {
-        cooldowns.clear();
+        COOLDOWNS.clear();
 
-        if (hasKit() && lunarClientAPI.isRunningLunarClient(player)) {
-            lunarClientAPI.clearCooldown(player, new LCCooldown("Ability", 0L, TimeUnit.SECONDS,
-                    getKit().getDisplayItem().getType()));
+        if (getKit() != null && LUNAR_API.isRunningLunarClient(player)) {
+            LUNAR_API.sendPacket(player, new LCPacketCooldown("Ability", 0L, getKit().getDisplayItem().getType().getId()));
         }
 
         if (abilityCooldownNotifier != null) {
@@ -191,10 +119,10 @@ public final class PlayerData {
     }
 
     public void setCooldown(Kit kit, Material icon, int cooldownTime, boolean notify) {
-        cooldowns.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
+        COOLDOWNS.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
 
-        if (hasKit() && lunarClientAPI.isRunningLunarClient(player)) {
-            lunarClientAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
+        if (getKit() != null && LUNAR_API.isRunningLunarClient(player)) {
+            LUNAR_API.sendPacket(player, new LCPacketCooldown("Ability", cooldownTime * 1000L, icon.getId()));
         }
 
         if (notify) {
@@ -202,80 +130,64 @@ public final class PlayerData {
                 @Override
                 public void run() {
                     MessageUtil.messagePlayer(player, MessageUtil.colorize("&aYour ability cooldown has expired."));
-                    cooldowns.remove(kit);
+                    COOLDOWNS.remove(kit);
                 }
-            }.runTaskLater(kitPvP, cooldownTime * 20L);
+            }.runTaskLater(KITPVP, cooldownTime * 20L);
         }
     }
 
-    public int getKills() {
-        return kills;
-    }
-
-    public void setKills(int kills) {
-        this.kills = kills;
-    }
-
-    public int getDeaths() {
-        return deaths;
-    }
-
-    public void setDeaths(int deaths) {
-        this.deaths = deaths;
-    }
-
     public void load() throws SQLException {
-        if (!mySQL.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
-            mySQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak," +
+        if (!MYSQL.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
+            MYSQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak," +
                     " topKillstreak, usingSoup, previousKit)" + " VALUES ('" + player.getUniqueId().toString()
                     + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + true + ", 'Knight')");
         }
 
-        if (!mySQL.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
-            mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
+        if (!MYSQL.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
+            MYSQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
         } else {
             ResultSet result;
 
-            try (Connection connection = kitPvP.getHikari().getConnection();
+            try (Connection connection = KITPVP.getHikari().getConnection();
                  PreparedStatement select = connection.prepareStatement("SELECT * FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'")) {
                 result = select.executeQuery();
 
                 while (result.next()) {
-                    ownedKits.add(kitManager.valueOf(result.getString("kitName")));
+                    ownedKits.add(KIT_MANAGER.valueOf(result.getString("kitName")));
                 }
 
-            } catch (SQLException e) {
-                // ignored
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         }
 
-        if (mySQL.exists("*", "Bounties", "uuid", "=", player.getUniqueId().toString())) {
-            setBounty((Integer) mySQL.get("bounty", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
-            setBenefactor((UUID) mySQL.get("benefactor", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
+        if (MYSQL.exists("*", "Bounties", "uuid", "=", player.getUniqueId().toString())) {
+            setBounty((Integer) MYSQL.get("bounty", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
+            setBenefactor(UUID.fromString((String) MYSQL.get("benefactor", "*", "Bounties", "uuid", "=", player.getUniqueId().toString())));
         }
 
-        setCoins((Integer) mySQL.get("coins", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setExperience((Integer) mySQL.get("experience", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setKills((Integer) mySQL.get("kills", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setDeaths((Integer) mySQL.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setKillstreak((Integer) mySQL.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setTopKillstreak((Integer) mySQL.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setUsingSoup((Boolean) mySQL.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-        setPreviousKit(KitManager.getInstance().valueOf((String) mySQL.get("previousKit", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())));
+        setCoins((Integer) MYSQL.get("coins", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setExperience((Integer) MYSQL.get("experience", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setKills((Integer) MYSQL.get("kills", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setDeaths((Integer) MYSQL.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setKillstreak((Integer) MYSQL.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setTopKillstreak((Integer) MYSQL.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setUsingSoup((Boolean) MYSQL.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setPreviousKit(KIT_MANAGER.valueOf((String) MYSQL.get("previousKit", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())));
 
         isLoaded = true;
     }
 
     public void saveAll() {
         if (!ownedKits.isEmpty()) {
-            mySQL.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'");
+            MYSQL.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'");
 
             for (Kit kits : ownedKits) {
                 if (kits == null) {
                     continue;
                 }
 
-                mySQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
+                MYSQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
             }
         }
 
@@ -283,14 +195,32 @@ public final class PlayerData {
     }
 
     public void saveStats() {
-        mySQL.update("UPDATE PlayerStats SET coins=" + coins + ", experience=" + experience
+        MYSQL.update("UPDATE PlayerStats SET coins=" + coins + ", experience=" + experience
                 + ", kills=" + kills + ", deaths=" + deaths + ", killstreak=" + killstreak
                 + ", topKillstreak=" + topKillstreak + ", usingSoup=" + usingSoup
                 + ", previousKit='" + previousKit.getName() + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
 
+        MYSQL.update("UPDATE Bounties SET bounty=" + bounty + ", benefactor='" + benefactor
+                + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+    }
+
+    public void addBounty(int bounty, UUID benefactor) {
         if (bounty > 0) {
-            mySQL.update("UPDATE Bounties SET bounty=" + bounty + ", benefactor='" + benefactor
-                    + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+            removeBounty();
+        }
+
+        this.bounty = bounty;
+        this.benefactor = benefactor;
+
+        MYSQL.update("INSERT INTO Bounties (uuid, bounty, benefactor) VALUES ('" + player.getUniqueId().toString() + "', " + bounty + ", '" + benefactor + "');");
+    }
+
+    public void removeBounty() {
+        if (bounty > 0) {
+            bounty = 0;
+            benefactor = null;
+
+            MYSQL.update("DELETE FROM Bounties WHERE uuid='" + player.getUniqueId().toString() + "'");
         }
     }
 
@@ -303,18 +233,6 @@ public final class PlayerData {
         INSTANCES.remove(this);
     }
 
-    public void addDeath() {
-        deaths += 1;
-    }
-
-    public void addKill() {
-        kills += 1;
-    }
-
-    public int getKillstreak() {
-        return killstreak;
-    }
-
     public void setKillstreak(int streak) {
         killstreak = streak;
         setTopKillstreak();
@@ -323,18 +241,6 @@ public final class PlayerData {
     public void addKillstreak() {
         killstreak += 1;
         setTopKillstreak();
-    }
-
-    public void resetKillStreak() {
-        killstreak = 0;
-    }
-
-    public int getTopKillstreak() {
-        return topKillstreak;
-    }
-
-    public void setTopKillstreak(int streak) {
-        topKillstreak = streak;
     }
 
     public void setTopKillstreak() {
@@ -353,26 +259,6 @@ public final class PlayerData {
         DecimalFormat format = new DecimalFormat(decimalFormatStr);
 
         return format.format(getKDR());
-    }
-
-    public boolean isPendingNoFallRemoval() {
-        return pendingNoFallRemoval;
-    }
-
-    public void setPendingNoFallRemoval(boolean value) {
-        pendingNoFallRemoval = value;
-    }
-
-    public boolean isLoaded() {
-        return isLoaded;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public int getExperience() {
-        return experience;
     }
 
     public void setExperience(int exp) {
@@ -429,7 +315,7 @@ public final class PlayerData {
                     MessageUtil.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
                     MessageUtil.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
                     MessageUtil.messagePlayer(player, "");
-                    addCoins(150);
+                    setCoins(getCoins() + 150);
                 }
             }
         }
@@ -438,23 +324,7 @@ public final class PlayerData {
         player.setExp(getExpDecimal());
     }
 
-    public boolean isTeleportingToSpawn() {
-        return teleportingToSpawn != null;
-    }
-
-    public void setTeleportingToSpawn(BukkitTask task) {
-        teleportingToSpawn = task;
-    }
-
-    public BukkitTask getTeleportingToSpawnTask() {
-        return teleportingToSpawn;
-    }
-
-    public boolean isUsingSoup() {
-        return usingSoup;
-    }
-
-    public void setUsingSoup(boolean status) {
-        usingSoup = status;
+    public void removeCoins(int coins) {
+        this.coins = Math.max(0, this.coins - coins);
     }
 }

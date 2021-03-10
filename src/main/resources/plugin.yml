@@ -1,5 +1,5 @@
 name: KitPvP
-version: '1.0.7'
+version: '1.0.8'
 main: net.foulest.kitpvp.KitPvP
 author: Foulest
 depend: [ PlaceholderAPI, WorldEdit, WorldGuard, FStaff ]

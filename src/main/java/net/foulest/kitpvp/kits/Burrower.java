@@ -36,9 +36,9 @@ public class Burrower implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
-        ItemStack special = new ItemBuilder(Material.BRICK).name("&aPanic Room &7(Right Click)")
-                .lore("&7Create a panic room for protection.").build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).hideInfo().unbreakable(true).getItem();
+        ItemStack special = new ItemBuilder(Material.BRICK).hideInfo().name("&aPanic Room &7(Right Click)")
+                .lore("&7Create a panic room for protection.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -48,10 +48,10 @@ public class Burrower implements Kit {
                 + "M0NDBlYWM4YmQ1MzA4YzMyY2Y5ODJjM2I5YzNjOWI0OWQzNDVkYjY0ODNlZDQ0Nzg0ZmQyZDk0ZmNhMzIyZSJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fBurrower's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).hideInfo().name("&fBurrower's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_CHESTPLATE).hideInfo().unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).hideInfo().unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_BOOTS).hideInfo().unbreakable(true).getItem()
         };
     }
 

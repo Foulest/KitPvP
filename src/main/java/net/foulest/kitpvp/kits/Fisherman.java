@@ -37,9 +37,9 @@ public class Fisherman implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.FISHING_ROD).name("&aHookshot &7(Right Click)")
-                .lore("&7Hooks players to your location.").unbreakable(true).build();
+                .lore("&7Hooks players to your location.").unbreakable(true).getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -49,10 +49,10 @@ public class Fisherman implements Kit {
                 + "MTcxNTI4NzZiYzNhOTZkZDJhMjI5OTI0NWVkYjNiZWVmNjQ3YzhhNTZhYzg4NTNhNjg3YzNlN2I1ZDhiYiJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fFisherman's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0xBF8426)).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fFisherman's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0xBF8426)).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

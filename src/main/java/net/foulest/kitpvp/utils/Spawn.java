@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.utils;
 
+import lombok.Getter;
 import net.foulest.kitpvp.KitPvP;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,19 +15,17 @@ import java.util.logging.Logger;
  * @created 02/18/2021
  * @project KitPvP
  */
+@Getter
 public class Spawn {
 
     private static final Spawn INSTANCE = new Spawn();
-    private final Logger log = Logger.getLogger("Minecraft");
-    private final KitPvP kitPvP = KitPvP.getInstance();
+    private static final Logger log = Logger.getLogger("Minecraft");
+    private static final KitPvP KITPVP = KitPvP.getInstance();
+    private static final Regions REGIONS = Regions.getInstance();
     private Location location;
 
     public static Spawn getInstance() {
         return INSTANCE;
-    }
-
-    public Location getLocation() {
-        return location;
     }
 
     public void setLocation(Location loc) {
@@ -54,7 +53,7 @@ public class Spawn {
             player.removePotionEffect(effect.getType());
         }
 
-        kitPvP.giveDefaultItems(player);
+        KITPVP.giveDefaultItems(player);
 
         player.setHealth(20);
         player.teleport(location);
@@ -100,6 +99,6 @@ public class Spawn {
         float pitch = ConfigManager.get().getInt("spawn.pitch");
         location = new Location(world, x, y, z, yaw, pitch);
 
-        Regions.getInstance().cacheRegions();
+        REGIONS.cacheRegions();
     }
 }

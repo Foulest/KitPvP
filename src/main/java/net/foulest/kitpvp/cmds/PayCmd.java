@@ -1,7 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.MessageUtil;
+import net.foulest.kitpvp.utils.PlayerData;
 import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +45,6 @@ public class PayCmd {
             Player sender = (Player) args.getSender();
             PlayerData targetData = PlayerData.getInstance(target);
             PlayerData senderData = PlayerData.getInstance(sender);
-            int oldAmount = targetData.getCoins();
             int check = senderData.getCoins() - Integer.parseInt(amount);
 
             if (check <= 0) {
@@ -53,7 +52,7 @@ public class PayCmd {
                 return;
             }
 
-            targetData.setCoins((Integer.parseInt(amount) + oldAmount));
+            targetData.setCoins(targetData.getCoins() + Integer.parseInt(amount));
             senderData.removeCoins(Integer.parseInt(amount));
             targetData.saveStats();
 

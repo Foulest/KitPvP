@@ -14,12 +14,14 @@ import org.bukkit.entity.Player;
  */
 public class KitShopCmd {
 
+    private static final Regions REGIONS = Regions.getInstance();
+
     @Command(name = "kitshop", aliases = {"shop"}, description = "Opens the Kit Shop.", usage = "/kitshop",
             inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 
-        if (!Regions.getInstance().isInSafezone(player)) {
+        if (!REGIONS.isInSafezone(player)) {
             MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
             return;
         }

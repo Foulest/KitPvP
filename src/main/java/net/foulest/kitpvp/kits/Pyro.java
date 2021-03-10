@@ -37,9 +37,9 @@ public class Pyro implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack weapon = new ItemBuilder(Material.WOOD_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).build();
-        ItemStack bow = new ItemBuilder(Material.BOW).enchant(Enchantment.ARROW_FIRE, 1).unbreakable(true).build();
-        ItemStack arrow = new ItemBuilder(Material.ARROW).amount(16).build();
+        ItemStack weapon = new ItemBuilder(Material.WOOD_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).getItem();
+        ItemStack bow = new ItemBuilder(Material.BOW).enchant(Enchantment.ARROW_FIRE, 1).unbreakable(true).getItem();
+        ItemStack arrow = new ItemBuilder(Material.ARROW).amount(16).getItem();
         return Arrays.asList(weapon, bow, arrow);
     }
 
@@ -49,10 +49,10 @@ public class Pyro implements Kit {
                 + "mNTc2NDU0Y2I2NDFhNmU1OTVlZGY0ZTc3YTcwYzIwM2U4OGVjYWIwZjIyMGQzZmUzMGZiM2NjYzhjOGJhOCJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fPyro's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.GOLD_BOOTS).enchant(Enchantment.PROTECTION_FIRE, 4).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fPyro's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_CHESTPLATE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.GOLD_BOOTS).enchant(Enchantment.PROTECTION_FIRE, 4).unbreakable(true).getItem()
         };
     }
 

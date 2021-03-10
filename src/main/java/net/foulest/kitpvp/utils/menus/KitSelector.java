@@ -24,11 +24,11 @@ public class KitSelector {
 
     public static final String INVENTORY_NAME = MessageUtil.colorize("Kit Selector");
     private static final Map<Player, Integer> PAGE = new HashMap<>();
+    private static final KitManager KIT_MANAGER = KitManager.getInstance();
     private final Inventory inv;
-    private final KitManager kitManager = KitManager.getInstance();
 
     public KitSelector(Player player) {
-        inv = Bukkit.createInventory(player, ensureSize(kitManager.getKits().size()) + 18, INVENTORY_NAME);
+        inv = Bukkit.createInventory(player, ensureSize(KIT_MANAGER.getKits().size()) + 18, INVENTORY_NAME);
 
         populateInventory(player, 0);
         player.closeInventory();
@@ -37,7 +37,7 @@ public class KitSelector {
     }
 
     public KitSelector(Player player, int page) {
-        inv = Bukkit.createInventory(player, ensureSize(kitManager.getKits().size()) + 18, INVENTORY_NAME + " - Page: " + (page + 1));
+        inv = Bukkit.createInventory(player, ensureSize(KIT_MANAGER.getKits().size()) + 18, INVENTORY_NAME + " - Page: " + (page + 1));
 
         populateInventory(player, page);
         player.closeInventory();
@@ -73,7 +73,7 @@ public class KitSelector {
      */
     private void populateInventory(Player player, int page) {
         PlayerData playerData = PlayerData.getInstance(player);
-        ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
+        ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int rowSize = 9;
 
         // Sets non-present items to glass.
@@ -85,16 +85,16 @@ public class KitSelector {
         }
 
         if (page > 0) {
-            inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").build());
+            inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
         }
 
-        List<Kit> checkedKits = kitManager.getKits().subList(page * 36, (page * 36) + ensureKits(kitManager.getKits().size() - (page * 36)));
+        List<Kit> checkedKits = KIT_MANAGER.getKits().subList(page * 36, (page * 36) + ensureKits(KIT_MANAGER.getKits().size() - (page * 36)));
 
         try {
-            List<Kit> futureCheck = kitManager.getKits().subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(kitManager.getKits().size() - ((page + 1) * 36)));
+            List<Kit> futureCheck = KIT_MANAGER.getKits().subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(KIT_MANAGER.getKits().size() - ((page + 1) * 36)));
 
             if (!futureCheck.isEmpty()) {
-                inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").build());
+                inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
             }
         } catch (IllegalArgumentException ex) {
             // ignored
@@ -102,7 +102,7 @@ public class KitSelector {
 
         // TODO: Sort alphabetically
         for (Kit kits : checkedKits) {
-            if (playerData.ownsKit(kits)) {
+            if (playerData.getOwnedKits().contains(kits)) {
                 inv.addItem(createKitItem(kits));
             }
         }
@@ -127,6 +127,6 @@ public class KitSelector {
 
         lore.add("&7");
         lore.add("&aClick to equip this kit.");
-        return new ItemBuilder(kit.getDisplayItem()).name("&a" + kit.getName()).lore(lore).build();
+        return new ItemBuilder(kit.getDisplayItem()).name("&a" + kit.getName()).lore(lore).getItem();
     }
 }

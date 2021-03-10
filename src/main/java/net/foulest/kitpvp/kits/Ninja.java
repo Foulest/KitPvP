@@ -37,7 +37,7 @@ public class Ninja implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack weapon = new ItemBuilder(Material.IRON_SWORD).unbreakable(true).build();
+        ItemStack weapon = new ItemBuilder(Material.IRON_SWORD).unbreakable(true).getItem();
         return Collections.singletonList(weapon);
     }
 
@@ -47,10 +47,10 @@ public class Ninja implements Kit {
                 + "jQ2ZmZlNGY2OGRhYWEwZjgzNDUzNmNiNTM4NmEzYTc5ZTZiM2U4NDM1OTY5NDM4MDRlMWIwOGE4MmVkNDRhNiJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fNinja's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x0C0C0C)).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fNinja's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x0C0C0C)).unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).getItem()
         };
     }
 

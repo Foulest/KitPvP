@@ -1,8 +1,10 @@
 package net.foulest.kitpvp.utils;
 
+import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -16,6 +18,7 @@ import java.util.List;
  * @created 02/18/2021
  * @project KitPvP
  */
+@Getter
 public class ItemBuilder {
 
     private final ItemStack item;
@@ -38,6 +41,23 @@ public class ItemBuilder {
     public ItemBuilder unbreakable(boolean status) {
         ItemMeta meta = item.getItemMeta();
         meta.spigot().setUnbreakable(status);
+        item.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilder addGlow() {
+        enchant(Enchantment.WATER_WORKER, 1);
+        ItemMeta meta = item.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        item.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilder hideInfo() {
+        ItemMeta meta = item.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         item.setItemMeta(meta);
         return this;
     }
@@ -110,18 +130,13 @@ public class ItemBuilder {
 
     public ItemBuilder color(Color color) {
         LeatherArmorMeta meta;
-        String leatherName = "LEATHER_";
 
-        if (item.getType().toString().contains(leatherName)) {
+        if (item.getType().toString().contains("LEATHER_")) {
             meta = (LeatherArmorMeta) item.getItemMeta();
             meta.setColor(color);
             item.setItemMeta(meta);
         }
 
         return this;
-    }
-
-    public ItemStack build() {
-        return item;
     }
 }

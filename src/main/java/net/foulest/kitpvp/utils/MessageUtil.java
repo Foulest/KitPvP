@@ -5,16 +5,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Random;
-
 /**
  * @author Foulest
  * @created 02/18/2021
  * @project KitPvP
  */
 public final class MessageUtil {
-
-    public static final Random RANDOM = new Random();
 
     private MessageUtil() {
     }
@@ -24,12 +20,12 @@ public final class MessageUtil {
     }
 
     public static void log(String message) {
-        Bukkit.getConsoleSender().sendMessage(colorize(message));
+        messagePlayer(Bukkit.getConsoleSender(), message);
     }
 
     public static void broadcastMessage(String message) {
         for (Player online : Bukkit.getOnlinePlayers()) {
-            online.sendMessage(colorize(message));
+            messagePlayer(online, message);
         }
     }
 

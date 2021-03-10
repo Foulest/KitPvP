@@ -4,6 +4,7 @@ import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
+import net.foulest.kitpvp.utils.menus.KitEnchanter;
 import net.foulest.kitpvp.utils.menus.KitSelector;
 import net.foulest.kitpvp.utils.menus.KitShop;
 import org.bukkit.*;
@@ -39,34 +40,14 @@ import java.sql.SQLException;
  */
 public class EventListener implements Listener {
 
-    private static final int MAX_KITS = 10;
-    private static final int FEATHER_FALLING_COST = 100;
-    private static final int PROTECTION_COST = 150;
-    private static final int POWER_COST = 200;
-    private static final int SHARPNESS_COST = 250;
-    private static final String BYPASS_LIMIT_PERMISSION = "kitpvp.bypasslimit";
-    private static final String PLAYER_INV_NAME = "container.inventory";
-    private static final String MODIFY_PERMISSION = "kitpvp.modify";
-    private static final String FEATHER_FALLING_METADATA = "featherFalling";
-    private static final String PROTECTION_METADATA = "protection";
-    private static final String SHARPNESS_METADATA = "sharpness";
-    private static final String POWER_METADATA = "power";
-    private static final String NO_FALL_METADATA = "noFall";
-    private static final String RIGHT_CLICK = "RIGHT";
-    private static final String KIT_SHOP_NAME = "Kit Shop";
-    private static final String KIT_ENCHANTER_NAME = "Kit Enchanter";
-    private static final String KIT_SELECTOR_NAME = "Kit Selector";
-    private static final String BOUNTIES_NAME = "Bounties";
-    private static final String YOUR_STATS_NAME = "Your Stats";
-    private static final String PREVIOUS_KIT_NAME = "Previous Kit";
-    private static final String USE_SOUP_NAME = "Use Soup";
-    private static final String USE_POTIONS_NAME = "Use Potions";
     private static final EventListener INSTANCE = new EventListener();
     private static final Spawn SPAWN = Spawn.getInstance();
     private static final KitPvP KITPVP = KitPvP.getInstance();
     private static final MySQL MYSQL = MySQL.getInstance();
     private static final KitManager KIT_MANAGER = KitManager.getInstance();
     private static final CombatLog COMBAT_LOG = CombatLog.getInstance();
+    private static final Regions REGIONS = Regions.getInstance();
+    private static final DeathListener DEATH_LISTENER = DeathListener.getInstance();
 
     public static EventListener getInstance() {
         return INSTANCE;
@@ -90,8 +71,8 @@ public class EventListener implements Listener {
         }
 
         for (Kit kit : KIT_MANAGER.getKits()) {
-            if (kit.getCost() == 0 && !playerData.ownsKit(kit)) {
-                playerData.addOwnedKit(kit);
+            if (kit.getCost() == 0 && !playerData.getOwnedKits().contains(kit)) {
+                playerData.getOwnedKits().add(kit);
             }
         }
 
@@ -103,17 +84,17 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (player.hasMetadata(NO_FALL_METADATA)) {
-            player.removeMetadata(NO_FALL_METADATA, KITPVP);
+        if (player.hasMetadata("noFall")) {
+            player.removeMetadata("noFall", KITPVP);
             playerData.setPendingNoFallRemoval(false);
         }
 
         if (COMBAT_LOG.isInCombat(player)) {
-            DeathListener.handleDeath(player, true);
+            DEATH_LISTENER.handleDeath(player, true);
         }
 
         playerData.clearCooldowns();
-        playerData.resetKillStreak();
+        playerData.setKillstreak(0);
         playerData.saveAll();
         playerData.unload();
     }
@@ -125,7 +106,7 @@ public class EventListener implements Listener {
         event.getDrops().clear();
         event.setDroppedExp(0);
 
-        DeathListener.handleDeath(player, false);
+        DEATH_LISTENER.handleDeath(player, false);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -133,7 +114,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             if (event.getItemDrop().getItemStack().getType() == Material.BOWL) {
                 event.getItemDrop().remove();
             } else {
@@ -151,7 +132,7 @@ public class EventListener implements Listener {
         }
 
         if (event.getBlock().getType() == Material.LADDER && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION)) {
+                && player.hasPermission("kitpvp.modify")) {
             event.setCancelled(true);
         }
     }
@@ -161,7 +142,7 @@ public class EventListener implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-            if (Regions.getInstance().isInSafezone(player)) {
+            if (REGIONS.isInSafezone(player)) {
                 event.setCancelled(true);
                 player.updateInventory();
             }
@@ -210,7 +191,12 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerCraft(CraftItemEvent event) {
-        event.setCancelled(true);
+        Player player = (Player) event.getWhoClicked();
+
+        if (!(player.getGameMode() == GameMode.CREATIVE
+                && player.hasPermission("kitpvp.modify"))) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -274,8 +260,8 @@ public class EventListener implements Listener {
             Player player = (Player) event.getEntity();
             PlayerData playerData = PlayerData.getInstance(player);
 
-            if (playerData.isTeleportingToSpawn()) {
-                playerData.getTeleportingToSpawnTask().cancel();
+            if (playerData.getTeleportingToSpawn() != null) {
+                playerData.getTeleportingToSpawn().cancel();
                 MessageUtil.messagePlayer(player, MessageUtil.colorize("&cTeleportation cancelled, you took damage."));
                 playerData.setTeleportingToSpawn(null);
             }
@@ -289,7 +275,7 @@ public class EventListener implements Listener {
 
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
-                && !(PLAYER_INV_NAME).equals(event.getClickedInventory().getName())) {
+                && !event.getClickedInventory().getName().equals("container.inventory")) {
             event.setCancelled(true);
             player.updateInventory();
             return;
@@ -302,13 +288,13 @@ public class EventListener implements Listener {
         }
 
         // Prevents players in kits from moving their armor.
-        if (playerData.hasKit() && event.getSlotType() == InventoryType.SlotType.ARMOR) {
+        if (playerData.getKit() != null && event.getSlotType() == InventoryType.SlotType.ARMOR) {
             event.setCancelled(true);
             player.updateInventory();
             return;
         }
 
-        if (event.getView().getTitle().contains(KIT_SHOP_NAME)) {
+        if (event.getView().getTitle().contains("Kit Shop")) {
             event.setCancelled(true);
             player.updateInventory();
 
@@ -330,7 +316,7 @@ public class EventListener implements Listener {
                     return;
                 }
 
-                if (player.hasPermission(BYPASS_LIMIT_PERMISSION) && playerData.getKits().size() == MAX_KITS) {
+                if (!player.hasPermission("kitpvp.bypasslimit") && playerData.getOwnedKits().size() == 10) {
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, " &cYou have reached your kit limit.");
                     MessageUtil.messagePlayer(player, "");
@@ -340,7 +326,7 @@ public class EventListener implements Listener {
                     return;
                 }
 
-                playerData.addOwnedKit(kit);
+                playerData.getOwnedKits().add(kit);
                 playerData.removeCoins(kit.getCost());
                 MYSQL.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kit.getName() + "')");
                 MessageUtil.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
@@ -348,7 +334,7 @@ public class EventListener implements Listener {
                 player.closeInventory();
             }
 
-        } else if (event.getView().getTitle().contains(KIT_SELECTOR_NAME)) {
+        } else if (event.getView().getTitle().contains("Kit Selector")) {
             event.setCancelled(true);
             player.updateInventory();
 
@@ -384,7 +370,7 @@ public class EventListener implements Listener {
                     break;
             }
 
-        } else if (event.getView().getTitle().contains(KIT_ENCHANTER_NAME)) {
+        } else if (event.getView().getTitle().contains("Kit Enchanter")) {
             event.setCancelled(true);
             player.updateInventory();
 
@@ -401,28 +387,28 @@ public class EventListener implements Listener {
 
             switch (itemName) {
                 case "Feather Falling":
-                    if (!Regions.getInstance().isInSafezone(player)) {
+                    if (!REGIONS.isInSafezone(player)) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (playerData.getCoins() - FEATHER_FALLING_COST < 0) {
+                    if (playerData.getCoins() - 50 < 0) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (!playerData.hasKit()) {
+                    if (playerData.getKit() == null) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (player.hasMetadata(FEATHER_FALLING_METADATA)) {
+                    if (player.hasMetadata("featherFalling")) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou already have the Feather Falling enchantment.");
                         event.setCancelled(true);
@@ -435,34 +421,74 @@ public class EventListener implements Listener {
                     MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                     MessageUtil.messagePlayer(player, "");
 
-                    playerData.removeCoins(FEATHER_FALLING_COST);
-                    player.setMetadata(FEATHER_FALLING_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.removeCoins(50);
+                    player.setMetadata("featherFalling", new FixedMetadataValue(KITPVP, true));
                     playerData.getKit().apply(player);
                     break;
 
-                case "Protection":
-                    if (!Regions.getInstance().isInSafezone(player)) {
+                case "Knockback":
+                    if (!REGIONS.isInSafezone(player)) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (playerData.getCoins() - PROTECTION_COST < 0) {
+                    if (playerData.getCoins() - 100 < 0) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (!playerData.hasKit()) {
+                    if (playerData.getKit() == null) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (player.hasMetadata(PROTECTION_METADATA)) {
+                    if (player.hasMetadata("featherFalling")) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou already have the Feather Falling enchantment.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    player.playSound(player.getLocation(), Sound.ANVIL_USE, 1.0F, 1.0F);
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, "&eThe &aKnockback &eenchantment has been purchased.");
+                    MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
+                    MessageUtil.messagePlayer(player, "");
+
+                    playerData.removeCoins(100);
+                    player.setMetadata("knockback", new FixedMetadataValue(KITPVP, true));
+                    playerData.getKit().apply(player);
+                    break;
+
+                case "Protection":
+                    if (!REGIONS.isInSafezone(player)) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (playerData.getCoins() - 150 < 0) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (playerData.getKit() == null) {
+                        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                        MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (player.hasMetadata("protection")) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou already have the Protection enchantment.");
                         event.setCancelled(true);
@@ -475,34 +501,34 @@ public class EventListener implements Listener {
                     MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                     MessageUtil.messagePlayer(player, "");
 
-                    playerData.removeCoins(PROTECTION_COST);
-                    player.setMetadata(PROTECTION_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.removeCoins(150);
+                    player.setMetadata("protection", new FixedMetadataValue(KITPVP, true));
                     playerData.getKit().apply(player);
                     break;
 
                 case "Power":
-                    if (!Regions.getInstance().isInSafezone(player)) {
+                    if (!REGIONS.isInSafezone(player)) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (playerData.getCoins() - POWER_COST < 0) {
+                    if (playerData.getCoins() - 200 < 0) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (!playerData.hasKit()) {
+                    if (playerData.getKit() == null) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (player.hasMetadata(POWER_METADATA)) {
+                    if (player.hasMetadata("power")) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou already have the Power enchantment.");
                         event.setCancelled(true);
@@ -515,34 +541,34 @@ public class EventListener implements Listener {
                     MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                     MessageUtil.messagePlayer(player, "");
 
-                    playerData.removeCoins(POWER_COST);
-                    player.setMetadata(POWER_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.removeCoins(200);
+                    player.setMetadata("power", new FixedMetadataValue(KITPVP, true));
                     playerData.getKit().apply(player);
                     break;
 
                 case "Sharpness":
-                    if (!Regions.getInstance().isInSafezone(player)) {
+                    if (!REGIONS.isInSafezone(player)) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou need to be in spawn to do this.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (playerData.getCoins() - SHARPNESS_COST < 0) {
+                    if (playerData.getCoins() - 250 < 0) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (!playerData.hasKit()) {
+                    if (playerData.getKit() == null) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou do not have a kit equipped.");
                         event.setCancelled(true);
                         return;
                     }
 
-                    if (player.hasMetadata(SHARPNESS_METADATA)) {
+                    if (player.hasMetadata("sharpness")) {
                         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
                         MessageUtil.messagePlayer(player, "&cYou already have the Sharpness enchantment.");
                         event.setCancelled(true);
@@ -555,8 +581,8 @@ public class EventListener implements Listener {
                     MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                     MessageUtil.messagePlayer(player, "");
 
-                    playerData.removeCoins(SHARPNESS_COST);
-                    player.setMetadata(SHARPNESS_METADATA, new FixedMetadataValue(KITPVP, true));
+                    playerData.removeCoins(250);
+                    player.setMetadata("sharpness", new FixedMetadataValue(KITPVP, true));
                     playerData.getKit().apply(player);
                     break;
 
@@ -564,7 +590,7 @@ public class EventListener implements Listener {
                     break;
             }
 
-        } else if (!playerData.hasKit()) {
+        } else if (playerData.getKit() == null) {
             event.setCancelled(true);
             player.updateInventory();
         }
@@ -573,7 +599,7 @@ public class EventListener implements Listener {
     /**
      * Prevents players from getting hungry.
      *
-     * @param event -
+     * @param event FoodLevelChangeEvent
      */
     @EventHandler
     public void onFoodChange(FoodLevelChangeEvent event) {
@@ -586,7 +612,7 @@ public class EventListener implements Listener {
     /**
      * Prevents mobs from naturally spawning.
      *
-     * @param event -
+     * @param event CreatureSpawnEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMobSpawn(CreatureSpawnEvent event) {
@@ -602,22 +628,22 @@ public class EventListener implements Listener {
     /**
      * Huge event that handles right clicks.
      *
-     * @param event -
+     * @param event PlayerInteractEvent
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (event.getAction().toString().contains(RIGHT_CLICK) && block != null
+        if (event.getAction().toString().contains("RIGHT") && block != null
                 && block.getState() instanceof InventoryHolder) {
             event.setCancelled(true);
             return;
         }
 
-        if (event.getAction().toString().contains(RIGHT_CLICK) && item != null) {
+        if (event.getAction().toString().contains("RIGHT") && item != null) {
             switch (item.getType()) {
                 case WEB:
                 case BLAZE_ROD:
@@ -627,33 +653,13 @@ public class EventListener implements Listener {
                     break;
 
                 case FISHING_ROD:
-                    if (Regions.getInstance().isInSafezone(player)) {
+                    if (REGIONS.isInSafezone(player)) {
                         event.setCancelled(true);
                     }
                     break;
 
                 case POTION:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(USE_POTIONS_NAME)) {
-                        event.setCancelled(true);
-                        player.updateInventory();
-
-                        playerData.setUsingSoup(false);
-                        playerData.saveStats();
-                        MessageUtil.messagePlayer(player, "&aYou are now using Potions.");
-
-                        ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
-                        player.getInventory().setItem(6, healingItem);
-                        break;
-                    }
-
-                    if (Regions.getInstance().isInSafezone(player)) {
-                        event.setCancelled(true);
-                        player.updateInventory();
-                    }
-                    break;
-
-                case MUSHROOM_SOUP:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(USE_SOUP_NAME)) {
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Using Potions")) {
                         event.setCancelled(true);
                         player.updateInventory();
 
@@ -661,12 +667,32 @@ public class EventListener implements Listener {
                         playerData.saveStats();
                         MessageUtil.messagePlayer(player, "&aYou are now using Soup.");
 
-                        ItemStack healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
+                        ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
                         player.getInventory().setItem(6, healingItem);
                         break;
                     }
 
-                    if (Regions.getInstance().isInSafezone(player)) {
+                    if (REGIONS.isInSafezone(player)) {
+                        event.setCancelled(true);
+                        player.updateInventory();
+                    }
+                    break;
+
+                case MUSHROOM_SOUP:
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Using Soup")) {
+                        event.setCancelled(true);
+                        player.updateInventory();
+
+                        playerData.setUsingSoup(false);
+                        playerData.saveStats();
+                        MessageUtil.messagePlayer(player, "&aYou are now using Potions.");
+
+                        ItemStack healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
+                        player.getInventory().setItem(6, healingItem);
+                        break;
+                    }
+
+                    if (REGIONS.isInSafezone(player)) {
                         event.setCancelled(true);
                         break;
                     }
@@ -674,13 +700,13 @@ public class EventListener implements Listener {
                     if (player.getHealth() < player.getMaxHealth()) {
                         event.setCancelled(true);
                         player.setHealth(Math.min(player.getHealth() + 7, player.getMaxHealth()));
-                        player.setItemInHand(new ItemBuilder(Material.BOWL).name("&fBowl").build());
+                        player.setItemInHand(new ItemBuilder(Material.BOWL).name("&fBowl").getItem());
                     }
                     break;
 
                 case WATCH:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(PREVIOUS_KIT_NAME)
-                            && playerData.hasPreviousKit() && !playerData.hasKit()) {
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Previous Kit")
+                            && playerData.getPreviousKit() != null && playerData.getKit() == null) {
                         event.setCancelled(true);
                         playerData.getPreviousKit().apply(player);
                         MessageUtil.messagePlayer(player, "&aYou equipped the " + playerData.getPreviousKit().getName() + " kit.");
@@ -691,7 +717,7 @@ public class EventListener implements Listener {
                     break;
 
                 case SKULL_ITEM:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(YOUR_STATS_NAME)) {
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Your Stats")) {
                         event.setCancelled(true);
                         player.updateInventory();
                         MessageUtil.messagePlayer(player, "");
@@ -711,23 +737,23 @@ public class EventListener implements Listener {
                     break;
 
                 case NETHER_STAR:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(KIT_SELECTOR_NAME)) {
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Kit Selector")) {
                         event.setCancelled(true);
                         player.updateInventory();
                         new KitSelector(player);
                     }
                     break;
 
-                case GOLD_INGOT:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(BOUNTIES_NAME)) {
+                case ENCHANTED_BOOK:
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Kit Enchanter")) {
                         event.setCancelled(true);
                         player.updateInventory();
-                        //new BountiesMenu(player);
+                        new KitEnchanter(player);
                     }
                     break;
 
                 case ENDER_CHEST:
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains(KIT_SHOP_NAME)) {
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Kit Shop")) {
                         event.setCancelled(true);
                         player.updateInventory();
                         new KitShop(player);
@@ -764,7 +790,7 @@ public class EventListener implements Listener {
     /**
      * Handles player move events.
      *
-     * @param event -
+     * @param event PlayerMoveEvent
      */
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -786,21 +812,21 @@ public class EventListener implements Listener {
         }
 
         // Cancels pending teleportation when moving.
-        if (playerData.isTeleportingToSpawn()) {
+        if (playerData.getTeleportingToSpawn() != null) {
             MessageUtil.messagePlayer(player, MessageUtil.colorize("&cTeleportation cancelled, you moved."));
-            playerData.getTeleportingToSpawnTask().cancel();
+            playerData.getTeleportingToSpawn().cancel();
             playerData.setTeleportingToSpawn(null);
         }
 
         // Kills the player if they leave the map/fall into the void.
         if (player.getLocation().getY() < 0 && !player.getAllowFlight()) {
-            DeathListener.handleDeath(player, false);
+            DEATH_LISTENER.handleDeath(player, false);
             return;
         }
 
         // Equips the player's previously used kit when they leave spawn without a kit equipped.
-        if (!playerData.hasKit() && !player.isDead() && !player.getAllowFlight()
-                && !Regions.getInstance().isInSafezone(player)) {
+        if (playerData.getKit() == null && !player.isDead() && !player.getAllowFlight()
+                && !REGIONS.isInSafezone(event.getFrom())) {
             player.closeInventory();
             playerData.getPreviousKit().apply(player);
             MessageUtil.messagePlayer(player, "&cYour previous kit has been automatically applied.");
@@ -809,7 +835,7 @@ public class EventListener implements Listener {
 
         // Denies entry into spawn while combat tagged.
         // Also heals the player whilst in a safe zone.
-        if (Regions.getInstance().isInSafezone(player)) {
+        if (REGIONS.isInSafezone(player)) {
             if (COMBAT_LOG.isInCombat(player)) {
                 event.setTo(event.getFrom());
                 MessageUtil.messagePlayer(player, "&cYou can't enter spawn while combat tagged.");
@@ -817,15 +843,16 @@ public class EventListener implements Listener {
                 player.setHealth(20);
                 player.setFireTicks(0);
 
-                if (!player.hasMetadata(NO_FALL_METADATA)) {
-                    player.setMetadata(NO_FALL_METADATA, new FixedMetadataValue(KITPVP, true));
+                if (!player.hasMetadata("noFall")) {
+                    player.setMetadata("noFall", new FixedMetadataValue(KITPVP, true));
                 }
             }
         }
 
         // Removes the player's noFall metadata.
-        if (player.hasMetadata(NO_FALL_METADATA) && !playerData.isPendingNoFallRemoval()
-                && !Regions.getInstance().isInSafezone(player)) {
+        if (player.hasMetadata("noFall")
+                && !playerData.isPendingNoFallRemoval()
+                && !REGIONS.isInSafezone(player)) {
             playerData.setPendingNoFallRemoval(true);
 
             new BukkitRunnable() {
@@ -833,8 +860,9 @@ public class EventListener implements Listener {
                 public void run() {
                     playerData.setPendingNoFallRemoval(false);
 
-                    if (player.hasMetadata(NO_FALL_METADATA) && !Regions.getInstance().isInSafezone(player)) {
-                        player.removeMetadata(NO_FALL_METADATA, KITPVP);
+                    if (player.hasMetadata("noFall")
+                            && !REGIONS.isInSafezone(player)) {
+                        player.removeMetadata("noFall", KITPVP);
                     }
                 }
             }.runTaskLater(KITPVP, 30L);
@@ -843,18 +871,20 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFallDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL
-                && event.getEntity().hasMetadata(NO_FALL_METADATA)) {
+        if (event.getEntity() instanceof Player
+                && event.getCause() == EntityDamageEvent.DamageCause.FALL
+                && event.getEntity().hasMetadata("noFall")) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onVoidDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+        if (event.getEntity() instanceof Player
+                && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             Player player = (Player) event.getEntity();
 
-            DeathListener.handleDeath(player, false);
+            DEATH_LISTENER.handleDeath(player, false);
         }
     }
 
@@ -881,7 +911,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -891,7 +921,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
             player.updateInventory();
         }
@@ -903,7 +933,7 @@ public class EventListener implements Listener {
 
         if (!(event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL
                 && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -933,7 +963,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -943,7 +973,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission(MODIFY_PERMISSION))) {
+                && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
             player.updateInventory();
         }

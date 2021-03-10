@@ -83,7 +83,8 @@ public class KitPvP extends JavaPlugin {
                     "previousKit VARCHAR(36))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitName VARCHAR(36))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Bounties (uuid VARCHAR(36), bounty INT, benefactor VARCHAR(36))");
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Enchants (uuid VARCHAR(36), enchantId INT)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Enchants (uuid VARCHAR(36), featherFalling BOOLEAN," +
+                    " knockback BOOLEAN, protection BOOLEAN, sharpness BOOLEAN, punch BOOLEAN, power BOOLEAN)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -151,31 +152,31 @@ public class KitPvP extends JavaPlugin {
                 player.getInventory().clear();
                 player.getInventory().setArmorContents(null);
 
-                ItemStack kitSelector = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").build();
+                ItemStack kitSelector = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").getItem();
                 player.getInventory().setItem(0, kitSelector);
 
-                ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").build();
+                ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").getItem();
                 player.getInventory().setItem(1, shopSelector);
 
-                ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
+                ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").getItem();
                 player.getInventory().setItem(2, previousKit);
 
-                ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").build();
+                ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
                 player.getInventory().setItem(4, yourStats);
 
                 ItemStack healingItem;
                 if (playerData.isUsingSoup()) {
-                    healingItem = new ItemBuilder(Material.POTION).durability(16421).name("&aUse Potions &7(Right Click)").build();
+                    healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
                 } else {
-                    healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUse Soup &7(Right Click)").build();
+                    healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
                 }
                 player.getInventory().setItem(6, healingItem);
 
-                ItemStack bounties = new ItemBuilder(Material.ENCHANTED_BOOK).name("&aKit Enchanter &7(Right Click)").build();
-                player.getInventory().setItem(7, bounties);
+                ItemStack kitEnchanter = new ItemBuilder(Material.ENCHANTED_BOOK).name("&aKit Enchanter &7(Right Click)").getItem();
+                player.getInventory().setItem(7, kitEnchanter);
 
                 if (player.hasPermission(staffPerm)) {
-                    ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
+                    ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").getItem();
                     player.getInventory().setItem(8, staffMode);
                 }
             }

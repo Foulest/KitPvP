@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.utils.kits;
 
+import lombok.Getter;
 import net.foulest.kitpvp.utils.PlayerData;
 import org.bukkit.entity.Player;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @created 02/18/2021
  * @project KitPvP
  */
+@Getter
 public class KitManager {
 
     private static final KitManager INSTANCE = new KitManager();
@@ -28,10 +30,6 @@ public class KitManager {
         kits.clear();
     }
 
-    public List<Kit> getKits() {
-        return kits;
-    }
-
     public Kit valueOf(String name) {
         for (Kit kit : kits) {
             if (kit.getName().equalsIgnoreCase(name)) {
@@ -44,6 +42,7 @@ public class KitManager {
 
     public boolean hasRequiredKit(Player player, String required) {
         PlayerData playerData = PlayerData.getInstance(player);
-        return playerData.hasKit() && valueOf(required) != null && playerData.getKit().getName().equals(valueOf(required).getName());
+        return playerData.getKit() != null && valueOf(required) != null
+                && playerData.getKit().getName().equals(valueOf(required).getName());
     }
 }

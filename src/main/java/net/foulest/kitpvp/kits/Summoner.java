@@ -36,9 +36,9 @@ public class Summoner implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.IRON_BLOCK).name("&aSummon Golem &7(Right Click)")
-                .lore("&7Summon your very own Iron Golem.").build();
+                .lore("&7Summon your very own Iron Golem.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -48,10 +48,10 @@ public class Summoner implements Kit {
                 + "RiNTcxYWY0M2JhZjBkYmI2ODI0OTNiZGUxY2U0ZTg0N2RiNzU4ZGQ5Njg1ZTliZWMyYjdhYmJjYzcyNzcyNiJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fSummoner's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fSummoner's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).getItem()
         };
     }
 

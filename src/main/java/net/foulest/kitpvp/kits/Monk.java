@@ -37,9 +37,9 @@ public class Monk implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.BLAZE_ROD).name("&aItem Scrambler &7(Right Click)")
-                .lore("&7Scrambles a player's hotbar items.").build();
+                .lore("&7Scrambles a player's hotbar items.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -49,10 +49,10 @@ public class Monk implements Kit {
                 + "WM5NmY3NWY2YWQ2ZTZhNjNhNWY3ZmI3ZTVkNWE5MmI4NmI4MzI2MmQyNzgzZThlMjBiMWZkZDA2NDlmNjllIn19fQ==";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fMonk's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.ORANGE).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fMonk's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.ORANGE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

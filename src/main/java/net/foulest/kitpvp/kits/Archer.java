@@ -41,9 +41,9 @@ public class Archer implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).enchant(Enchantment.KNOCKBACK, 1).unbreakable(true).build();
-        ItemStack bow = new ItemBuilder(Material.BOW).enchant(Enchantment.ARROW_DAMAGE, 1).unbreakable(true).build();
-        ItemStack arrow = new ItemBuilder(Material.ARROW).amount(32).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).hideInfo().enchant(Enchantment.KNOCKBACK, 1).unbreakable(true).getItem();
+        ItemStack bow = new ItemBuilder(Material.BOW).hideInfo().enchant(Enchantment.ARROW_DAMAGE, 1).unbreakable(true).getItem();
+        ItemStack arrow = new ItemBuilder(Material.ARROW).hideInfo().amount(32).getItem();
         return Arrays.asList(sword, bow, arrow);
     }
 
@@ -53,10 +53,10 @@ public class Archer implements Kit {
                 + "MwMzIyZDM1NjgzMjI4ZjMwZmJjYThjZDFjMmE2MDIwODczMDE1MTZmNmI0MzhiNDhkNjc2ZWU1NTIwNzU3MCJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fArcher's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_BOOTS).enchant(Enchantment.PROTECTION_FALL, 4).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).hideInfo().name("&fArcher's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).hideInfo().unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_LEGGINGS).hideInfo().unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_BOOTS).hideInfo().enchant(Enchantment.PROTECTION_FALL, 4).unbreakable(true).getItem()
         };
     }
 

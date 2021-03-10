@@ -12,7 +12,7 @@ import java.sql.*;
 public class MySQL {
 
     private static final MySQL INSTANCE = new MySQL();
-    private final KitPvP kitPvP = KitPvP.getInstance();
+    private static final KitPvP KITPVP = KitPvP.getInstance();
 
     public static MySQL getInstance() {
         return INSTANCE;
@@ -23,7 +23,7 @@ public class MySQL {
             data = "'" + data + "'";
         }
 
-        try (Connection connection = kitPvP.getHikari().getConnection();
+        try (Connection connection = KITPVP.getHikari().getConnection();
              PreparedStatement select = connection.prepareStatement("SELECT " + scope + " FROM "
                      + table + " WHERE " + column + logicGate + data)) {
             ResultSet result = select.executeQuery();
@@ -40,7 +40,7 @@ public class MySQL {
     }
 
     public void update(String command) {
-        try (Connection connection = kitPvP.getHikari().getConnection();
+        try (Connection connection = KITPVP.getHikari().getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(command);
         } catch (SQLException e) {
@@ -55,7 +55,7 @@ public class MySQL {
 
         ResultSet result = null;
 
-        try (Connection connection = kitPvP.getHikari().getConnection();
+        try (Connection connection = KITPVP.getHikari().getConnection();
              PreparedStatement select = connection.prepareStatement("SELECT " + scope + " FROM "
                      + table + " WHERE " + column + logicGate + data)) {
             result = select.executeQuery();
@@ -74,7 +74,7 @@ public class MySQL {
 
         ResultSet result;
 
-        try (Connection connection = kitPvP.getHikari().getConnection();
+        try (Connection connection = KITPVP.getHikari().getConnection();
              PreparedStatement select = connection.prepareStatement("SELECT " + scope + " FROM "
                      + table + " WHERE " + column + logicGate + data)) {
             result = select.executeQuery();

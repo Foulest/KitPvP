@@ -37,9 +37,9 @@ public class Imprisoner implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.DISPENSER).name("&aLava Prison &7(Right Click)")
-                .lore("&7Sends players to jail.").build();
+                .lore("&7Sends players to jail.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -49,10 +49,10 @@ public class Imprisoner implements Kit {
                 + "xNTdjZmZiMDYwNjNiMzUyZGM2ODQ3OGY0NzZlN2QyMDJjM2JhNmU3Y2JmMjk3MjQxYmU4MTY4MTA3NGJmIn19fQ==";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fImprisoner's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x1E4866)).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fImprisoner's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x1E4866)).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

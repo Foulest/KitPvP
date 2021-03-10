@@ -23,6 +23,7 @@ public class SpawnCmd {
     private static final Spawn SPAWN = Spawn.getInstance();
     private static final KitPvP KITPVP = KitPvP.getInstance();
     private static final CombatLog COMBAT_LOG = CombatLog.getInstance();
+    private static final Regions REGIONS = Regions.getInstance();
 
     @Command(name = "spawn", description = "Teleports you to spawn.", usage = "/spawn", inGameOnly = true)
     public void onCommand(CommandArgs args) {
@@ -40,14 +41,14 @@ public class SpawnCmd {
             return;
         }
 
-        if (Regions.getInstance().isInSafezone(player)) {
+        if (REGIONS.isInSafezone(player)) {
             SPAWN.teleport(player);
             player.getInventory().setHeldItemSlot(0);
             MessageUtil.messagePlayer(player, MessageUtil.colorize("&aTeleported to spawn."));
             return;
         }
 
-        if (playerData.isTeleportingToSpawn()) {
+        if (playerData.getTeleportingToSpawn() == null) {
             MessageUtil.messagePlayer(player, MessageUtil.colorize("&cYou are already teleporting to spawn."));
             return;
         }

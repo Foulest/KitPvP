@@ -36,9 +36,9 @@ public class Timelord implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
+        ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).getItem();
         ItemStack special = new ItemBuilder(Material.WATCH).name("&aFreeze Time &7(Right Click)")
-                .lore("&7Freezes players in time.").build();
+                .lore("&7Freezes players in time.").getItem();
         return Arrays.asList(sword, special);
     }
 
@@ -48,10 +48,10 @@ public class Timelord implements Kit {
                 + "M3Mjc0ZWMyODg5YjdjYWZhYjc2OGFkMjE2YzNlM2FlNjZmODAwNTQ3MDljNDcwNTI3NGVhNDAyMDA1Yzk2YiJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fTimelord's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fTimelord's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).getItem()
         };
     }
 

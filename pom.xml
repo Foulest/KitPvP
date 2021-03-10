@@ -6,7 +6,7 @@
 
     <groupId>net.foulest</groupId>
     <artifactId>KitPvP</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.lunarclient</groupId>
             <artifactId>bukkitapi</artifactId>
-            <version>1.0-20200729.212152-7</version>
+            <version>1.0-20210307.203619-3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

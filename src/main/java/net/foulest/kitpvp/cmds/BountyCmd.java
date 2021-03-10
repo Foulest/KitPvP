@@ -91,7 +91,7 @@ public class BountyCmd {
             return;
         }
 
-        MessageUtil.messagePlayer(player, "&eYou set a &a$" + amount + " &ebounty on &a" + target.getName() + "&e's head.");
+        MessageUtil.messagePlayer(player, "&aYou set a $" + amount + " bounty on " + target.getName() + "'s head.");
 
         MessageUtil.messagePlayer(target, "");
         MessageUtil.messagePlayer(target, " &c" + player.getName() + " &eset a &c$" + amount + " &ebounty on your head.");
@@ -99,12 +99,11 @@ public class BountyCmd {
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online != target && online != player) {
-                MessageUtil.messagePlayer(online, "&a" + player.getName() + " &eset a &a$" + amount + " &ebounty on &a" + target.getName() + "&e's head.");
+                MessageUtil.messagePlayer(online, "&c" + player.getName() + " &eset a &c$" + amount + " &ebounty on &c" + target.getName() + "&e's head.");
             }
         }
 
-        targetData.setBounty(amount);
-        targetData.setBenefactor(player.getUniqueId());
+        targetData.addBounty(amount, player.getUniqueId());
         playerData.removeCoins(amount);
 
         playerData.saveStats();

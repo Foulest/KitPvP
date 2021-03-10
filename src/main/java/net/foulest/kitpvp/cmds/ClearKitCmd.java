@@ -22,6 +22,7 @@ public class ClearKitCmd {
     private static final String CLEAR_KIT_PERMISSION = "kitpvp.clearkit.others";
     private static final CombatLog COMBAT_LOG = CombatLog.getInstance();
     private static final KitPvP KITPVP = KitPvP.getInstance();
+    private static final Regions REGIONS = Regions.getInstance();
 
     @Command(name = "clearkit", description = "Clears your kit.", usage = "/clearkit", inGameOnly = true)
     public void onCommand(CommandArgs args) {
@@ -40,8 +41,8 @@ public class ClearKitCmd {
                 return;
             }
 
-            if (Regions.getInstance().isInSafezone(sender)) {
-                if (!playerData.hasKit()) {
+            if (REGIONS.isInSafezone(sender)) {
+                if (playerData.getKit() == null) {
                     MessageUtil.messagePlayer(sender, "&cYou do not have a kit selected.");
                     return;
                 }
@@ -65,7 +66,7 @@ public class ClearKitCmd {
             }
 
             PlayerData targetData = PlayerData.getInstance(target);
-            if (!targetData.hasKit()) {
+            if (targetData.getKit() == null) {
                 MessageUtil.messagePlayer(target, "&cYou do not have a kit selected.");
                 return;
             }

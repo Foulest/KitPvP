@@ -1,7 +1,7 @@
 package net.foulest.kitpvp.listeners;
 
 import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.object.LCCooldown;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketCooldown;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.MessageUtil;
 import net.foulest.kitpvp.utils.PlayerData;
@@ -12,7 +12,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Foulest
@@ -38,10 +37,10 @@ public class CombatLog {
 
         // Displays Lunar Client combat tag cooldowns.
         if (LUNAR_API.isRunningLunarClient(damager)) {
-            LUNAR_API.sendCooldown(damager, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
+            LUNAR_API.sendPacket(damager, new LCPacketCooldown("Combat Tag", 15000L, Material.IRON_SWORD.getId()));
         }
         if (LUNAR_API.isRunningLunarClient(receiver)) {
-            LUNAR_API.sendCooldown(receiver, new LCCooldown("Combat Tag", 15L, TimeUnit.SECONDS, Material.IRON_SWORD));
+            LUNAR_API.sendPacket(damager, new LCPacketCooldown("Combat Tag", 15000L, Material.IRON_SWORD.getId()));
         }
 
         // Handles combat tagging for the damager.
@@ -65,9 +64,9 @@ public class CombatLog {
         }
 
         // Cancels the damager's pending teleportation when taking damage for.
-        if (damagerData.isTeleportingToSpawn()) {
+        if (damagerData.getTeleportingToSpawn() != null) {
             MessageUtil.messagePlayer(damager, MessageUtil.colorize("&cTeleportation cancelled, you entered combat."));
-            damagerData.getTeleportingToSpawnTask().cancel();
+            damagerData.getTeleportingToSpawn().cancel();
             damagerData.setTeleportingToSpawn(null);
         }
 
@@ -92,9 +91,9 @@ public class CombatLog {
         }
 
         // Cancels the receiver's pending teleportation when moving.
-        if (receiverData.isTeleportingToSpawn()) {
+        if (receiverData.getTeleportingToSpawn() != null) {
             MessageUtil.messagePlayer(receiver, MessageUtil.colorize("&cTeleportation cancelled, you entered combat."));
-            receiverData.getTeleportingToSpawnTask().cancel();
+            receiverData.getTeleportingToSpawn().cancel();
             receiverData.setTeleportingToSpawn(null);
         }
 
@@ -126,7 +125,7 @@ public class CombatLog {
 
         // Clears Lunar Client combat tag cooldowns.
         if (LUNAR_API.isRunningLunarClient(player)) {
-            LUNAR_API.clearCooldown(player, new LCCooldown("Combat Tag", 0L, TimeUnit.SECONDS, Material.IRON_SWORD));
+            LUNAR_API.sendPacket(player, new LCPacketCooldown("Combat Tag", 0L, Material.IRON_SWORD.getId()));
         }
     }
 }

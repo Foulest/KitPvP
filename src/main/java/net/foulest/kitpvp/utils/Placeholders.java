@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
  */
 public class Placeholders extends PlaceholderExpansion {
 
-    private final CombatLog combatLog = CombatLog.getInstance();
+    private static final CombatLog COMBAT_LOG = CombatLog.getInstance();
 
     @Override
     public String getIdentifier() {
@@ -25,89 +25,76 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.0.7";
+        return "1.0.8";
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
         PlayerData playerData = PlayerData.getInstance(player);
-        String killsPlaceholder = "kills";
-        String deathsPlaceholder = "deaths";
-        String kdrPlaceholder = "kdr";
-        String killstreakPlaceholder = "killstreak";
-        String topKillstreakPlaceholder = "top_killstreak";
-        String coinsPlaceholder = "coins";
-        String levelPlaceholder = "level";
-        String experiencePlaceholder = "experience";
-        String experiencePercentPlaceholder = "experience_percent";
-        String combatTagPlaceholder = "combattag";
-        String activeKitPlaceholder = "activekit";
-        String bountyPlaceholder = "bounty";
-        String bountyTabPlaceholder = "bounty_tab";
 
         // Placeholder: %kitpvp_kills%
-        if (killsPlaceholder.equals(identifier)) {
+        if (identifier.equals("kills")) {
             return (player == null) ? "0" : "" + playerData.getKills();
         }
 
         // Placeholder: %kitpvp_deaths%
-        if (deathsPlaceholder.equals(identifier)) {
+        if (identifier.equals("deaths")) {
             return (player == null) ? "0" : "" + playerData.getDeaths();
         }
 
         // Placeholder: %kitpvp_kdr%
-        if (kdrPlaceholder.equals(identifier)) {
+        if (identifier.equals("kdr")) {
             return (player == null) ? "0" : "" + playerData.getKDRText();
         }
 
         // Placeholder: %kitpvp_killstreak%
-        if (killstreakPlaceholder.equals(identifier)) {
+        if (identifier.equals("killstreak")) {
             return (player == null) ? "0" : "" + playerData.getKillstreak();
         }
 
         // Placeholder: %kitpvp_top_killstreak%
-        if (topKillstreakPlaceholder.equals(identifier)) {
+        if (identifier.equals("top_killstreak")) {
             return (player == null) ? "0" : "" + playerData.getTopKillstreak();
         }
 
         // Placeholder: %kitpvp_coins%
-        if (coinsPlaceholder.equals(identifier)) {
+        if (identifier.equals("coins")) {
             return (player == null) ? "0" : "" + playerData.getCoins();
         }
 
         // Placeholder: %kitpvp_level%
-        if (levelPlaceholder.equals(identifier)) {
+        if (identifier.equals("level")) {
             return (player == null) ? "0" : "" + playerData.getLevel();
         }
 
         // Placeholder: %kitpvp_experience%
-        if (experiencePlaceholder.equals(identifier)) {
+        if (identifier.equals("experience")) {
             return (player == null) ? "0" : "" + playerData.getExperience();
         }
 
         // Placeholder: %kitpvp_experience_percent%
-        if (experiencePercentPlaceholder.equals(identifier)) {
+        if (identifier.equals("experience_percent")) {
             return (player == null) ? "0" : "" + playerData.getExpPercent() + "%";
         }
 
         // Placeholder: %kitpvp_combattag%
-        if (combatTagPlaceholder.equals(identifier)) {
-            return combatLog.isInCombat(player) ? "&c00:" + String.format("%02d", combatLog.getRemainingTime(player)) : "&aSafe";
+        if (identifier.equals("combattag")) {
+            return COMBAT_LOG.isInCombat(player) ? "&c00:" + String.format("%02d", COMBAT_LOG.getRemainingTime(player)) : "&aSafe";
         }
 
         // Placeholder: %kitpvp_activekit%
-        if (activeKitPlaceholder.equals(identifier)) {
+        if (identifier.equals("activekit")) {
             return (player == null || playerData.getKit() == null) ? "None" : playerData.getKit().getName();
         }
 
         // Placeholder: %kitpvp_bounty%
-        if (bountyPlaceholder.equals(identifier)) {
+        if (identifier.equals("bounty")) {
             return (player == null || playerData.getBounty() == 0) ? "" : Integer.toString(playerData.getBounty());
         }
 
         // Placeholder: %kitpvp_bounty_tab%
-        if (bountyTabPlaceholder.equals(identifier)) {
-            return (player == null || playerData.getBounty() == 0) ? "" : "&6Bounty: &e&l" + playerData.getBounty();
+        if (identifier.equals("bounty_tab")) {
+            return (player == null || playerData.getBounty() == 0) ? "" : "&6Bounty: &e&l$" + playerData.getBounty();
         }
 
         return null;

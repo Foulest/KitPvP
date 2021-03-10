@@ -16,14 +16,15 @@ import org.bukkit.entity.Player;
  */
 public class KitsCmd {
 
-    private final KitManager kitManager = KitManager.getInstance();
+    private static final KitManager KIT_MANAGER = KitManager.getInstance();
+    private static final Regions REGIONS = Regions.getInstance();
 
     @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
             description = "Selects a kit or opens the Kit Selector.", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 
-        if (!Regions.getInstance().isInSafezone(player)) {
+        if (!REGIONS.isInSafezone(player)) {
             MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
             return;
         }
@@ -38,7 +39,7 @@ public class KitsCmd {
             return;
         }
 
-        Kit kit = kitManager.valueOf(args.getArgs(0));
+        Kit kit = KIT_MANAGER.valueOf(args.getArgs(0));
 
         if (kit == null) {
             MessageUtil.messagePlayer(player, "&cCould not find the kit you wanted; opening the Kit Selector.");

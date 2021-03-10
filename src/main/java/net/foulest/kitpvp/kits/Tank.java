@@ -36,7 +36,7 @@ public class Tank implements Kit {
 
     @Override
     public List<ItemStack> getItems() {
-        ItemStack weapon = new ItemBuilder(Material.STONE_AXE).unbreakable(true).build();
+        ItemStack weapon = new ItemBuilder(Material.STONE_AXE).unbreakable(true).getItem();
         return Collections.singletonList(weapon);
     }
 
@@ -46,10 +46,10 @@ public class Tank implements Kit {
                 + "Y1OWIyYmIwNzBjMTIwOGJhNTE0NTIzNjFmZDMwYTY2NzIxMzI5NWYyMWRiNDM3ZGY1NzI4MWQ1ODJjODlhZCJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fTank's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.DIAMOND_CHESTPLATE).unbreakable(true).build(),
-                new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).build(),
-                new ItemBuilder(Material.DIAMOND_BOOTS).unbreakable(true).build()
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fTank's Head").unbreakable(true).getItem(),
+                new ItemBuilder(Material.DIAMOND_CHESTPLATE).unbreakable(true).getItem(),
+                new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).getItem(),
+                new ItemBuilder(Material.DIAMOND_BOOTS).unbreakable(true).getItem()
         };
     }
 

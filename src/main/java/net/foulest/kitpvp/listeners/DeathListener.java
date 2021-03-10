@@ -1,23 +1,17 @@
 package net.foulest.kitpvp.listeners;
 
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.ConfigManager;
-import net.foulest.kitpvp.utils.MessageUtil;
-import net.foulest.kitpvp.utils.PlayerData;
-import net.foulest.kitpvp.utils.Spawn;
+import net.foulest.kitpvp.utils.*;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.lang.reflect.Field;
 
 /**
  * @author Foulest
@@ -26,18 +20,16 @@ import java.lang.reflect.Field;
  */
 public class DeathListener implements Listener {
 
-    private static final String FEATHER_FALLING_METADATA = "featherFalling";
-    private static final String PROTECTION_METADATA = "protection";
-    private static final String SHARPNESS_METADATA = "sharpness";
-    private static final String POWER_METADATA = "power";
-    private static final int MIN_KILLSTREAK = 5;
+    private static final DeathListener INSTANCE = new DeathListener();
     private static final KitPvP KITPVP = KitPvP.getInstance();
     private static final Spawn SPAWN = Spawn.getInstance();
     private static final CombatLog COMBAT_LOG = CombatLog.getInstance();
 
-    public static void handleDeath(Player receiver, boolean onPlayerQuit) {
-        CraftPlayer craftPlayer = (CraftPlayer) receiver;
-        PacketPlayInClientCommand packet = new PacketPlayInClientCommand();
+    public static DeathListener getInstance() {
+        return INSTANCE;
+    }
+
+    public void handleDeath(Player receiver, boolean onPlayerQuit) {
         PlayerData receiverData = PlayerData.getInstance(receiver);
         Kit currentKit = receiverData.getKit();
         Vector vec = new Vector();
@@ -48,7 +40,7 @@ public class DeathListener implements Listener {
         }
 
         // Removes potential player created Wolves.
-        if (receiverData.hasKit()) {
+        if (receiverData.getKit() != null) {
             String tamerKitName = "Tamer";
             String summonerKitName = "Summoner";
 
@@ -85,7 +77,7 @@ public class DeathListener implements Listener {
 
         // Sets the player's current kit and adds a death.
         receiverData.setPreviousKit(currentKit);
-        receiverData.addDeath();
+        receiverData.setDeaths(receiverData.getDeaths() + 1);
 
         // Runs specific code if the player is killed by another player.
         if (COMBAT_LOG.getLastAttacker(receiver) != null) {
@@ -93,12 +85,12 @@ public class DeathListener implements Listener {
             PlayerData damagerData = PlayerData.getInstance(damager);
 
             // Adds a kill to the damager.
-            damagerData.addKill();
+            damagerData.setKills(damagerData.getKills() + 1);
             damagerData.addKillstreak();
             damager.playSound(damager.getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
 
             // Run specific code if the damager is on a multiple of 5 killstreak.
-            if (damagerData.getKillstreak() >= MIN_KILLSTREAK && damagerData.getKillstreak() % MIN_KILLSTREAK == 0) {
+            if (damagerData.getKillstreak() >= 5 && damagerData.getKillstreak() % 5 == 0) {
                 // Sends all online players a killstreak message in chat.
                 MessageUtil.broadcastMessage("&6" + damager.getName() + " &eis on a &6" + damagerData.getKillstreak() + " &ekillstreak!");
 
@@ -112,24 +104,26 @@ public class DeathListener implements Listener {
             int rewardAmount = 5 * (damagerData.getKillstreak() / 5);
             int coinsGiven = ConfigManager.get().getInt("kill.coins-bonus") + rewardAmount;
             int experienceGiven = ConfigManager.get().getInt("kill.experience-bonus") + rewardAmount;
-            damagerData.addCoins(coinsGiven);
+            damagerData.setCoins(damagerData.getCoins() + coinsGiven);
             damagerData.addExperience(experienceGiven);
 
             // Removes the player's potential bounty.
-            if (receiverData.getBounty() > 0 && receiverData.getBenefactor() != damager.getUniqueId()) {
-                MessageUtil.messagePlayer(Bukkit.getPlayer(receiverData.getBenefactor()), "");
-                MessageUtil.messagePlayer(Bukkit.getPlayer(receiverData.getBenefactor()),
-                        " &eYour &a$" + receiverData.getBounty() + " &ebounty on &a" + receiver.getName()
-                                + " &ewas claimed by &a" + damager.getName() + "&e.");
-                MessageUtil.messagePlayer(Bukkit.getPlayer(receiverData.getBenefactor()), "");
+            if (receiverData.getBounty() > 0 && Bukkit.getPlayer(receiverData.getBenefactor()) != damager) {
+                if (Bukkit.getPlayer(receiverData.getBenefactor()) != null
+                        && Bukkit.getPlayer(receiverData.getBenefactor()).isOnline()) {
+                    Player benefactor = Bukkit.getPlayer(receiverData.getBenefactor());
 
-                MessageUtil.messagePlayer(damager, "");
-                MessageUtil.messagePlayer(damager,
-                        " &eYou claimed the &a$" + receiverData.getBounty() + " &ebounty on &a"
-                                + receiver.getName() + " &e's head.");
-                MessageUtil.messagePlayer(damager, "");
+                    benefactor.playSound(benefactor.getLocation(), Sound.DONKEY_IDLE, 1.0f, 1.0f);
+                    MessageUtil.messagePlayer(benefactor, "&aYour $" + receiverData.getBounty()
+                            + " bounty on " + receiver.getName() + " was claimed by " + damager.getName() + ".");
+                }
 
-                receiverData.removeBenefactor();
+                damager.playSound(damager.getLocation(), Sound.BLAZE_DEATH, 1.0f, 1.0f);
+                damager.playSound(damager.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
+                MessageUtil.messagePlayer(damager, "&eYou claimed the &a$" + receiverData.getBounty()
+                        + " &ebounty on &a" + receiver.getName() + "&e's head.");
+                damagerData.setCoins(damagerData.getCoins() + receiverData.getBounty());
+
                 receiverData.removeBounty();
             }
 
@@ -149,7 +143,7 @@ public class DeathListener implements Listener {
         receiverData.clearCooldowns();
 
         // Sends all online players a killstreak message in chat.
-        if (receiverData.getKillstreak() >= MIN_KILLSTREAK) {
+        if (receiverData.getKillstreak() >= 5) {
             MessageUtil.broadcastMessage("&a" + receiver.getPlayer().getName() + " &edied and lost their &a"
                     + receiverData.getKillstreak() + " &ekillstreak.");
         }
@@ -162,14 +156,12 @@ public class DeathListener implements Listener {
 
         // Prevents the player from reaching the respawn screen using NMS.
         if (!onPlayerQuit) {
-            try {
-                Field a = PacketPlayInClientCommand.class.getDeclaredField("a");
-                a.setAccessible(true);
-                a.set(packet, PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN);
-                (craftPlayer.getHandle()).playerConnection.a(packet);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // Teleports the player to spawn.
+            SPAWN.teleport(receiver);
+            receiver.getInventory().setHeldItemSlot(0);
+            receiver.playSound(receiver.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
+
+            NMSUtil.getConnection(receiver).a(new PacketPlayInClientCommand(PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN));
 
             // Removes knockback before teleporting the player to spawn.
             new BukkitRunnable() {
@@ -178,47 +170,42 @@ public class DeathListener implements Listener {
                     receiver.setVelocity(vec);
                 }
             }.runTaskLater(KITPVP, 1L);
-
-            // Teleports the player to spawn.
-            SPAWN.teleport(receiver);
-            receiver.getInventory().setHeldItemSlot(0);
-            receiver.playSound(receiver.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
         }
 
         // Removes Feather Falling metadata from the player.
-        if (receiver.hasMetadata(FEATHER_FALLING_METADATA)) {
+        if (receiver.hasMetadata("featherFalling")) {
             MessageUtil.messagePlayer(receiver, "");
             MessageUtil.messagePlayer(receiver, "&eYour &cFeather Falling &eenchantment was removed on death.");
             MessageUtil.messagePlayer(receiver, "");
-            receiver.removeMetadata(FEATHER_FALLING_METADATA, KITPVP);
+            receiver.removeMetadata("featherFalling", KITPVP);
         }
 
         // Removes Protection metadata from the player.
-        if (receiver.hasMetadata(PROTECTION_METADATA)) {
+        if (receiver.hasMetadata("protection")) {
             MessageUtil.messagePlayer(receiver, "");
             MessageUtil.messagePlayer(receiver, "&eYour &cProtection &eenchantment was removed on death.");
             MessageUtil.messagePlayer(receiver, "");
-            receiver.removeMetadata(PROTECTION_METADATA, KITPVP);
+            receiver.removeMetadata("protection", KITPVP);
         }
 
         // Removes Power metadata from the player.
-        if (receiver.hasMetadata(POWER_METADATA)) {
+        if (receiver.hasMetadata("power")) {
             MessageUtil.messagePlayer(receiver, "");
             MessageUtil.messagePlayer(receiver, "&eYour &cPower &eenchantment was removed on death.");
             MessageUtil.messagePlayer(receiver, "");
-            receiver.removeMetadata(POWER_METADATA, KITPVP);
+            receiver.removeMetadata("power", KITPVP);
         }
 
         // Removes Sharpness metadata from the player.
-        if (receiver.hasMetadata(SHARPNESS_METADATA)) {
+        if (receiver.hasMetadata("sharpness")) {
             MessageUtil.messagePlayer(receiver, "");
             MessageUtil.messagePlayer(receiver, "&eYour &cSharpness &eenchantment was removed on death.");
             MessageUtil.messagePlayer(receiver, "");
-            receiver.removeMetadata(SHARPNESS_METADATA, KITPVP);
+            receiver.removeMetadata("sharpness", KITPVP);
         }
 
         // Resets the player's killstreak.
-        receiverData.resetKillStreak();
+        receiverData.setKillstreak(0);
 
         // Saves the receiver's stats with the database.
         receiverData.saveStats();

@@ -73,14 +73,10 @@ public interface Kit {
      * @param player The player to apply the kit to.
      */
     default void apply(Player player) {
-        String featherFallingMetadata = "featherFalling";
-        String protectionMetadata = "protection";
-        String sharpnessMetadata = "sharpness";
-        String powerMetadata = "power";
         PlayerData playerData = PlayerData.getInstance(player);
 
         // Checks if the player owns the kit they're trying to equip.
-        if (!playerData.ownsKit(this)) {
+        if (!playerData.getOwnedKits().contains(this)) {
             MessageUtil.messagePlayer(player, "&cYou do not own the " + getName() + " kit.");
             return;
         }
@@ -112,9 +108,9 @@ public interface Kit {
         // Sets the player's healing item.
         for (int i = 0; i < player.getInventory().getSize(); ++i) {
             if (playerData.isUsingSoup()) {
-                player.getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").build());
+                player.getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").getItem());
             } else {
-                player.getInventory().addItem(new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing").build());
+                player.getInventory().addItem(new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing").getItem());
             }
         }
 
@@ -122,12 +118,20 @@ public interface Kit {
         for (int i = 0; i < getItems().size(); ++i) {
             ItemStack item = getItems().get(i);
 
-            if (item.getType().toString().toLowerCase().contains("sword") && player.hasMetadata(sharpnessMetadata)) {
-                item = new ItemBuilder(item).enchant(Enchantment.DAMAGE_ALL, 2).build();
+            if (item.getType().toString().toLowerCase().contains("sword")
+                    || item.getType().toString().toLowerCase().contains("cactus")
+                    || item.getType().toString().toLowerCase().contains("axe")) {
+                if (player.hasMetadata("knockback")) {
+                    item = new ItemBuilder(item).enchant(Enchantment.KNOCKBACK, 2).getItem();
+                }
+
+                if (player.hasMetadata("sharpness")) {
+                    item = new ItemBuilder(item).enchant(Enchantment.DAMAGE_ALL, 2).getItem();
+                }
             }
 
-            if (item.getType().toString().toLowerCase().contains("bow") && player.hasMetadata(powerMetadata)) {
-                item = new ItemBuilder(item).enchant(Enchantment.ARROW_DAMAGE, 2).build();
+            if (item.getType().toString().toLowerCase().contains("bow") && player.hasMetadata("power")) {
+                item = new ItemBuilder(item).enchant(Enchantment.ARROW_DAMAGE, 2).getItem();
             }
 
             player.getInventory().setItem(i, item);
@@ -139,27 +143,26 @@ public interface Kit {
         ItemStack leggings = getArmor()[2];
         ItemStack boots = getArmor()[3];
 
-        if (player.hasMetadata(protectionMetadata)) {
+        if (player.hasMetadata("protection")) {
             if (helmet != null && helmet.getType() != Material.AIR) {
-                helmet = new ItemBuilder(helmet).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
+                helmet = new ItemBuilder(helmet).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).getItem();
             }
 
             if (chestplate != null && chestplate.getType() != Material.AIR) {
-                chestplate = new ItemBuilder(chestplate).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
+                chestplate = new ItemBuilder(chestplate).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).getItem();
             }
 
             if (leggings != null && leggings.getType() != Material.AIR) {
-                leggings = new ItemBuilder(leggings).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
+                leggings = new ItemBuilder(leggings).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).getItem();
             }
 
             if (boots != null && boots.getType() != Material.AIR) {
-                boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).build();
+                boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2).getItem();
             }
         }
 
-        if (player.hasMetadata(featherFallingMetadata)
-                && boots != null && boots.getType() != Material.AIR) {
-            boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_FALL, 4).build();
+        if (player.hasMetadata("featherFalling") && boots != null && boots.getType() != Material.AIR) {
+            boots = new ItemBuilder(boots).enchant(Enchantment.PROTECTION_FALL, 4).getItem();
         }
 
         player.getInventory().setHelmet(helmet);

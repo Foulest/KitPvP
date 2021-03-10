@@ -40,7 +40,7 @@ public class ArmorColorCmd {
             return;
         }
 
-        ItemStack chestplate = new ItemBuilder(player.getInventory().getChestplate()).color(Color.fromRGB(Integer.parseInt(args.getArgs(0), 16))).build();
+        ItemStack chestplate = new ItemBuilder(player.getInventory().getChestplate()).color(Color.fromRGB(Integer.parseInt(args.getArgs(0), 16))).getItem();
         player.getInventory().setChestplate(chestplate);
         player.updateInventory();
 

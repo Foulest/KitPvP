@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
  */
 public class StaffModeListener implements Listener {
 
-    private final Spawn spawn = Spawn.getInstance();
+    private static final Spawn SPAWN = Spawn.getInstance();
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStaffMode(StaffModeEvent event) {
@@ -25,10 +25,10 @@ public class StaffModeListener implements Listener {
         Player player = Bukkit.getPlayer(staffMode.getUUID());
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (staffMode.enteredStaffMode()) {
+        if (staffMode.isInStaffMode()) {
             playerData.setKit(null);
         } else {
-            spawn.teleport(player);
+            SPAWN.teleport(player);
         }
     }
 }

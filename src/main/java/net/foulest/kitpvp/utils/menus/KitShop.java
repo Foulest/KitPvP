@@ -25,8 +25,8 @@ public class KitShop {
 
     public static final String INVENTORY_NAME = MessageUtil.colorize("Kit Shop");
     private static final Map<Player, Integer> PAGE = new HashMap<>();
+    private static final KitManager KIT_MANAGER = KitManager.getInstance();
     private final Inventory inv;
-    private final KitManager kitManager = KitManager.getInstance();
 
     public KitShop(Player player) {
         this(player, 0);
@@ -36,9 +36,9 @@ public class KitShop {
         player.closeInventory();
 
         if (page > 0) {
-            inv = Bukkit.createInventory(player, ensureSize(kitManager.getKits().size()) + 18, INVENTORY_NAME + " - Page: " + (page + 1));
+            inv = Bukkit.createInventory(player, ensureSize(KIT_MANAGER.getKits().size()) + 18, INVENTORY_NAME + " - Page: " + (page + 1));
         } else {
-            inv = Bukkit.createInventory(player, ensureSize(kitManager.getKits().size()) + 18, INVENTORY_NAME);
+            inv = Bukkit.createInventory(player, ensureSize(KIT_MANAGER.getKits().size()) + 18, INVENTORY_NAME);
         }
 
         if (populateInventory(player, page)) {
@@ -70,7 +70,7 @@ public class KitShop {
 
     private boolean populateInventory(Player player, int page) {
         PlayerData playerData = PlayerData.getInstance(player);
-        ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").build();
+        ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int paidKits = 0;
         int rowSize = 9;
 
@@ -84,25 +84,25 @@ public class KitShop {
 
         // Previous page item
         if (page > 0) {
-            inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").build());
+            inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
         }
 
         // Future kits check
-        List<Kit> checkedKits = kitManager.getKits().subList(page * 36, (page * 36) + ensureKits(kitManager.getKits().size() - (page * 36)));
+        List<Kit> checkedKits = KIT_MANAGER.getKits().subList(page * 36, (page * 36) + ensureKits(KIT_MANAGER.getKits().size() - (page * 36)));
 
         // Next page item
         try {
-            List<Kit> futureCheck = kitManager.getKits().subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(kitManager.getKits().size() - ((page + 1) * 36)));
+            List<Kit> futureCheck = KIT_MANAGER.getKits().subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(KIT_MANAGER.getKits().size() - ((page + 1) * 36)));
 
             if (!futureCheck.isEmpty()) {
-                inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").build());
+                inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
             }
         } catch (IllegalArgumentException ex) {
             // ignored
         }
 
         for (Kit kits : checkedKits) {
-            if (!playerData.ownsKit(kits)) {
+            if (!playerData.getOwnedKits().contains(kits)) {
                 inv.addItem(createKitItem(kits));
                 paidKits++;
             }
@@ -126,6 +126,6 @@ public class KitShop {
 
         lore.add("");
         lore.add("&aClick to purchase this kit.");
-        return new ItemBuilder(kit.getDisplayItem()).name("&c" + kit.getName()).lore(lore).build();
+        return new ItemBuilder(kit.getDisplayItem()).name("&c" + kit.getName()).lore(lore).getItem();
     }
 }
