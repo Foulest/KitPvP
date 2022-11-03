@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.foulest'
+version = '1.1.6'
+description = 'KitPvP'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+    flatDir {
+        dirs 'libs'
+    }
+
+    maven {
+        url = uri('https://repo.extendedclip.com/content/repositories/placeholderapi/')
+    }
+
+    maven {
+        url = uri('https://maven.enginehub.org/repo/')
+    }
+
+    maven {
+        url = uri('https://maven.sk89q.com/repo/')
+    }
+
+    maven {
+        url = uri('https://nexus-repo.jordanosterberg.com/repository/maven-releases/')
+    }
+}
+
+configurations {
+    provided
+    implementation.extendsFrom(provided)
+}
+
+dependencies {
+    provided group: 'dev.jcsoftware', name: 'JScoreboards', version: '2.1.2-RELEASE'
+    provided group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
+    provided group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    provided group: 'org.slf4j', name: 'slf4j-api', version: '2.0.3'
+    implementation 'ch.qos.logback:logback-core:1.4.4'
+    implementation 'ch.qos.logback:logback-classic:1.4.4'
+    compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
+    compileOnly group: 'me.clip', name: 'placeholderapi', version: '2.10.10'
+    compileOnly group: 'com.sk89q', name: 'worldedit', version: '6.0.0-SNAPSHOT'
+    compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-legacy', version: '6.2'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+}
+
+jar {
+    from {
+        configurations.provided.asFileTree.files.collect {
+            zipTree(it)
+        }
+    }
+}
