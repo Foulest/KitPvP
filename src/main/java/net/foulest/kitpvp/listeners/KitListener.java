@@ -139,8 +139,8 @@ public class KitListener implements Listener {
                 && !playerData.hasCooldown(true)
                 && !Regions.isInSafezone(player.getLocation())) {
 
-            player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
-            player.playEffect(player.getEyeLocation(), Effect.MOBSPAWNER_FLAMES, 1);
+            player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, (Integer) 1);
+            player.playEffect(player.getEyeLocation(), Effect.MOBSPAWNER_FLAMES, (Integer) 1);
             player.playSound(player.getEyeLocation(), Sound.GHAST_FIREBALL, 1.0f, 0.0f);
 
             for (Entity entity : player.getNearbyEntities(5, 3, 5)) {
