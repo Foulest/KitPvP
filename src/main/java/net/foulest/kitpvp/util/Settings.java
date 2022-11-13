@@ -106,7 +106,7 @@ public class Settings {
 
         storageType = config.getString("storage.type");
         storageFileName = config.getString("storage.sqlite.file");
-        storageFile = new File(KitPvP.instance.getDataFolder() + "/" + config.getString("storage.sqlite.file"));
+        storageFile = new File(KitPvP.instance.getDataFolder() + File.separator + config.getString("storage.sqlite.file"));
         host = config.getString("storage.mariadb.host");
         user = config.getString("storage.mariadb.user");
         password = config.getString("storage.mariadb.password");
