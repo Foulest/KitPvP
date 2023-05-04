@@ -2,7 +2,6 @@ package net.foulest.kitpvp.util;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.foulest.kitpvp.data.PlayerData;
-import net.foulest.kitpvp.koth.KOTH;
 import net.foulest.kitpvp.listeners.CombatLog;
 import org.bukkit.entity.Player;
 
@@ -26,7 +25,7 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.1.6";
+        return "1.1.7";
     }
 
     @Override
@@ -101,16 +100,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
         // Placeholder: %kitpvp_bounty_tab%
         if (identifier.equals("bounty_tab")) {
             return (player == null || playerData.getBounty() == 0) ? "" : "&6Bounty: &e&l$" + playerData.getBounty();
-        }
-
-        // Placeholder: %kitpvp_koth%
-        if (identifier.equals("koth")) {
-            return KOTH.getActiveKoth() == null ? "" : KOTH.getActiveKoth().getName();
-        }
-
-        // Placeholder: %kitpvp_koth_time_left%
-        if (identifier.equals("koth_time_left")) {
-            return KOTH.getActiveKoth() == null ? "00:00" : KOTH.getTimeLeftNeat(KOTH.getActiveKoth());
         }
 
         return null;

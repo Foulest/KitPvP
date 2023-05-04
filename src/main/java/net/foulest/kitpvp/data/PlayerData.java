@@ -3,10 +3,12 @@ package net.foulest.kitpvp.data;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.util.*;
+import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.util.ItemBuilder;
+import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.SkullCreatorUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import net.foulest.kitpvp.util.kits.KitManager;
-import net.foulest.kitpvp.util.scoreboard.Scoreboard;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -59,7 +61,6 @@ public final class PlayerData {
     private boolean punchEnchant;
     private boolean powerEnchant;
     private boolean pendingNoFallRemoval;
-    private Scoreboard activeScoreboard;
 
     private PlayerData(Player player) {
         this.player = player;
@@ -79,8 +80,8 @@ public final class PlayerData {
 
         for (PlayerData playerData : INSTANCES) {
             if (playerData == null || playerData.getPlayer() == null
-                    || playerData.getPlayer().getUniqueId() == null
-                    || player == null || player.getUniqueId() == null) {
+                || playerData.getPlayer().getUniqueId() == null
+                || player == null || player.getUniqueId() == null) {
                 MessageUtil.log(Level.WARNING, "Player data for player '" + player + "' is null");
                 return null;
             }
@@ -142,13 +143,8 @@ public final class PlayerData {
         if (!DatabaseUtil.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
             MessageUtil.log(Level.INFO, "Player doesn't exist, inserting into database.");
 
-            if (Settings.usingMariaDB) {
-                DatabaseUtil.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak, usingSoup, previousKit)"
-                        + " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + true + ", 'Knight')");
-            } else {
-                DatabaseUtil.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak, usingSoup, previousKit)"
-                        + " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 1 + ", 'Knight')");
-            }
+            DatabaseUtil.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak, usingSoup, previousKit)"
+                                + " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + true + ", 'Knight')");
 
             if (!DatabaseUtil.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
                 MessageUtil.log(Level.WARNING, "Player data '" + player.getName() + "' failed to load.");
@@ -164,11 +160,7 @@ public final class PlayerData {
             setDeaths((Integer) DatabaseUtil.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
             setKillstreak((Integer) DatabaseUtil.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
             setTopKillstreak((Integer) DatabaseUtil.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-
-            setUsingSoup(Settings.usingMariaDB
-                    ? (Boolean) DatabaseUtil.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())
-                    : (Integer) DatabaseUtil.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()) == 1);
-
+            setUsingSoup((Boolean) DatabaseUtil.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
             setPreviousKit(KitManager.getKit((String) DatabaseUtil.get("previousKit", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())));
 
         } catch (NullPointerException ex) {
@@ -178,7 +170,7 @@ public final class PlayerData {
         // Inserts default values into PlayerKits.
         if (!DatabaseUtil.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
             DatabaseUtil.update("INSERT INTO PlayerKits (uuid, kitName)" +
-                    " VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
+                                " VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
         } else {
             // Loads values from PlayerKits.
             try {
@@ -204,13 +196,8 @@ public final class PlayerData {
 
         // Inserts default values into Enchants.
         if (!DatabaseUtil.exists("*", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-            if (Settings.usingMariaDB) {
-                DatabaseUtil.update("INSERT INTO Enchants (uuid, featherFalling, thorns, protection, knockback, sharpness, punch, power)"
-                        + " VALUES ('" + player.getUniqueId().toString() + "', " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ")");
-            } else {
-                DatabaseUtil.update("INSERT INTO Enchants (uuid, featherFalling, thorns, protection, knockback, sharpness, punch, power)"
-                        + " VALUES ('" + player.getUniqueId().toString() + "', " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ")");
-            }
+            DatabaseUtil.update("INSERT INTO Enchants (uuid, featherFalling, thorns, protection, knockback, sharpness, punch, power)"
+                                + " VALUES ('" + player.getUniqueId().toString() + "', " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ")");
 
             setFeatherFallingEnchant(false);
             setThornsEnchant(false);
@@ -224,45 +211,31 @@ public final class PlayerData {
             // Loads values from Enchants.
             try {
                 if (DatabaseUtil.exists("featherFalling", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setFeatherFallingEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("featherFalling", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("featherFalling", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setFeatherFallingEnchant((Boolean) DatabaseUtil.get("featherFalling", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("thorns", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setThornsEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("thorns", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("thorns", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setThornsEnchant((Boolean) DatabaseUtil.get("thorns", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("protection", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setProtectionEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("protection", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("protection", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setProtectionEnchant((Boolean) DatabaseUtil.get("protection", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("knockback", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setKnockbackEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("knockback", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("knockback", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setKnockbackEnchant((Boolean) DatabaseUtil.get("knockback", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("sharpness", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setSharpnessEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("sharpness", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("sharpness", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setSharpnessEnchant((Boolean) DatabaseUtil.get("sharpness", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("punch", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setPunchEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("punch", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("punch", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setPunchEnchant((Boolean) DatabaseUtil.get("punch", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
                 if (DatabaseUtil.exists("power", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setPowerEnchant(Settings.usingMariaDB
-                            ? (Boolean) DatabaseUtil.get("power", "*", "Enchants", "uuid", "=", player.getUniqueId().toString())
-                            : (Integer) DatabaseUtil.get("power", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()) == 1);
+                    setPowerEnchant((Boolean) DatabaseUtil.get("power", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
                 }
 
             } catch (NullPointerException ex) {
@@ -283,7 +256,7 @@ public final class PlayerData {
                 }
 
                 DatabaseUtil.update("INSERT INTO PlayerKits (uuid, kitName)" +
-                        " VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
+                                    " VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
             }
         }
 
@@ -292,30 +265,30 @@ public final class PlayerData {
 
     public void saveStats() {
         DatabaseUtil.update("UPDATE PlayerStats SET"
-                + " coins=" + coins
-                + ", experience=" + experience
-                + ", kills=" + kills
-                + ", deaths=" + deaths
-                + ", killstreak=" + killstreak
-                + ", topKillstreak=" + topKillstreak
-                + ", usingSoup=" + (Settings.usingMariaDB ? usingSoup : (usingSoup ? 1 : 0))
-                + ", previousKit='" + previousKit.getName()
-                + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+                            + " coins=" + coins
+                            + ", experience=" + experience
+                            + ", kills=" + kills
+                            + ", deaths=" + deaths
+                            + ", killstreak=" + killstreak
+                            + ", topKillstreak=" + topKillstreak
+                            + ", usingSoup=" + usingSoup
+                            + ", previousKit='" + previousKit.getName()
+                            + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
 
         DatabaseUtil.update("UPDATE Bounties SET"
-                + " bounty=" + bounty
-                + ", benefactor='" + benefactor
-                + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+                            + " bounty=" + bounty
+                            + ", benefactor='" + benefactor
+                            + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
 
         DatabaseUtil.update("UPDATE Enchants SET"
-                + " featherFalling=" + (Settings.usingMariaDB ? featherFallingEnchant : (featherFallingEnchant ? 1 : 0))
-                + ", thorns=" + (Settings.usingMariaDB ? thornsEnchant : (thornsEnchant ? 1 : 0))
-                + ", protection=" + (Settings.usingMariaDB ? protectionEnchant : (protectionEnchant ? 1 : 0))
-                + ", knockback=" + (Settings.usingMariaDB ? knockbackEnchant : (knockbackEnchant ? 1 : 0))
-                + ", sharpness=" + (Settings.usingMariaDB ? sharpnessEnchant : (sharpnessEnchant ? 1 : 0))
-                + ", punch=" + (Settings.usingMariaDB ? punchEnchant : (punchEnchant ? 1 : 0))
-                + ", power=" + (Settings.usingMariaDB ? powerEnchant : (powerEnchant ? 1 : 0))
-                + " WHERE uuid='" + player.getUniqueId().toString() + "'");
+                            + " featherFalling=" + featherFallingEnchant
+                            + ", thorns=" + thornsEnchant
+                            + ", protection=" + protectionEnchant
+                            + ", knockback=" + knockbackEnchant
+                            + ", sharpness=" + sharpnessEnchant
+                            + ", punch=" + punchEnchant
+                            + ", power=" + powerEnchant
+                            + " WHERE uuid='" + player.getUniqueId().toString() + "'");
     }
 
     public void addBounty(int bounty, UUID benefactor) {
@@ -327,7 +300,7 @@ public final class PlayerData {
         this.benefactor = benefactor;
 
         DatabaseUtil.update("INSERT INTO Bounties (uuid, bounty, benefactor)" +
-                " VALUES ('" + player.getUniqueId().toString() + "', " + bounty + ", '" + benefactor + "');");
+                            " VALUES ('" + player.getUniqueId().toString() + "', " + bounty + ", '" + benefactor + "');");
     }
 
     public void removeBounty() {
@@ -455,12 +428,6 @@ public final class PlayerData {
         }
 
         this.coins += coins;
-    }
-
-    public void clearScoreboard() {
-        if (getActiveScoreboard() != null) {
-            getActiveScoreboard().getContents().removePlayer(player);
-        }
     }
 
     public void giveDefaultItems() {

@@ -47,7 +47,8 @@ public class Regions {
             ProtectedRegion region = regions.getValue();
             BlockVector regionMin = region.getMinimumPoint();
             BlockVector regionMax = region.getMaximumPoint();
-            AxisAlignedBB regionZone = new AxisAlignedBB(new BlockPosition(regionMin.getX(), regionMin.getY(), regionMin.getZ()),
+
+            AxisAlignedBB regionZone = new AxisAlignedBB(new BlockPosition(region.getMinimumPoint().getX(), regionMin.getY(), regionMin.getZ()),
                     new BlockPosition((regionMax.getX() + 1), regionMax.getY(), (regionMax.getZ() + 1)));
             Vec3D vec3D = new Vec3D(loc.getX(), loc.getY(), loc.getZ());
 

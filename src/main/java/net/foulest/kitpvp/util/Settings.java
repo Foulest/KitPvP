@@ -1,16 +1,11 @@
 package net.foulest.kitpvp.util;
 
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.koth.KOTH;
-import net.foulest.kitpvp.util.scoreboard.Scoreboard;
-import net.foulest.kitpvp.util.scoreboard.ScoreboardUtil;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.logging.Level;
 
 public class Settings {
@@ -26,19 +21,11 @@ public class Settings {
     public static int killCoinBonus;
     public static int killExpBonus;
     public static int killStreakBonus;
-    public static String storageType;
-    public static File storageFile;
-    public static String storageFileName;
     public static String host;
     public static String user;
     public static String password;
     public static String database;
     public static int port;
-    public static boolean usingMariaDB;
-    public static boolean usingSQLite;
-    public static boolean scoreboardsEnabled;
-    public static Scoreboard defaultScoreboard;
-    public static Scoreboard kothScoreboard;
 
     public static void setupSettings() {
         file = new File(KitPvP.instance.getDataFolder(), "settings.yml");
@@ -65,22 +52,11 @@ public class Settings {
         config.addDefault("kill.coin-bonus", 10);
         config.addDefault("kill.exp-bonus", 15);
         config.addDefault("kill.streak-bonus", 5);
-        config.addDefault("storage.type", "sqlite");
-        config.addDefault("storage.sqlite.file", "sqlite.db");
-        config.addDefault("storage.mariadb.host", "host");
-        config.addDefault("storage.mariadb.user", "user");
-        config.addDefault("storage.mariadb.password", "password");
-        config.addDefault("storage.mariadb.database", "database");
-        config.addDefault("storage.mariadb.port", 3306);
-        config.addDefault("scoreboards", Collections.<String>emptyList());
-        config.addDefault("scoreboards.enabled", true);
-        config.addDefault("scoreboards.default-scoreboard", "default");
-        config.addDefault("scoreboards.koth-scoreboard", "koth");
-        config.addDefault("scoreboards.default.title", "&e&lKitPvP");
-        config.addDefault("scoreboards.default.lines", new ArrayList<String>());
-        config.addDefault("scoreboards.koth.title", "&e&lKitPvP");
-        config.addDefault("scoreboards.koth.lines", new ArrayList<String>());
-        config.addDefault("koth", Collections.<String>emptyList());
+        config.addDefault("storage.host", "host");
+        config.addDefault("storage.user", "user");
+        config.addDefault("storage.password", "password");
+        config.addDefault("storage.database", "database");
+        config.addDefault("storage.port", 3306);
         config.options().copyDefaults(true);
 
         try {
@@ -104,33 +80,11 @@ public class Settings {
         killExpBonus = config.getInt("kill.exp-bonus");
         killStreakBonus = config.getInt("kill.streak-bonus");
 
-        storageType = config.getString("storage.type");
-        storageFileName = config.getString("storage.sqlite.file");
-        storageFile = new File(KitPvP.instance.getDataFolder() + File.separator + config.getString("storage.sqlite.file"));
-        host = config.getString("storage.mariadb.host");
-        user = config.getString("storage.mariadb.user");
-        password = config.getString("storage.mariadb.password");
-        database = config.getString("storage.mariadb.database");
-        port = config.getInt("storage.mariadb.port");
-
-        scoreboardsEnabled = config.getBoolean("scoreboards.enabled");
-        defaultScoreboard = ScoreboardUtil.getScoreboard(config.getString("scoreboards.default-scoreboard"));
-        kothScoreboard = ScoreboardUtil.getScoreboard(config.getString("scoreboards.koth-scoreboard"));
-
-        switch (storageType.toLowerCase()) {
-            case "mariadb":
-                usingMariaDB = true;
-                usingSQLite = false;
-                break;
-
-            case "sqlite":
-                usingMariaDB = false;
-                usingSQLite = true;
-                break;
-        }
-
-        KOTH.loadKoths();
-        ScoreboardUtil.loadScoreboards();
+        host = config.getString("storage.host");
+        user = config.getString("storage.user");
+        password = config.getString("storage.password");
+        database = config.getString("storage.database");
+        port = config.getInt("storage.port");
     }
 
     public static void saveSettings() {
@@ -145,23 +99,11 @@ public class Settings {
         config.set("kill.exp-bonus", killExpBonus);
         config.set("kill.streak-bonus", killStreakBonus);
 
-        config.set("storage.type", storageType);
-        config.set("storage.sqlite.file", storageFileName);
-        config.set("storage.mariadb.host", host);
-        config.set("storage.mariadb.user", user);
-        config.set("storage.mariadb.password", password);
-        config.set("storage.mariadb.database", database);
-        config.set("storage.mariadb.port", port);
-
-        config.set("scoreboards.enabled", scoreboardsEnabled);
-
-        if (defaultScoreboard != null) {
-            config.set("scoreboards.default-scoreboard", defaultScoreboard.getName());
-        }
-
-        if (kothScoreboard != null) {
-            config.set("scoreboards.koth-scoreboard", kothScoreboard.getName());
-        }
+        config.set("storage.host", host);
+        config.set("storage.user", user);
+        config.set("storage.password", password);
+        config.set("storage.database", database);
+        config.set("storage.port", port);
 
         try {
             config.save(file);

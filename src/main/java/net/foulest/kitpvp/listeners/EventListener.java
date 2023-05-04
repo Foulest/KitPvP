@@ -2,7 +2,6 @@ package net.foulest.kitpvp.listeners;
 
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
-import net.foulest.kitpvp.koth.KOTH;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.menus.KitSelector;
 import net.foulest.kitpvp.menus.KitShop;
@@ -13,7 +12,6 @@ import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import net.foulest.kitpvp.util.kits.KitManager;
-import net.foulest.kitpvp.util.scoreboard.ScoreboardUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -36,8 +34,6 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.logging.Level;
 
 /**
  * @author Foulest
@@ -79,17 +75,6 @@ public class EventListener implements Listener {
         }
 
         Spawn.teleport(player);
-
-        if (KOTH.getActiveKoth() != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!ScoreboardUtil.showKOTHScoreboard(player)) {
-                        MessageUtil.log(Level.WARNING, "KOTH scoreboard couldn't be sent to " + player.getName());
-                    }
-                }
-            }.runTaskLater(KitPvP.instance, 10L);
-        }
     }
 
     @EventHandler
@@ -134,7 +119,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             if (event.getItemDrop().getItemStack().getType() == Material.BOWL) {
                 event.getItemDrop().remove();
             } else {
@@ -152,8 +137,8 @@ public class EventListener implements Listener {
         }
 
         if (event.getBlock().getType() == Material.LADDER
-                && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify")) {
+            && player.getGameMode() == GameMode.CREATIVE
+            && player.hasPermission("kitpvp.modify")) {
             event.setCancelled(true);
         }
     }
@@ -187,7 +172,7 @@ public class EventListener implements Listener {
                 CombatLog.markForCombat(damager, receiver);
 
                 MessageUtil.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &6"
-                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "❤&e.");
+                                                   + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "❤&e.");
 
                 new BukkitRunnable() {
                     @Override
@@ -215,7 +200,7 @@ public class EventListener implements Listener {
         Player player = (Player) event.getWhoClicked();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -308,7 +293,7 @@ public class EventListener implements Listener {
 
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
-                && !event.getClickedInventory().getName().equals("container.inventory")) {
+            && !event.getClickedInventory().getName().equals("container.inventory")) {
             event.setCancelled(true);
             player.updateInventory();
             return;
@@ -316,7 +301,7 @@ public class EventListener implements Listener {
 
         // Null/meta check.
         if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()
-                || event.getCurrentItem().getItemMeta() == null) {
+            || event.getCurrentItem().getItemMeta() == null) {
             return;
         }
 
@@ -408,7 +393,7 @@ public class EventListener implements Listener {
             player.updateInventory();
 
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()
-                    || event.getCurrentItem().getItemMeta() == null) {
+                || event.getCurrentItem().getItemMeta() == null) {
                 return;
             }
 
@@ -718,8 +703,8 @@ public class EventListener implements Listener {
         CreatureSpawnEvent.SpawnReason spawnEvent = event.getSpawnReason();
 
         if (spawnEvent != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG
-                && spawnEvent != CreatureSpawnEvent.SpawnReason.SPAWNER
-                && spawnEvent != CreatureSpawnEvent.SpawnReason.CUSTOM) {
+            && spawnEvent != CreatureSpawnEvent.SpawnReason.SPAWNER
+            && spawnEvent != CreatureSpawnEvent.SpawnReason.CUSTOM) {
             event.setCancelled(true);
         }
     }
@@ -743,7 +728,7 @@ public class EventListener implements Listener {
         }
 
         if (event.getAction().toString().contains("RIGHT") && block != null
-                && block.getState() instanceof InventoryHolder) {
+            && block.getState() instanceof InventoryHolder) {
             event.setCancelled(true);
             return;
         }
@@ -812,7 +797,7 @@ public class EventListener implements Listener {
 
                 case WATCH:
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Previous Kit")
-                            && playerData.getPreviousKit() != null && playerData.getKit() == null) {
+                        && playerData.getPreviousKit() != null && playerData.getKit() == null) {
                         event.setCancelled(true);
                         playerData.getPreviousKit().apply(player);
                         MessageUtil.messagePlayer(player, "&aYou equipped the " + playerData.getPreviousKit().getName() + " kit.");
@@ -868,7 +853,7 @@ public class EventListener implements Listener {
 
                 default:
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName() != null
-                            && item.getItemMeta().getDisplayName().toLowerCase().contains("right click")) {
+                        && item.getItemMeta().getDisplayName().toLowerCase().contains("right click")) {
                         event.setCancelled(true);
                         player.updateInventory();
                     }
@@ -933,7 +918,7 @@ public class EventListener implements Listener {
 
         // Equips the player's previously used kit when they leave spawn without a kit equipped.
         if (playerData.getKit() == null && !player.isDead() && !player.getAllowFlight()
-                && !Regions.isInSafezone(event.getFrom())) {
+            && !Regions.isInSafezone(event.getFrom())) {
             player.closeInventory();
             playerData.getPreviousKit().apply(player);
             MessageUtil.messagePlayer(player, "&cYour previous kit has been automatically applied.");
@@ -995,7 +980,7 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public static void onVoidDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player
-                && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             Player player = (Player) event.getEntity();
 
             DeathListener.handleDeath(player, false);
@@ -1025,7 +1010,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -1035,7 +1020,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
             player.updateInventory();
         }
@@ -1046,8 +1031,8 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL
-                && player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.getGameMode() == GameMode.CREATIVE
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -1077,7 +1062,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
         }
     }
@@ -1087,7 +1072,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!(player.getGameMode() == GameMode.CREATIVE
-                && player.hasPermission("kitpvp.modify"))) {
+              && player.hasPermission("kitpvp.modify"))) {
             event.setCancelled(true);
             player.updateInventory();
         }

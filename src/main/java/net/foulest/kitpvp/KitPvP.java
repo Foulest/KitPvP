@@ -6,10 +6,12 @@ import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.kits.*;
-import net.foulest.kitpvp.listeners.*;
+import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.listeners.DeathListener;
+import net.foulest.kitpvp.listeners.EventListener;
+import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.DatabaseUtil;
-import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.PlaceholderUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.CommandFramework;
@@ -20,10 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.logging.Level;
 
 /**
  * @author Foulest
@@ -33,7 +33,6 @@ import java.util.logging.Level;
 public class KitPvP extends JavaPlugin {
 
     // TODO: refund missed snowballs
-    // TODO: block fisherman and imprisoner from hitting on koth
     // TODO: golems don't move
     // TODO: fix hulk ability
 
@@ -62,14 +61,14 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the plugin's listeners.
         Bukkit.getLogger().info("[KitPvP] - Loading Listeners...");
-        loadListeners(new DeathListener(), new EventListener(), new KitListener(), new KOTHListener());
+        loadListeners(new DeathListener(), new EventListener(), new KitListener());
 
         // Loads the plugin's commands.
         Bukkit.getLogger().info("[KitPvP] - Loading Commands...");
         loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(),
                 new EcoSetCmd(), new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
                 new KitShopCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
-                new PotionsCmd(), new ReloadCmd(), new KOTHCmd());
+                new PotionsCmd(), new ReloadCmd());
 
         // Loads the plugin's kits.
         Bukkit.getLogger().info("[KitPvP] - Loading Kits...");
@@ -130,42 +129,25 @@ public class KitPvP extends JavaPlugin {
         DatabaseUtil.hikari = new HikariDataSource();
 
         // Sets up the MariaDB database.
-        if (Settings.usingMariaDB) {
-            DatabaseUtil.hikari.setPoolName("MariaDBConnectionPool");
-            DatabaseUtil.hikari.setJdbcUrl("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database);
-            DatabaseUtil.hikari.setDriverClassName("org.mariadb.jdbc.Driver");
-            DatabaseUtil.hikari.addDataSourceProperty("user", Settings.user);
-            DatabaseUtil.hikari.addDataSourceProperty("password", Settings.password);
-            DatabaseUtil.hikari.addDataSourceProperty("characterEncoding", "utf8");
-            DatabaseUtil.hikari.addDataSourceProperty("useUnicode", "true");
-
-        } else {
-            // Creates the SQLite database file.
-            if (!Settings.storageFile.exists()) {
-                try {
-                    Settings.storageFile.createNewFile();
-                } catch (IOException ex) {
-                    MessageUtil.log(Level.WARNING, "Failed to create SQLite database. Error: " + ex.getMessage());
-                }
-            }
-
-            // Sets up the SQLite database.
-            DatabaseUtil.hikari.setPoolName("SQLiteConnectionPool");
-            DatabaseUtil.hikari.setJdbcUrl("jdbc:sqlite:" + Settings.storageFile);
-            DatabaseUtil.hikari.setDataSourceClassName("org.sqlite.SQLiteDataSource");
-        }
+        DatabaseUtil.hikari.setPoolName("MariaDBConnectionPool");
+        DatabaseUtil.hikari.setJdbcUrl("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database);
+        DatabaseUtil.hikari.setDriverClassName("org.mariadb.jdbc.Driver");
+        DatabaseUtil.hikari.addDataSourceProperty("user", Settings.user);
+        DatabaseUtil.hikari.addDataSourceProperty("password", Settings.password);
+        DatabaseUtil.hikari.addDataSourceProperty("characterEncoding", "utf8");
+        DatabaseUtil.hikari.addDataSourceProperty("useUnicode", "true");
 
         // Sets up other connection flags.
         DatabaseUtil.hikari.setConnectionTestQuery("SELECT 1;");
 
         // Creates missing tables in the database.
         DatabaseUtil.update("CREATE TABLE IF NOT EXISTS PlayerStats (uuid VARCHAR(36), coins INT, " +
-                "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, usingSoup BOOLEAN, " +
-                "previousKit VARCHAR(36))");
+                            "experience INT, kills INT, deaths INT, killstreak INT, topKillstreak INT, usingSoup BOOLEAN, " +
+                            "previousKit VARCHAR(36))");
         DatabaseUtil.update("CREATE TABLE IF NOT EXISTS PlayerKits (uuid VARCHAR(36), kitName VARCHAR(36))");
         DatabaseUtil.update("CREATE TABLE IF NOT EXISTS Bounties (uuid VARCHAR(36), bounty INT, benefactor VARCHAR(36))");
         DatabaseUtil.update("CREATE TABLE IF NOT EXISTS Enchants (uuid VARCHAR(36), featherFalling BOOLEAN," +
-                " thorns BOOLEAN, protection BOOLEAN, knockback BOOLEAN, sharpness BOOLEAN, punch BOOLEAN, power BOOLEAN)");
+                            " thorns BOOLEAN, protection BOOLEAN, knockback BOOLEAN, sharpness BOOLEAN, punch BOOLEAN, power BOOLEAN)");
     }
 
     /**

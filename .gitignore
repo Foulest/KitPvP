@@ -19,7 +19,6 @@ $RECYCLE.BIN/
 *.stackdump
 *.tar.gz
 *.war
-*.zip
 *~
 .AppleDB
 .AppleDesktop
@@ -42,6 +41,7 @@ $RECYCLE.BIN/
 .fuse_hidden*
 .gradle/
 .idea/
+build/
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 .nfs*
@@ -68,3 +68,4 @@ run/
 target/
 /build/tmp/jar/MANIFEST.MF
 /build/tmp/compileJava/source-classes-mapping.txt
+machinet.conf
