@@ -38,7 +38,7 @@ public class Pyro implements Kit {
     public List<ItemBuilder> getItems() {
         ItemBuilder weapon = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo().enchant(Enchantment.FIRE_ASPECT, 1);
         ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo().enchant(Enchantment.ARROW_FIRE, 1);
-        ItemBuilder arrow = new ItemBuilder(Material.ARROW).amount(16);
+        ItemBuilder arrow = new ItemBuilder(Material.ARROW).amount(16).slot(9);
         return Arrays.asList(weapon, bow, arrow);
     }
 

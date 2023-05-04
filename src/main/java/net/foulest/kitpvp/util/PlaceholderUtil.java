@@ -25,7 +25,7 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.1.8";
+        return "1.0.0";
     }
 
     @Override
@@ -37,71 +37,62 @@ public class PlaceholderUtil extends PlaceholderExpansion {
             return "";
         }
 
-        // Placeholder: %kitpvp_kills%
-        if (identifier.equals("kills")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getKills());
+        StringBuilder builder = new StringBuilder();
+
+        switch (identifier) {
+            case "kills":
+                builder.append(player == null ? "0" : playerData.getKills());
+                break;
+
+            case "deaths":
+                builder.append(player == null ? "0" : playerData.getDeaths());
+                break;
+
+            case "kdr":
+                builder.append(player == null ? "0" : playerData.getKDRText());
+                break;
+
+            case "killstreak":
+                builder.append(player == null ? "0" : playerData.getKillstreak());
+                break;
+
+            case "top_killstreak":
+                builder.append(player == null ? "0" : playerData.getTopKillstreak());
+                break;
+
+            case "coins":
+                builder.append(player == null ? "0" : playerData.getCoins());
+                break;
+
+            case "level":
+                builder.append(player == null ? "0" : playerData.getLevel());
+                break;
+
+            case "experience":
+                builder.append(player == null ? "0" : playerData.getExperience());
+                break;
+
+            case "experience_percent":
+                builder.append(player == null ? "0" : playerData.getExpPercent()).append("%");
+                break;
+
+            case "combattag":
+                builder.append(CombatLog.isInCombat(player) ? "&c00:" + String.format("%02d", CombatLog.getRemainingTime(player)) : "&aSafe");
+                break;
+
+            case "activekit":
+                builder.append(player == null || playerData.getKit() == null ? "None" : playerData.getKit().getName());
+                break;
+
+            case "bounty":
+                builder.append(player == null || playerData.getBounty() == 0 ? "" : playerData.getBounty());
+                break;
+
+            case "bounty_tab":
+                builder.append(player == null || playerData.getBounty() == 0 ? "" : "&6Bounty: &e&l$" + playerData.getBounty());
+                break;
         }
 
-        // Placeholder: %kitpvp_deaths%
-        if (identifier.equals("deaths")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getDeaths());
-        }
-
-        // Placeholder: %kitpvp_kdr%
-        if (identifier.equals("kdr")) {
-            return (player == null) ? "0" : playerData.getKDRText();
-        }
-
-        // Placeholder: %kitpvp_killstreak%
-        if (identifier.equals("killstreak")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getKillstreak());
-        }
-
-        // Placeholder: %kitpvp_top_killstreak%
-        if (identifier.equals("top_killstreak")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getTopKillstreak());
-        }
-
-        // Placeholder: %kitpvp_coins%
-        if (identifier.equals("coins")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getCoins());
-        }
-
-        // Placeholder: %kitpvp_level%
-        if (identifier.equals("level")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getLevel());
-        }
-
-        // Placeholder: %kitpvp_experience%
-        if (identifier.equals("experience")) {
-            return (player == null) ? "0" : String.valueOf(playerData.getExperience());
-        }
-
-        // Placeholder: %kitpvp_experience_percent%
-        if (identifier.equals("experience_percent")) {
-            return (player == null) ? "0" : playerData.getExpPercent() + "%";
-        }
-
-        // Placeholder: %kitpvp_combattag%
-        if (identifier.equals("combattag")) {
-            return CombatLog.isInCombat(player) ? "&c00:" + String.format("%02d", CombatLog.getRemainingTime(player)) : "&aSafe";
-        }
-
-        // Placeholder: %kitpvp_activekit%
-        if (identifier.equals("activekit")) {
-            return (player == null || playerData.getKit() == null) ? "None" : playerData.getKit().getName();
-        }
-
-        // Placeholder: %kitpvp_bounty%
-        if (identifier.equals("bounty")) {
-            return (player == null || playerData.getBounty() == 0) ? "" : Integer.toString(playerData.getBounty());
-        }
-
-        // Placeholder: %kitpvp_bounty_tab%
-        if (identifier.equals("bounty_tab")) {
-            return (player == null || playerData.getBounty() == 0) ? "" : "&6Bounty: &e&l$" + playerData.getBounty();
-        }
-
-        return null;
+        return builder.toString();
     }
 }

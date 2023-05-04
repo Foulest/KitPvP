@@ -34,6 +34,7 @@ import java.util.Objects;
 public class KitPvP extends JavaPlugin {
 
     public static KitPvP instance;
+    public static String pluginName = "KitPvP";
     public static boolean loaded = false;
     private CommandFramework framework;
 
@@ -44,68 +45,68 @@ public class KitPvP extends JavaPlugin {
         framework = new CommandFramework(this);
 
         // Registers placeholders with PlaceholderAPI.
-        Bukkit.getLogger().info("[KitPvP] - Loading Placeholders...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Placeholders...");
         new PlaceholderUtil().register();
 
         // Creates the default settings config.
-        Bukkit.getLogger().info("[KitPvP] - Loading Settings...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Settings...");
         Settings.setupSettings();
         Settings.loadSettings();
 
         // Sets up the Hikari instance.
-        Bukkit.getLogger().info("[KitPvP] - Loading Database...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Database...");
         loadDatabase();
 
         // Loads the plugin's listeners.
-        Bukkit.getLogger().info("[KitPvP] - Loading Listeners...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Listeners...");
         loadListeners(new DeathListener(), new EventListener(), new KitListener());
 
         // Loads the plugin's commands.
-        Bukkit.getLogger().info("[KitPvP] - Loading Commands...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Commands...");
         loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(),
                 new EcoSetCmd(), new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
                 new KitShopCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
                 new PotionsCmd(), new ReloadCmd());
 
         // Loads the plugin's kits.
-        Bukkit.getLogger().info("[KitPvP] - Loading Kits...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Kits...");
         loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
                 new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(), new Ninja(),
                 new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(), new Vampire(),
                 new Zen());
 
         // Loads the spawn.
-        Bukkit.getLogger().info("[KitPvP] - Loading Spawn...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Spawn...");
         Spawn.load();
 
         if (Spawn.getLocation().getWorld().getDifficulty() == Difficulty.PEACEFUL) {
-            Bukkit.getLogger().warning("[KitPvP] - The world difficulty is set to Peaceful. This will cause issues with hostile mobs in certain kits.");
+            Bukkit.getLogger().warning("[" + pluginName + " - The world difficulty is set to Peaceful. This will cause issues with hostile mobs in certain kits.");
         }
 
         // Loads online players' user data.
-        Bukkit.getLogger().info("[KitPvP] - Loading Player Data...");
+        Bukkit.getLogger().info("[" + pluginName + " - Loading Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
             Objects.requireNonNull(PlayerData.getInstance(player)).load();
             Spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
         }
 
-        Bukkit.getLogger().info("[KitPvP] Loaded successfully.");
+        Bukkit.getLogger().info("[" + pluginName + " Loaded successfully.");
         loaded = true;
     }
 
     @Override
     public void onDisable() {
         // Unloads the kits saved in the Kit Manager.
-        Bukkit.getLogger().info("[KitPvP] - Unloading Kits...");
+        Bukkit.getLogger().info("[" + pluginName + " - Unloading Kits...");
         KitManager.kits.clear();
 
         // Saves the settings.
-        Bukkit.getLogger().info("[KitPvP] - Saving Settings...");
+        Bukkit.getLogger().info("[" + pluginName + " - Saving Settings...");
         Settings.saveSettings();
 
         // Saves online players' data.
-        Bukkit.getLogger().info("[KitPvP] - Saving Player Data...");
+        Bukkit.getLogger().info("[" + pluginName + " - Saving Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
             Objects.requireNonNull(PlayerData.getInstance(player)).saveAll();
 
@@ -115,12 +116,12 @@ public class KitPvP extends JavaPlugin {
         }
 
         // Closes the MySQL connection.
-        Bukkit.getLogger().info("[KitPvP] - Saving Database...");
+        Bukkit.getLogger().info("[" + pluginName + " - Saving Database...");
         if (DatabaseUtil.hikari != null) {
             DatabaseUtil.hikari.close();
         }
 
-        Bukkit.getLogger().info("[KitPvP] Shut down successfully.");
+        Bukkit.getLogger().info("[" + pluginName + " Shut down successfully.");
     }
 
     /**

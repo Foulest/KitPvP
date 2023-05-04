@@ -20,14 +20,14 @@ import java.util.Arrays;
 public class KitEnchanter {
 
     private static final String inventoryName = MessageUtil.colorize("Kit Enchanter");
-    private final Inventory inv;
+    private final Inventory inventory;
 
     public KitEnchanter(Player player) {
-        inv = Bukkit.createInventory(player, 27, inventoryName);
+        inventory = Bukkit.createInventory(player, 27, inventoryName);
 
         populateInventory(player);
         player.closeInventory();
-        player.openInventory(inv);
+        player.openInventory(inventory);
     }
 
     /**
@@ -44,7 +44,7 @@ public class KitEnchanter {
         }
 
         for (int i = 0; i < maxSlots; i++) {
-            inv.setItem(i, glass);
+            inventory.setItem(i, glass);
         }
 
         ItemStack featherFalling = new ItemBuilder(Material.DIAMOND_BOOTS).addGlow().name("&aFeather Falling")
@@ -65,7 +65,7 @@ public class KitEnchanter {
                         "", "&cNote: &7This enchantment is temporary.", "&7Kits that already have this enchantment",
                         "&7will be upgraded to a higher level.")).getItem();
 
-        ItemStack knockback = new ItemBuilder(Material.DIAMOND_SWORD).addGlow().name("&aKnockback")
+        ItemStack knockback = new ItemBuilder(Material.DIAMOND_SWORD).hideInfo().addGlow().name("&aKnockback")
                 .lore(Arrays.asList("&7Adds the &fKnockback II &7enchantment.", "",
                         (playerData.isKnockbackEnchant() ? "&cYou have this equipped." : "&7Cost: &6100 coins"),
                         "", "&cNote: &7This enchantment is temporary.", "&7Kits that already have this enchantment",
@@ -89,16 +89,12 @@ public class KitEnchanter {
                         "", "&cNote: &7This enchantment is temporary.", "&7Kits that already have this enchantment",
                         "&7will be upgraded to a higher level.")).getItem();
 
-        inv.setItem(10, featherFalling);
-        inv.setItem(11, thorns);
-        inv.setItem(12, protection);
-        inv.setItem(13, knockback);
-        inv.setItem(14, sharpness);
-        inv.setItem(15, punch);
-        inv.setItem(16, power);
-    }
-
-    public Inventory getInventory() {
-        return inv;
+        inventory.setItem(10, featherFalling);
+        inventory.setItem(11, thorns);
+        inventory.setItem(12, protection);
+        inventory.setItem(13, knockback);
+        inventory.setItem(14, sharpness);
+        inventory.setItem(15, punch);
+        inventory.setItem(16, power);
     }
 }

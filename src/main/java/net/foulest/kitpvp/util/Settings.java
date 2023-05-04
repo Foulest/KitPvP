@@ -21,6 +21,12 @@ public class Settings {
     public static int killCoinBonus;
     public static int killExpBonus;
     public static int killStreakBonus;
+    public static boolean premiumEnabled;
+    public static String premiumRankName;
+    public static String premiumPermission;
+    public static String premiumStoreLink;
+    public static int nonPremiumKitLimit;
+    public static boolean bountiesPremiumOnly;
     public static String host;
     public static String user;
     public static String password;
@@ -52,6 +58,12 @@ public class Settings {
         config.addDefault("kill.coin-bonus", 10);
         config.addDefault("kill.exp-bonus", 15);
         config.addDefault("kill.streak-bonus", 5);
+        config.addDefault("premium.enabled", true);
+        config.addDefault("premium.rank-name", "Premium");
+        config.addDefault("premium.permission", "kitpvp.premium");
+        config.addDefault("premium.store-link", "store.kitpvp.io");
+        config.addDefault("premium.non-premium-kit-limit", 10);
+        config.addDefault("premium.bounties-premium-only", true);
         config.addDefault("storage.host", "host");
         config.addDefault("storage.user", "user");
         config.addDefault("storage.password", "password");
@@ -80,6 +92,13 @@ public class Settings {
         killExpBonus = config.getInt("kill.exp-bonus");
         killStreakBonus = config.getInt("kill.streak-bonus");
 
+        premiumEnabled = config.getBoolean("premium.enabled");
+        premiumRankName = config.getString("premium.rank-name");
+        premiumPermission = config.getString("premium.permission");
+        premiumStoreLink = config.getString("premium.store-link");
+        nonPremiumKitLimit = config.getInt("premium.non-premium-kit-limit");
+        bountiesPremiumOnly = config.getBoolean("premium.bounties-premium-only");
+
         host = config.getString("storage.host");
         user = config.getString("storage.user");
         password = config.getString("storage.password");
@@ -98,6 +117,13 @@ public class Settings {
         config.set("kill.coin-bonus", killCoinBonus);
         config.set("kill.exp-bonus", killExpBonus);
         config.set("kill.streak-bonus", killStreakBonus);
+
+        config.set("premium.enabled", premiumEnabled);
+        config.set("premium.rank-name", premiumRankName);
+        config.set("premium.permission", premiumPermission);
+        config.set("premium.store-link", premiumStoreLink);
+        config.set("premium.non-premium-kit-limit", nonPremiumKitLimit);
+        config.set("premium.bounties-premium-only", bountiesPremiumOnly);
 
         config.set("storage.host", host);
         config.set("storage.user", user);

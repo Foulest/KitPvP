@@ -10,6 +10,7 @@ import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.kits.Kit;
 import net.foulest.kitpvp.util.kits.KitManager;
 import org.bukkit.*;
@@ -336,12 +337,13 @@ public class EventListener implements Listener {
                     return;
                 }
 
-                if (!player.hasPermission("kitpvp.bypasslimit") && playerData.getOwnedKits().size() == 10) {
+                if (!player.hasPermission("kitpvp.bypasslimit") && Settings.premiumEnabled
+                    && playerData.getOwnedKits().size() == Settings.nonPremiumKitLimit) {
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, " &cYou have reached your kit limit.");
                     MessageUtil.messagePlayer(player, "");
-                    MessageUtil.messagePlayer(player, " &ePurchase &6Premium &eto bypass this limit.");
-                    MessageUtil.messagePlayer(player, " &eStore: &6store.kitpvp.io");
+                    MessageUtil.messagePlayer(player, " &ePurchase &6" + Settings.premiumRankName + " &eto bypass this limit.");
+                    MessageUtil.messagePlayer(player, " &eStore: &6" + Settings.premiumStoreLink);
                     MessageUtil.messagePlayer(player, "");
                     return;
                 }
@@ -813,19 +815,7 @@ public class EventListener implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Your Stats")) {
                         event.setCancelled(true);
                         player.updateInventory();
-                        MessageUtil.messagePlayer(player, "");
-                        MessageUtil.messagePlayer(player, " &a&lYour Stats");
-                        MessageUtil.messagePlayer(player, " &fKills: &e" + playerData.getKills());
-                        MessageUtil.messagePlayer(player, " &fDeaths: &e" + playerData.getDeaths());
-                        MessageUtil.messagePlayer(player, " &fK/D Ratio: &e" + playerData.getKDRText());
-                        MessageUtil.messagePlayer(player, "");
-                        MessageUtil.messagePlayer(player, " &fStreak: &e" + playerData.getKillstreak());
-                        MessageUtil.messagePlayer(player, " &fHighest Streak: &e" + playerData.getTopKillstreak());
-                        MessageUtil.messagePlayer(player, "");
-                        MessageUtil.messagePlayer(player, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
-                        MessageUtil.messagePlayer(player, " &fCoins: &6" + playerData.getCoins());
-                        MessageUtil.messagePlayer(player, " &fBounty: &6" + playerData.getBounty());
-                        MessageUtil.messagePlayer(player, "");
+                        player.performCommand("stats");
                     }
                     break;
 

@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.util;
 
+import net.foulest.kitpvp.KitPvP;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,7 @@ public final class MessageUtil {
     }
 
     public static void log(Level level, String message) {
-        Bukkit.getLogger().log(level, "[KitPvP] " + message);
+        Bukkit.getLogger().log(level, "[" + KitPvP.pluginName + " " + message);
     }
 
     public static void broadcast(String message) {
@@ -29,5 +30,9 @@ public final class MessageUtil {
 
     public static String colorize(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
+    public static String stripColor(String message) {
+        return ChatColor.stripColor(message);
     }
 }

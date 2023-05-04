@@ -11,9 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Foulest
@@ -25,23 +23,23 @@ public class KitSelector {
 
     private static final String inventoryName = MessageUtil.colorize("Kit Selector");
     private static final Map<Player, Integer> pages = new HashMap<>();
-    private final Inventory inv;
+    private final Inventory inventory;
 
     public KitSelector(Player player) {
-        inv = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName);
+        inventory = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName);
 
         populateInventory(player, 0);
         player.closeInventory();
-        player.openInventory(inv);
+        player.openInventory(inventory);
         pages.put(player, 0);
     }
 
     public KitSelector(Player player, int page) {
-        inv = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName + " - Page: " + (page + 1));
+        inventory = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName + " - Page: " + (page + 1));
 
         populateInventory(player, page);
         player.closeInventory();
-        player.openInventory(inv);
+        player.openInventory(inventory);
         pages.put(player, page);
     }
 
@@ -101,14 +99,14 @@ public class KitSelector {
 
         // Sets non-present items to glass.
         for (int i = 0; i < rowSize; i++) {
-            inv.setItem(i, glass);
+            inventory.setItem(i, glass);
         }
-        for (int i = (inv.getSize() - rowSize); i < inv.getSize(); i++) {
-            inv.setItem(i, glass);
+        for (int i = (inventory.getSize() - rowSize); i < inventory.getSize(); i++) {
+            inventory.setItem(i, glass);
         }
 
         if (page > 0) {
-            inv.setItem(inv.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
+            inventory.setItem(inventory.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
         }
 
         List<Kit> checkedKits = KitManager.kits.subList(page * 36, (page * 36) + ensureKits(KitManager.kits.size() - (page * 36)));
@@ -117,21 +115,21 @@ public class KitSelector {
             List<Kit> futureCheck = KitManager.kits.subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(KitManager.kits.size() - ((page + 1) * 36)));
 
             if (!futureCheck.isEmpty()) {
-                inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
+                inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
             }
         } catch (IllegalArgumentException ex) {
             // ignored
         }
 
-        // TODO: Sort alphabetically
-        for (Kit kits : checkedKits) {
-            if (playerData.getOwnedKits().contains(kits)) {
-                inv.addItem(createKitItem(kits));
+        // Sort kits alphabetically using the kits.getName() function
+        List<Kit> sortedKits = new ArrayList<>(checkedKits);
+        sortedKits.sort(Comparator.comparing(Kit::getName));
+
+        // Add sorted kits in alphabetical order
+        for (Kit kit : sortedKits) {
+            if (playerData.getOwnedKits().contains(kit)) {
+                inventory.addItem(createKitItem(kit));
             }
         }
-    }
-
-    public Inventory getInventory() {
-        return inv;
     }
 }

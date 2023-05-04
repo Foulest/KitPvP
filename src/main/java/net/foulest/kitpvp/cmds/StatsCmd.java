@@ -41,10 +41,7 @@ public class StatsCmd {
             MessageUtil.messagePlayer(sender, " &fKills: &e" + playerData.getKills());
             MessageUtil.messagePlayer(sender, " &fDeaths: &e" + playerData.getDeaths());
             MessageUtil.messagePlayer(sender, " &fK/D Ratio: &e" + playerData.getKDRText());
-            MessageUtil.messagePlayer(sender, "");
-            MessageUtil.messagePlayer(sender, " &fStreak: &e" + playerData.getKillstreak());
-            MessageUtil.messagePlayer(sender, " &fHighest Streak: &e" + playerData.getTopKillstreak());
-            MessageUtil.messagePlayer(sender, "");
+            MessageUtil.messagePlayer(sender, " &fStreak: &e" + playerData.getKillstreak() + " &7(" + playerData.getTopKillstreak() + ")");
             MessageUtil.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
             MessageUtil.messagePlayer(sender, " &fCoins: &6" + playerData.getCoins());
             MessageUtil.messagePlayer(sender, " &fBounty: &6" + playerData.getBounty());
@@ -73,11 +70,9 @@ public class StatsCmd {
 
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &a&l" + player.getName() + " Stats");
-            MessageUtil.messagePlayer(sender, " &fKills: &e" + playerData.getKills());
-            MessageUtil.messagePlayer(sender, " &fDeaths: &e" + playerData.getDeaths());
+            MessageUtil.messagePlayer(sender, " &fKills: &e" + playerData.getKills() + " &f┃ &fDeaths: &e" + playerData.getDeaths());
             MessageUtil.messagePlayer(sender, " &fK/D Ratio: &e" + playerData.getKDRText());
-            MessageUtil.messagePlayer(sender, "");
-            MessageUtil.messagePlayer(sender, " &fStreak: &e" + playerData.getKillstreak());
+            MessageUtil.messagePlayer(sender, " &fCurrent Streak: &e" + playerData.getKillstreak());
             MessageUtil.messagePlayer(sender, " &fHighest Streak: &e" + playerData.getTopKillstreak());
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");

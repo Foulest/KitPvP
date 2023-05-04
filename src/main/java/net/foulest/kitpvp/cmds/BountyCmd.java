@@ -2,6 +2,7 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
@@ -43,15 +44,17 @@ public class BountyCmd {
 
             MessageUtil.messagePlayer(player, "");
 
-            if (player.hasPermission("kitpvp.bounties")) {
+            if (player.hasPermission("kitpvp.bounties")
+                || (Settings.premiumEnabled && Settings.bountiesPremiumOnly && player.hasPermission(Settings.premiumPermission))) {
                 MessageUtil.messagePlayer(player, " &fYou can place one on another player");
                 MessageUtil.messagePlayer(player, " &fusing &e/bounty set <player> <amount>&f.");
-            } else {
-                MessageUtil.messagePlayer(player, " &eOnly &6Premium &emembers can set bounties.");
-                MessageUtil.messagePlayer(player, " &eStore: &6store.kitpvp.io");
-            }
+                MessageUtil.messagePlayer(player, "");
 
-            MessageUtil.messagePlayer(player, "");
+            } else if (Settings.premiumEnabled && Settings.bountiesPremiumOnly && !player.hasPermission(Settings.premiumPermission)) {
+                MessageUtil.messagePlayer(player, " &eOnly &6" + Settings.premiumRankName + " &emembers can set bounties.");
+                MessageUtil.messagePlayer(player, " &eStore: &6" + Settings.premiumStoreLink);
+                MessageUtil.messagePlayer(player, "");
+            }
             return;
         }
 
