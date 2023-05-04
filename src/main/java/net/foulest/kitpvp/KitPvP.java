@@ -18,6 +18,7 @@ import net.foulest.kitpvp.util.command.CommandFramework;
 import net.foulest.kitpvp.util.kits.Kit;
 import net.foulest.kitpvp.util.kits.KitManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,10 +32,6 @@ import java.util.Objects;
  */
 @Getter
 public class KitPvP extends JavaPlugin {
-
-    // TODO: refund missed snowballs
-    // TODO: golems don't move
-    // TODO: fix hulk ability
 
     public static KitPvP instance;
     public static boolean loaded = false;
@@ -80,6 +77,10 @@ public class KitPvP extends JavaPlugin {
         // Loads the spawn.
         Bukkit.getLogger().info("[KitPvP] - Loading Spawn...");
         Spawn.load();
+
+        if (Spawn.getLocation().getWorld().getDifficulty() == Difficulty.PEACEFUL) {
+            Bukkit.getLogger().warning("[KitPvP] - The world difficulty is set to Peaceful. This will cause issues with hostile mobs in certain kits.");
+        }
 
         // Loads online players' user data.
         Bukkit.getLogger().info("[KitPvP] - Loading Player Data...");

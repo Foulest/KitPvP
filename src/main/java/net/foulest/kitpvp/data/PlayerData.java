@@ -41,7 +41,7 @@ public final class PlayerData {
     private BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportingToSpawn;
     private Kit kit;
-    private Kit previousKit;
+    private Kit previousKit = KitManager.getKit("Knight");
     private int coins;
     private int kills;
     private int experience;
@@ -64,9 +64,6 @@ public final class PlayerData {
 
     private PlayerData(Player player) {
         this.player = player;
-        previousKit = KitManager.getKit("Knight");
-        kit = null;
-
         INSTANCES.add(this);
     }
 
@@ -264,6 +261,10 @@ public final class PlayerData {
     }
 
     public void saveStats() {
+        if (previousKit == null) {
+            previousKit = KitManager.getKit("Knight");
+        }
+
         DatabaseUtil.update("UPDATE PlayerStats SET"
                             + " coins=" + coins
                             + ", experience=" + experience

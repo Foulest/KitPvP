@@ -232,6 +232,7 @@ public class EventListener implements Listener {
 
                 CombatLog.markForCombat(damager, receiver);
             }
+            return;
         }
 
         // Combat tags players for Wolf damage.
@@ -244,6 +245,7 @@ public class EventListener implements Listener {
 
                 CombatLog.markForCombat(damager, receiver);
             }
+            return;
         }
 
         // Combat tags players for Iron Golem damage.
@@ -974,16 +976,6 @@ public class EventListener implements Listener {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL && playerData.isNoFall()) {
                 event.setCancelled(true);
             }
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public static void onVoidDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player
-            && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            Player player = (Player) event.getEntity();
-
-            DeathListener.handleDeath(player, false);
         }
     }
 
