@@ -92,11 +92,6 @@ public class KitSelector {
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int rowSize = 9;
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         // Sets non-present items to glass.
         for (int i = 0; i < rowSize; i++) {
             inventory.setItem(i, glass);

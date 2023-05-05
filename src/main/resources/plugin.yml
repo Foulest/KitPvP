@@ -1,6 +1,76 @@
 name: KitPvP
-version: '1.1.9'
+version: '1.2.0'
 main: net.foulest.kitpvp.KitPvP
 author: Foulest
 depend: [ PlaceholderAPI, WorldEdit, WorldGuard ]
 loadbefore: [ Essentials ]
+permissions:
+  kitpvp.armorcolor:
+    description: Allows players to change the color of their armor.
+    default: false
+  kitpvp.balance:
+    description: Allows players to check their balance.
+    default: true
+  kitpvp.bounties:
+    description: Allows players to use the bounty command.
+    default: true
+  kitpvp.bounties.place:
+    description: Allows players to place bounties on other players.
+    default: false
+  kitpvp.clearkit:
+    description: Allows players to clear their kit.
+    default: true
+  kitpvp.clearkit.others:
+    description: Allows players to clear other players' kits.
+    default: false
+  kitpvp.combattag:
+    description: Allows players to see their combat tag timer.
+    default: true
+  kitpvp.ecogive:
+    description: Allows players to give money to other players.
+    default: false
+  kitpvp.ecoset:
+    description: Allows players to set other players' balances.
+    default: false
+  kitpvp.ecotake:
+    description: Allows players to take money from other players.
+    default: false
+  kitpvp.kitenchanter:
+    description: Allows players to use the kit enchanter.
+    default: true
+  kitpvp.kitselector:
+    description: Allows players to use the kit selector.
+    default: true
+  kitpvp.kitshop:
+    description: Allows players to use the kit shop.
+    default: true
+  kitpvp.pay:
+    description: Allows players to pay other players.
+    default: true
+  kitpvp.potions:
+    description: Allows players to use potions.
+    default: true
+  kitpvp.punish:
+    description: Allows players to punish other players.
+    default: false
+  kitpvp.reloadcfg:
+    description: Allows players to reload the config.
+    default: false
+  kitpvp.setspawn:
+    description: Allows players to set the spawn.
+    default: false
+  kitpvp.soup:
+    description: Allows players to use soup.
+    default: true
+  kitpvp.spawn:
+    description: Allows players to use the spawn command.
+    default: true
+  kitpvp.stats:
+    description: Allows players to see their stats.
+    default: true
+  kitpvp.bypasslimit:
+    description: Allows players to bypass the kit limit.
+    default: false
+  kitpvp.modify:
+    description: Allows players to modify the map .
+    default: false

@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
  */
 public class PayCmd {
 
-    @Command(name = "pay", description = "Send coins to another player.", usage = "/pay <player> <amount>",
-            inGameOnly = true)
+    @Command(name = "pay", description = "Send coins to another player.",
+            usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
     public void onCommand(CommandArgs args) {
         if (args.length() == 2) {
             Player target = Bukkit.getPlayer(args.getArgs(0));
@@ -45,19 +45,7 @@ public class PayCmd {
             PlayerData targetData = PlayerData.getInstance(player);
             PlayerData senderData = PlayerData.getInstance(sender);
 
-            if (targetData == null) {
-                player.kickPlayer("Disconnected");
-                return;
-            }
-
-            if (senderData == null) {
-                sender.kickPlayer("Disconnected");
-                return;
-            }
-
-            int check = senderData.getCoins() - amount;
-
-            if (check <= 0) {
+            if (senderData.getCoins() - amount <= 0) {
                 MessageUtil.messagePlayer(sender, "&cYou don't have enough coins.");
                 return;
             }

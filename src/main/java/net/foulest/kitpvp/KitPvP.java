@@ -33,6 +33,8 @@ import java.util.Objects;
 @Getter
 public class KitPvP extends JavaPlugin {
 
+    // TODO: Add admin command to remove a bounty and refund coins.
+
     public static KitPvP instance;
     public static String pluginName = "KitPvP";
     public static boolean loaded = false;
@@ -63,10 +65,10 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the plugin's commands.
         Bukkit.getLogger().info("[" + pluginName + " - Loading Commands...");
-        loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(),
+        loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatTagCmd(), new EcoGiveCmd(),
                 new EcoSetCmd(), new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
                 new KitShopCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
-                new PotionsCmd(), new ReloadCmd());
+                new PotionsCmd(), new PunishCmd(), new ReloadCfgCmd());
 
         // Loads the plugin's kits.
         Bukkit.getLogger().info("[" + pluginName + " - Loading Kits...");

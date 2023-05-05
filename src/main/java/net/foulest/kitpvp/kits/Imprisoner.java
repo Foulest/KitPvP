@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.SkullCreatorUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Color;
@@ -61,7 +62,17 @@ public class Imprisoner implements Kit {
     }
 
     @Override
+    public boolean enabled() {
+        return Settings.imprisonerKitEnabled;
+    }
+
+    @Override
     public int getCost() {
-        return 250;
+        return Settings.imprisonerKitCost;
+    }
+
+    @Override
+    public boolean premiumOnly() {
+        return Settings.imprisonerKitPremiumOnly;
     }
 }

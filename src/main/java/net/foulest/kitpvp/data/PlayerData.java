@@ -3,12 +3,10 @@ package net.foulest.kitpvp.data;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.util.DatabaseUtil;
-import net.foulest.kitpvp.util.ItemBuilder;
-import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.*;
 import net.foulest.kitpvp.util.kits.Kit;
 import net.foulest.kitpvp.util.kits.KitManager;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -42,7 +40,7 @@ public final class PlayerData {
     private BukkitTask teleportingToSpawn;
     private Kit kit;
     private Kit previousKit = KitManager.getKit("Knight");
-    private int coins;
+    private int coins = Settings.startingCoins;
     private int kills;
     private int experience;
     private int level;
@@ -71,17 +69,17 @@ public final class PlayerData {
      * Returns the player's PlayerData.
      */
     public static PlayerData getInstance(Player player) {
+        Validate.notNull(player, "Player cannot be null");
+        Validate.notNull(player.getUniqueId(), "Player UUID cannot be null");
+
         if (INSTANCES.isEmpty()) {
-            new PlayerData(player);
+            return new PlayerData(player);
         }
 
         for (PlayerData playerData : INSTANCES) {
-            if (playerData == null || playerData.getPlayer() == null
-                || playerData.getPlayer().getUniqueId() == null
-                || player == null || player.getUniqueId() == null) {
-                MessageUtil.log(Level.WARNING, "Player data for player '" + player + "' is null");
-                return null;
-            }
+            Validate.notNull(playerData, "PlayerData cannot be null");
+            Validate.notNull(playerData.getPlayer(), "Player in PlayerData cannot be null");
+            Validate.notNull(playerData.getPlayer().getUniqueId(), "Player UUID in PlayerData cannot be null");
 
             if (playerData.getPlayer().getUniqueId().equals(player.getUniqueId())) {
                 return playerData;

@@ -89,11 +89,6 @@ public class KitShop {
         int paidKits = 0;
         int rowSize = 9;
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return true;
-        }
-
         // Sets non-present items to glass.
         for (int i = 0; i < rowSize; i++) {
             inventory.setItem(i, glass);

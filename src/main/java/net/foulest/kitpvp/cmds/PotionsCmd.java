@@ -19,15 +19,10 @@ import org.bukkit.inventory.ItemStack;
 public class PotionsCmd {
 
     @Command(name = "potions", aliases = {"pots"}, description = "Sets your healing item to Potions.",
-            usage = "/potions", inGameOnly = true)
+            usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (!Regions.isInSafezone(player.getLocation())) {
             MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");

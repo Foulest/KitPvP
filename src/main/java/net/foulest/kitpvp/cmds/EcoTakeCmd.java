@@ -32,11 +32,6 @@ public class EcoTakeCmd {
             return;
         }
 
-        if (targetData == null) {
-            target.kickPlayer("Disconnected");
-            return;
-        }
-
         if (!StringUtils.isNumeric(args.getArgs(1))) {
             MessageUtil.messagePlayer(args.getSender(), "&c'" + args.getArgs(1) + "' is not a valid amount.");
             return;

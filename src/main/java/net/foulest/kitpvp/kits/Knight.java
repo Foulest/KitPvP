@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.SkullCreatorUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
@@ -55,7 +56,17 @@ public class Knight implements Kit {
     }
 
     @Override
+    public boolean enabled() {
+        return Settings.knightKitEnabled;
+    }
+
+    @Override
     public int getCost() {
-        return 0;
+        return Settings.knightKitCost;
+    }
+
+    @Override
+    public boolean premiumOnly() {
+        return Settings.knightKitPremiumOnly;
     }
 }

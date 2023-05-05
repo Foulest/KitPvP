@@ -27,11 +27,6 @@ public class CombatLog {
         for (Player player : players) {
             PlayerData playerData = PlayerData.getInstance(player);
 
-            if (playerData == null) {
-                player.kickPlayer("Disconnected");
-                return;
-            }
-
             // Handles combat tagging for the receiver.
             if (!isInCombat(player)) {
                 combatHandler.put(player, 15);

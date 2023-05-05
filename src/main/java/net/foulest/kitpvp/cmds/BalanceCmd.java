@@ -17,16 +17,12 @@ import org.bukkit.entity.Player;
 public class BalanceCmd {
 
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
-            description = "Shows your current balance.", usage = "/balance", inGameOnly = true)
+            description = "Shows your current balance.",
+            permission = "kitpvp.balance", usage = "/balance", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
         CommandSender sender = args.getSender();
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (args.length() != 1) {
             MessageUtil.messagePlayer(sender, "&fCoins: &6" + playerData.getCoins());
@@ -38,11 +34,6 @@ public class BalanceCmd {
 
         if (target == null) {
             MessageUtil.messagePlayer(sender, "&cPlayer not found.");
-            return;
-        }
-
-        if (targetData == null) {
-            target.kickPlayer("Disconnected");
             return;
         }
 

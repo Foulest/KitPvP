@@ -21,16 +21,12 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class SpawnCmd {
 
-    @Command(name = "spawn", description = "Teleports you to spawn.", usage = "/spawn", inGameOnly = true)
+    @Command(name = "spawn", description = "Teleports you to spawn.",
+            usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         Entity entityPlayer = player.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (CombatLog.isInCombat(player)) {
             MessageUtil.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");

@@ -19,7 +19,8 @@ import org.bukkit.entity.Player;
 public class KitsCmd {
 
     @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
-            description = "Selects a kit or opens the Kit Selector.", inGameOnly = true)
+            description = "Selects a kit or opens the Kit Selector.", inGameOnly = true,
+            permission = "kitpvp.kitselector")
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 

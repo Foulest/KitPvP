@@ -55,11 +55,6 @@ public class EventListener implements Listener {
 
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (!playerData.load()) {
             player.kickPlayer("Disconnected");
             return;
@@ -70,7 +65,9 @@ public class EventListener implements Listener {
         player.getInventory().setHeldItemSlot(0);
 
         for (Kit kit : KitManager.kits) {
-            if (kit.getCost() == 0 && !playerData.getOwnedKits().contains(kit)) {
+            // Adds free kits to player's owned kits list.
+            if (kit.enabled() && kit.getCost() == 0 && !playerData.getOwnedKits().contains(kit)
+                && (!kit.premiumOnly() || kit.premiumOnly() && Settings.premiumEnabled && player.hasPermission(Settings.premiumPermission))) {
                 playerData.getOwnedKits().add(kit);
             }
         }
@@ -82,11 +79,6 @@ public class EventListener implements Listener {
     public static void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.isNoFall()) {
             playerData.setNoFall(false);
@@ -269,12 +261,6 @@ public class EventListener implements Listener {
             Player player = (Player) event.getEntity();
             PlayerData playerData = PlayerData.getInstance(player);
 
-            if (playerData == null) {
-                event.setCancelled(true);
-                player.kickPlayer("Disconnected");
-                return;
-            }
-
             if (playerData.getTeleportingToSpawn() != null) {
                 playerData.getTeleportingToSpawn().cancel();
                 MessageUtil.messagePlayer(player, MessageUtil.colorize("&cTeleportation cancelled, you took damage."));
@@ -287,12 +273,6 @@ public class EventListener implements Listener {
     public static void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
@@ -332,12 +312,26 @@ public class EventListener implements Listener {
             Kit kit = KitManager.getKit(itemName);
 
             if (kit != null) {
+                if (!kit.enabled()) {
+                    MessageUtil.messagePlayer(player, "&cThis kit is currently disabled.");
+                    return;
+                }
+
                 if (playerData.getCoins() - kit.getCost() < 0) {
                     MessageUtil.messagePlayer(player, "&cYou do not have enough coins to purchase " + kit.getName() + ".");
                     return;
                 }
 
-                if (!player.hasPermission("kitpvp.bypasslimit") && Settings.premiumEnabled
+                if (kit.premiumOnly() && Settings.premiumEnabled && !player.hasPermission(Settings.premiumPermission)) {
+                    MessageUtil.messagePlayer(player, "");
+                    MessageUtil.messagePlayer(player, " &cYou must be " + Settings.premiumRankName + " &cto purchase this kit.");
+                    MessageUtil.messagePlayer(player, " &eStore: &6" + Settings.premiumStoreLink);
+                    MessageUtil.messagePlayer(player, "");
+                    return;
+                }
+
+                if (!player.hasPermission("kitpvp.bypasslimit")
+                    && Settings.premiumEnabled && !player.hasPermission(Settings.premiumPermission)
                     && playerData.getOwnedKits().size() == Settings.nonPremiumKitLimit) {
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, " &cYou have reached your kit limit.");
@@ -725,12 +719,6 @@ public class EventListener implements Listener {
         Block block = event.getClickedBlock();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (event.getAction().toString().contains("RIGHT") && block != null
             && block.getState() instanceof InventoryHolder) {
             event.setCancelled(true);
@@ -855,23 +843,6 @@ public class EventListener implements Listener {
     }
 
     /**
-     * Prevents players from chatting while not loaded.
-     * This fixes an issue that almost never happens.
-     *
-     * @param event -
-     */
-    @EventHandler
-    public static void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-        }
-    }
-
-    /**
      * Handles player move events.
      *
      * @param event PlayerMoveEvent
@@ -883,12 +854,6 @@ public class EventListener implements Listener {
         double deltaY = event.getTo().getY() - event.getFrom().getY();
         double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
         boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         // Ignores rotation updates.
         if (!playerMoved) {
@@ -956,12 +921,6 @@ public class EventListener implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             PlayerData playerData = PlayerData.getInstance(player);
-
-            if (playerData == null) {
-                event.setCancelled(true);
-                player.kickPlayer("Disconnected");
-                return;
-            }
 
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL && playerData.isNoFall()) {
                 event.setCancelled(true);

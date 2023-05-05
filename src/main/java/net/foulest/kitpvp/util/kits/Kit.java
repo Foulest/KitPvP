@@ -3,6 +3,7 @@ package net.foulest.kitpvp.util.kits;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Foulest
@@ -49,9 +51,19 @@ public interface Kit {
     List<String> getLore();
 
     /**
+     * The enabled status of the kit.
+     */
+    boolean enabled();
+
+    /**
      * The cost of the kit in coins.
      */
     int getCost();
+
+    /**
+     * The premium status of the kit.
+     */
+    boolean premiumOnly();
 
     /**
      * Applies a kit to a player.
@@ -62,14 +74,24 @@ public interface Kit {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Integer> airSlots = new ArrayList<>();
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         // Checks if the player owns the kit they're trying to equip.
         if (!playerData.getOwnedKits().contains(this)) {
             MessageUtil.messagePlayer(player, "&cYou do not own the " + getName() + " kit.");
+            return;
+        }
+
+        // Checks if the kit is enabled.
+        if (!enabled()) {
+            MessageUtil.messagePlayer(player, "&cThis kit is currently disabled.");
+            return;
+        }
+
+        // TODO: Change message
+        if (premiumOnly() && Settings.premiumEnabled && !player.hasPermission(Settings.premiumPermission)) {
+            MessageUtil.messagePlayer(player, "");
+            MessageUtil.messagePlayer(player, " &cYou must be " + Settings.premiumRankName + " &cto use this kit.");
+            MessageUtil.messagePlayer(player, " &eStore: &6" + Settings.premiumStoreLink);
+            MessageUtil.messagePlayer(player, "");
             return;
         }
 

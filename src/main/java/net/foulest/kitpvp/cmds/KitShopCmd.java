@@ -15,8 +15,8 @@ import org.bukkit.entity.Player;
  */
 public class KitShopCmd {
 
-    @Command(name = "kitshop", aliases = {"shop"}, description = "Opens the Kit Shop.", usage = "/kitshop",
-            inGameOnly = true)
+    @Command(name = "kitshop", aliases = {"shop"}, description = "Opens the Kit Shop.",
+            usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 

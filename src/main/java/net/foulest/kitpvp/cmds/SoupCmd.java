@@ -18,15 +18,11 @@ import org.bukkit.inventory.ItemStack;
  */
 public class SoupCmd {
 
-    @Command(name = "soup", description = "Sets your healing item to Soup.", usage = "/soup", inGameOnly = true)
+    @Command(name = "soup", description = "Sets your healing item to Soup.",
+            usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (!Regions.isInSafezone(player.getLocation())) {
             MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");

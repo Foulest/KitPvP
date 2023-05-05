@@ -26,6 +26,18 @@ public final class MessageUtil {
         for (Player online : Bukkit.getOnlinePlayers()) {
             messagePlayer(online, message);
         }
+
+        messagePlayer(Bukkit.getConsoleSender(), message);
+    }
+
+    public static void broadcastWithPerm(String message, String permission) {
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.hasPermission(permission)) {
+                messagePlayer(online, message);
+            }
+        }
+
+        messagePlayer(Bukkit.getConsoleSender(), message);
     }
 
     public static String colorize(String message) {

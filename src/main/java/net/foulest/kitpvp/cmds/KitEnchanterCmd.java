@@ -14,7 +14,7 @@ import net.foulest.kitpvp.util.command.CommandArgs;
 public class KitEnchanterCmd {
 
     @Command(name = "enchanter", aliases = {"kitenchanter"}, description = "Opens the Kit Enchanter.",
-            usage = "/enchanter", inGameOnly = true)
+            usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
     public void onCommand(CommandArgs args) {
         if (args.length() != 0) {
             MessageUtil.messagePlayer(args.getSender(), "&cUsage: /enchanter");

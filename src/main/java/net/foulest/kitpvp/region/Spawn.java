@@ -43,11 +43,6 @@ public class Spawn {
     public static void teleport(Player player) {
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (location == null) {
             MessageUtil.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");
             return;

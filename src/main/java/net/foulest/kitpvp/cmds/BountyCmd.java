@@ -18,17 +18,12 @@ import org.bukkit.entity.Player;
  */
 public class BountyCmd {
 
-    @Command(name = "bounty", aliases = {"bounties"}, description = "Shows your current balance.",
-            usage = "/bounty [player]", inGameOnly = true)
+    @Command(name = "bounty", aliases = {"bounties"},
+            description = "Allows players to place bounties on each other.",
+            permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
 
         if (args.length() == 0) {
@@ -44,7 +39,7 @@ public class BountyCmd {
 
             MessageUtil.messagePlayer(player, "");
 
-            if (player.hasPermission("kitpvp.bounties")
+            if (player.hasPermission("kitpvp.bounties.place")
                 || (Settings.premiumEnabled && Settings.bountiesPremiumOnly && player.hasPermission(Settings.premiumPermission))) {
                 MessageUtil.messagePlayer(player, " &fYou can place one on another player");
                 MessageUtil.messagePlayer(player, " &fusing &e/bounty set <player> <amount>&f.");
@@ -68,11 +63,6 @@ public class BountyCmd {
 
         if (target == null) {
             MessageUtil.messagePlayer(player, "&cPlayer not found.");
-            return;
-        }
-
-        if (targetData == null) {
-            target.kickPlayer("Disconnected");
             return;
         }
 

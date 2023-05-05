@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.SkullCreatorUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
@@ -56,7 +57,17 @@ public class Thor implements Kit {
     }
 
     @Override
+    public boolean enabled() {
+        return Settings.thorKitEnabled;
+    }
+
+    @Override
     public int getCost() {
-        return 250;
+        return Settings.thorKitCost;
+    }
+
+    @Override
+    public boolean premiumOnly() {
+        return Settings.thorKitPremiumOnly;
     }
 }

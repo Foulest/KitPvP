@@ -12,10 +12,11 @@ import org.bukkit.entity.Player;
  * <p>
  * Command for displaying your current combat tag timer.
  */
-public class CombatLogCmd {
+public class CombatTagCmd {
 
-    @Command(name = "combatlog", aliases = {"combattag", "ct", "combat", "combattime"},
-            description = "Displays your current combat tag timer.", usage = "/combatlog", inGameOnly = true)
+    @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
+            description = "Displays your current combat tag timer.",
+            permission = "kitpvp.combattag", usage = "/combatlog", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
 

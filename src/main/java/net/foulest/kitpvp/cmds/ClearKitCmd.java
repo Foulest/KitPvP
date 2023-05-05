@@ -39,7 +39,8 @@ public class ClearKitCmd {
         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
     }
 
-    @Command(name = "clearkit", description = "Clears your kit.", usage = "/clearkit", inGameOnly = true)
+    @Command(name = "clearkit", description = "Clears your kit.",
+            permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         if (!(args.getSender() instanceof Player)) {
             MessageUtil.messagePlayer(args.getSender(), "Only players can execute this command.");
@@ -48,11 +49,6 @@ public class ClearKitCmd {
 
         Player player = args.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         // Clearing your own kit.
         if (args.length() == 0) {
@@ -83,11 +79,6 @@ public class ClearKitCmd {
 
             if (target == null) {
                 MessageUtil.messagePlayer(player, "&cThat player is not online.");
-                return;
-            }
-
-            if (targetData == null) {
-                target.kickPlayer("Disconnected");
                 return;
             }
 

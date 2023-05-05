@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender;
  * <p>
  * Command for reloading the plugin's config file.
  */
-public class ReloadCmd {
+public class ReloadCfgCmd {
 
     @Command(name = "reloadcfg", description = "Reloads the plugin's config file.",
             permission = "kitpvp.reloadcfg", usage = "/reloadcfg")

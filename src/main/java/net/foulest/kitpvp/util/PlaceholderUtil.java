@@ -31,12 +31,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return "";
-        }
-
         StringBuilder builder = new StringBuilder();
 
         switch (identifier) {

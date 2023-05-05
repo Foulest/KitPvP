@@ -38,11 +38,6 @@ public class KitEnchanter {
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int maxSlots = 27;
 
-        if (playerData == null) {
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         for (int i = 0; i < maxSlots; i++) {
             inventory.setItem(i, glass);
         }

@@ -45,12 +45,6 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Location> roomLocations = getRoomLocations(player.getLocation());
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Burrower
             && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.BRICK
@@ -99,18 +93,6 @@ public class KitListener implements Listener {
             PlayerData damagerData = PlayerData.getInstance(damager);
             PlayerData receiverData = PlayerData.getInstance(receiver);
 
-            if (damagerData == null) {
-                event.setCancelled(true);
-                damager.kickPlayer("Disconnected");
-                return;
-            }
-
-            if (receiverData == null) {
-                event.setCancelled(true);
-                receiver.kickPlayer("Disconnected");
-                return;
-            }
-
             if (damagerData.getKit() instanceof Cactus
                 && receiverData.getKit() != null
                 && !Regions.isInSafezone(damager.getLocation())
@@ -127,12 +109,6 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Dragon
             && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.FIREBALL
@@ -147,12 +123,6 @@ public class KitListener implements Listener {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
                     Player receiver = (Player) entity;
                     PlayerData receiverData = PlayerData.getInstance(receiver);
-
-                    if (receiverData == null) {
-                        event.setCancelled(true);
-                        player.kickPlayer("Disconnected");
-                        return;
-                    }
 
                     if (player.hasLineOfSight(entity) && receiverData.getKit() != null
                         && !Regions.isInSafezone(receiver.getLocation())) {
@@ -172,21 +142,9 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (event.getCaught() instanceof Player) {
             Player receiver = (Player) event.getCaught();
             PlayerData receiverData = PlayerData.getInstance(receiver);
-
-            if (receiverData == null) {
-                event.setCancelled(true);
-                player.kickPlayer("Disconnected");
-                return;
-            }
 
             CombatLog.markForCombat(player, receiver);
 
@@ -212,12 +170,6 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Ghost
             && !player.isSneaking()
             && !Regions.isInSafezone(player.getLocation())) {
@@ -234,12 +186,6 @@ public class KitListener implements Listener {
     public static void onTamerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Tamer
             && event.getAction().toString().contains("RIGHT")
@@ -276,12 +222,6 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Hulk
             && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
@@ -309,12 +249,6 @@ public class KitListener implements Listener {
             for (Player playerInList : playerList) {
                 PlayerData playerInListData = PlayerData.getInstance(playerInList);
 
-                if (playerInListData == null) {
-                    event.setCancelled(true);
-                    player.kickPlayer("Disconnected");
-                    return;
-                }
-
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     playerInList.damage(10, player);
 
@@ -334,12 +268,6 @@ public class KitListener implements Listener {
     public static void onImprisonerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Imprisoner
             && event.getAction().toString().contains("RIGHT")
@@ -362,21 +290,9 @@ public class KitListener implements Listener {
                 Player damager = (Player) snowball.getShooter();
                 PlayerData damagerData = PlayerData.getInstance(damager);
 
-                if (damagerData == null) {
-                    event.setCancelled(true);
-                    damager.kickPlayer("Disconnected");
-                    return;
-                }
-
                 if (event.getEntity() instanceof Player) {
                     Player receiver = (Player) event.getEntity();
                     PlayerData receiverData = PlayerData.getInstance(damager);
-
-                    if (receiverData == null) {
-                        event.setCancelled(true);
-                        receiver.kickPlayer("Disconnected");
-                        return;
-                    }
 
                     if (damagerData.getKit() instanceof Imprisoner
                         && snowball.hasMetadata("prison")
@@ -438,12 +354,6 @@ public class KitListener implements Listener {
         Entity entityPlayer = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Kangaroo
             && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.FIREWORK
@@ -470,12 +380,6 @@ public class KitListener implements Listener {
     public static void onMageAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Mage
             && event.getAction().toString().contains("RIGHT")
@@ -507,27 +411,14 @@ public class KitListener implements Listener {
     }
 
     // TODO: make monk swap sword as well
-    // TODO: send message to target
     @EventHandler(ignoreCancelled = true)
     public static void onMonkAbility(PlayerInteractEntityEvent event) {
         Player damager = event.getPlayer();
         PlayerData damagerData = PlayerData.getInstance(damager);
 
-        if (damagerData == null) {
-            event.setCancelled(true);
-            damager.kickPlayer("Disconnected");
-            return;
-        }
-
         if (event.getRightClicked() instanceof Player) {
             Player receiver = (Player) event.getRightClicked();
             PlayerData receiverData = PlayerData.getInstance(receiver);
-
-            if (receiverData == null) {
-                event.setCancelled(true);
-                receiver.kickPlayer("Disconnected");
-                return;
-            }
 
             if (damagerData.getKit() instanceof Monk
                 && damager.getItemInHand().getType() == Material.BLAZE_ROD
@@ -543,6 +434,7 @@ public class KitListener implements Listener {
                 receiver.getInventory().setItem(heldItemSlot, receiver.getInventory().getItem(random));
                 receiver.getInventory().setItem(random, itemInHand);
                 receiver.updateInventory();
+                MessageUtil.messagePlayer(receiver, "&cYour items have been swapped by a Monk!");
 
                 MessageUtil.messagePlayer(damager, "&aYour ability has been used.");
                 damagerData.setCooldown(damagerData.getKit(), 30, true);
@@ -554,12 +446,6 @@ public class KitListener implements Listener {
     public static void onSpidermanAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Spiderman
             && event.getAction().toString().contains("RIGHT")
@@ -583,18 +469,6 @@ public class KitListener implements Listener {
                 Player receiver = (Player) event.getEntity();
                 PlayerData damagerData = PlayerData.getInstance(damager);
                 PlayerData receiverData = PlayerData.getInstance(receiver);
-
-                if (damagerData == null) {
-                    event.setCancelled(true);
-                    damager.kickPlayer("Disconnected");
-                    return;
-                }
-
-                if (receiverData == null) {
-                    event.setCancelled(true);
-                    receiver.kickPlayer("Disconnected");
-                    return;
-                }
 
                 if (damagerData.getKit() instanceof Spiderman) {
                     if (receiverData.getKit() == null || Regions.isInSafezone(receiver.getLocation())) {
@@ -655,12 +529,6 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Summoner && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.IRON_BLOCK && !playerData.hasCooldown(true)
             && !Regions.isInSafezone(player.getLocation())) {
@@ -687,12 +555,6 @@ public class KitListener implements Listener {
             for (Player playerInList : playerList) {
                 PlayerData playerInListData = PlayerData.getInstance(playerInList);
 
-                if (playerInListData == null) {
-                    event.setCancelled(true);
-                    playerInList.kickPlayer("Disconnected");
-                    return;
-                }
-
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     ironGolem.setTarget(playerInList);
                 }
@@ -716,12 +578,6 @@ public class KitListener implements Listener {
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Thor && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.IRON_AXE && !playerData.hasCooldown(true)
             && !Regions.isInSafezone(player.getLocation())) {
@@ -742,12 +598,6 @@ public class KitListener implements Listener {
             for (Player playerInList : playerList) {
                 PlayerData playerInListData = PlayerData.getInstance(playerInList);
 
-                if (playerInListData == null) {
-                    event.setCancelled(true);
-                    playerInList.kickPlayer("Disconnected");
-                    return;
-                }
-
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     player.getWorld().strikeLightningEffect(playerInList.getLocation());
                     playerInList.damage(10, player);
@@ -765,12 +615,6 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Timelord && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.WATCH && !playerData.hasCooldown(true)
@@ -791,12 +635,6 @@ public class KitListener implements Listener {
 
             for (Player playerInList : playerList) {
                 PlayerData playerInListData = PlayerData.getInstance(playerInList);
-
-                if (playerInListData == null) {
-                    event.setCancelled(true);
-                    playerInList.kickPlayer("Disconnected");
-                    return;
-                }
 
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     playerInList.getWorld().playEffect(playerInList.getLocation(), Effect.STEP_SOUND, 152);
@@ -820,12 +658,6 @@ public class KitListener implements Listener {
         List<Player> playerList = new ArrayList<>();
         List<PotionEffect> playerEffects = new ArrayList<>();
 
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
-
         if (playerData.getKit() instanceof Vampire && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.REDSTONE && !playerData.hasCooldown(true)
             && !Regions.isInSafezone(player.getLocation())) {
@@ -834,12 +666,6 @@ public class KitListener implements Listener {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
                     Player nearby = (Player) entity;
                     PlayerData nearbyData = PlayerData.getInstance(nearby);
-
-                    if (nearbyData == null) {
-                        event.setCancelled(true);
-                        nearby.kickPlayer("Disconnected");
-                        return;
-                    }
 
                     if (nearbyData.getKit() != null && !Regions.isInSafezone(nearby.getLocation())) {
                         playerList.add((Player) entity);
@@ -878,12 +704,6 @@ public class KitListener implements Listener {
                 }
 
                 PlayerData listPlayerData = PlayerData.getInstance(listPlayer);
-
-                if (listPlayerData == null) {
-                    event.setCancelled(true);
-                    listPlayer.kickPlayer("Disconnected");
-                    return;
-                }
 
                 Kit currentKit = listPlayerData.getKit();
 
@@ -929,18 +749,6 @@ public class KitListener implements Listener {
             PlayerData damagerData = PlayerData.getInstance(damager);
             PlayerData receiverData = PlayerData.getInstance(receiver);
 
-            if (damagerData == null) {
-                event.setCancelled(true);
-                damager.kickPlayer("Disconnected");
-                return;
-            }
-
-            if (receiverData == null) {
-                event.setCancelled(true);
-                receiver.kickPlayer("Disconnected");
-                return;
-            }
-
             if (damagerData.getKit() instanceof Vampire && receiverData.getKit() != null
                 && !Regions.isInSafezone(damager.getLocation()) && !Regions.isInSafezone(receiver.getLocation())) {
                 damager.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 0, false, false));
@@ -953,12 +761,6 @@ public class KitListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerData.getInstance(player);
         List<Player> playerList = new ArrayList<>();
-
-        if (playerData == null) {
-            event.setCancelled(true);
-            player.kickPlayer("Disconnected");
-            return;
-        }
 
         if (playerData.getKit() instanceof Zen && event.getAction().toString().contains("RIGHT")
             && player.getItemInHand().getType() == Material.SLIME_BALL && !playerData.hasCooldown(true)
@@ -982,12 +784,6 @@ public class KitListener implements Listener {
 
             for (Player listPlayer : playerList) {
                 PlayerData listPlayerData = PlayerData.getInstance(listPlayer);
-
-                if (listPlayerData == null) {
-                    event.setCancelled(true);
-                    listPlayer.kickPlayer("Disconnected");
-                    return;
-                }
 
                 if (listPlayerData.getKit() != null && !Regions.isInSafezone(listPlayer.getLocation())) {
                     double distance = listPlayer.getLocation().distanceSquared(player.getLocation());

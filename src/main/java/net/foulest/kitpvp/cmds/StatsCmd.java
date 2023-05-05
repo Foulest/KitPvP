@@ -17,7 +17,8 @@ public class StatsCmd {
 
     private static final int MAX_NAME_LENGTH = 16;
 
-    @Command(name = "stats", description = "Shows a player's statistics.", usage = "/stats", inGameOnly = true)
+    @Command(name = "stats", description = "Shows a player's statistics.",
+            usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")
     public void onCommand(CommandArgs args) {
         Player player;
         Player sender = args.getPlayer();
@@ -30,11 +31,6 @@ public class StatsCmd {
 
         if (args.length() == 0) {
             playerData = PlayerData.getInstance(sender);
-
-            if (playerData == null) {
-                sender.kickPlayer("Disconnected");
-                return;
-            }
 
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &a&lYour Stats");
@@ -62,11 +58,6 @@ public class StatsCmd {
             }
 
             playerData = PlayerData.getInstance(player);
-
-            if (playerData == null) {
-                player.kickPlayer("Disconnected");
-                return;
-            }
 
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &a&l" + player.getName() + " Stats");

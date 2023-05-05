@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.SkullCreatorUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
@@ -59,7 +60,17 @@ public class Burrower implements Kit {
     }
 
     @Override
+    public boolean enabled() {
+        return Settings.burrowerKitEnabled;
+    }
+
+    @Override
     public int getCost() {
-        return 250;
+        return Settings.burrowerKitCost;
+    }
+
+    @Override
+    public boolean premiumOnly() {
+        return Settings.burrowerKitPremiumOnly;
     }
 }

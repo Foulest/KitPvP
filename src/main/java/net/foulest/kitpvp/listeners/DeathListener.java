@@ -29,12 +29,6 @@ public class DeathListener implements Listener {
 
     public static void handleDeath(Player receiver, boolean onPlayerQuit) {
         PlayerData receiverData = PlayerData.getInstance(receiver);
-
-        if (receiverData == null) {
-            receiver.kickPlayer("Disconnected");
-            return;
-        }
-
         Kit currentKit = receiverData.getKit();
         Vector vec = new Vector();
 
@@ -85,11 +79,6 @@ public class DeathListener implements Listener {
             Player damager = CombatLog.getLastAttacker(receiver);
             PlayerData damagerData = PlayerData.getInstance(damager);
 
-            if (damagerData == null) {
-                damager.kickPlayer("Disconnected");
-                return;
-            }
-
             // Adds a kill to the damager.
             damagerData.setKills(damagerData.getKills() + 1);
             damagerData.addKillstreak();
@@ -108,8 +97,8 @@ public class DeathListener implements Listener {
 
             // Gives the damager coins and experience.
             int rewardAmount = 5 * (damagerData.getKillstreak() / 5);
-            int coinsGiven = Settings.killCoinBonus + rewardAmount;
-            int experienceGiven = Settings.killExpBonus + rewardAmount;
+            int coinsGiven = Settings.coinsOnKill + rewardAmount;
+            int experienceGiven = Settings.expOnKill + rewardAmount;
             damagerData.addCoins(coinsGiven);
             damagerData.addExperience(experienceGiven);
 
