@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -52,7 +52,7 @@ public class Hulk implements Kit {
                 + "GJhMTIwZTM3MjdkZDc3MDY2Mjk3MThhNTE3MTI1YjFkNTgwNWZmYTUxM2E3ZDcxZmYyMmRiYTg4NjRmZWMzMSJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fHulk's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fHulk's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x3E7F2B)),
                 new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.LEATHER_BOOTS).unbreakable(true).hideInfo().color(Color.fromRGB(0x3E7F2B))

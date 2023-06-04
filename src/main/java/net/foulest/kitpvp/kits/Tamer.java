@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -49,7 +49,7 @@ public class Tamer implements Kit {
                 + "U2ZjU4NmZiZjViMTMxNmVlODI4Mjk0NmM4NTA4NzUxYzk3MTk0ZGFjZWVjNTk5ZDIxNDg4ZjNhYTU0NTAyNSJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fTamer's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fTamer's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0xCCAA7A)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).hideInfo()

@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +44,7 @@ public class Thor implements Kit {
                 + "Zjg2NDRkZmQyNGM4MjRmNTU1NTY5ZWMwNjVjMDcwYTk3ZWQ5M2U1ZTY0M2E3MmQ1MzA0OGUyMDMyMWUwYjI3MCJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fThor's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fThor's Head"),
                 new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.GOLD_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.GOLD_BOOTS).unbreakable(true).hideInfo()

@@ -14,7 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -38,30 +41,22 @@ public class DeathListener implements Listener {
         }
 
         // Removes potential player created Wolves.
-        if (receiverData.getKit() != null) {
+        if (currentKit != null) {
             if (currentKit instanceof Tamer) {
-                for (Entity entity : Bukkit.getWorld(receiver.getWorld().getUID()).getEntities()) {
-                    if (entity.getType() == EntityType.WOLF) {
-                        Wolf wolf = (Wolf) entity;
-
-                        if (wolf.getOwner() == receiver) {
-                            wolf.remove();
-                        }
-                    }
-                }
+                Bukkit.getWorld(receiver.getWorld().getUID()).getEntities().stream()
+                        .filter(entity -> entity.getType() == EntityType.WOLF)
+                        .map(entity -> (Wolf) entity)
+                        .filter(wolf -> wolf.getOwner() == receiver)
+                        .forEach(Wolf::remove);
             }
 
             // Removes potential player created Iron Golems.
             if (currentKit instanceof Summoner) {
-                for (Entity entity : Bukkit.getWorld(receiver.getWorld().getUID()).getEntities()) {
-                    if (entity.isValid() && entity.getType() == EntityType.IRON_GOLEM) {
-                        IronGolem ironGolem = (IronGolem) entity;
-
-                        if (ironGolem.hasMetadata(receiver.getName())) {
-                            ironGolem.remove();
-                        }
-                    }
-                }
+                Bukkit.getWorld(receiver.getWorld().getUID()).getEntities().stream()
+                        .filter(entity -> entity.getType() == EntityType.IRON_GOLEM)
+                        .map(entity -> (IronGolem) entity)
+                        .filter(golem -> golem.hasMetadata(receiver.getName()))
+                        .forEach(IronGolem::remove);
             }
         }
 
@@ -71,7 +66,9 @@ public class DeathListener implements Listener {
         receiver.getWorld().playEffect(receiver.getLocation(), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
 
         // Sets the player's current kit and adds a death.
-        receiverData.setPreviousKit(currentKit);
+        if (currentKit != null) {
+            receiverData.setPreviousKit(currentKit);
+        }
         receiverData.setDeaths(receiverData.getDeaths() + 1);
 
         // Runs specific code if the player is killed by another player.
@@ -121,9 +118,6 @@ public class DeathListener implements Listener {
 
                 receiverData.removeBounty();
             }
-
-            // Saves the damager's stats.
-            damagerData.saveStats();
 
             // Prints kill messages to both the damager and receiver.
             MessageUtil.messagePlayer(receiver.getPlayer(), "&eYou were killed by &c" + damager.getName()
@@ -191,8 +185,5 @@ public class DeathListener implements Listener {
 
         // Resets the player's killstreak.
         receiverData.setKillstreak(0);
-
-        // Saves the receiver's stats with the database.
-        receiverData.saveStats();
     }
 }

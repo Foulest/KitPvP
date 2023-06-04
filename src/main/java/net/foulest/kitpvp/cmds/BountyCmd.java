@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
@@ -108,8 +109,5 @@ public class BountyCmd {
 
         targetData.addBounty(amount, player.getUniqueId());
         playerData.removeCoins(amount);
-
-        playerData.saveStats();
-        targetData.saveStats();
     }
 }

@@ -16,11 +16,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * @author Foulest
@@ -29,15 +27,18 @@ import java.util.logging.Level;
  * Main class for storing player data.
  */
 @Getter
-@Setter
 public final class PlayerData {
 
     private static final Set<PlayerData> INSTANCES = new HashSet<>();
     private final Player player;
+    private final String uuid;
     private final List<Kit> ownedKits = new ArrayList<>();
-    private Map<Kit, Long> cooldowns = new HashMap<>();
+    private final Map<Kit, Long> cooldowns = new HashMap<>();
+    @Setter
     private BukkitTask abilityCooldownNotifier;
+    @Setter
     private BukkitTask teleportingToSpawn;
+    @Setter
     private Kit kit;
     private Kit previousKit = KitManager.getKit("Knight");
     private int coins = Settings.startingCoins;
@@ -49,7 +50,6 @@ public final class PlayerData {
     private int topKillstreak;
     private int bounty;
     private UUID benefactor;
-    private boolean noFall;
     private boolean usingSoup;
     private boolean featherFallingEnchant;
     private boolean thornsEnchant;
@@ -58,10 +58,14 @@ public final class PlayerData {
     private boolean sharpnessEnchant;
     private boolean punchEnchant;
     private boolean powerEnchant;
+    @Setter
+    private boolean noFall;
+    @Setter
     private boolean pendingNoFallRemoval;
 
     private PlayerData(Player player) {
         this.player = player;
+        this.uuid = player.getUniqueId().toString();
         INSTANCES.add(this);
     }
 
@@ -135,159 +139,158 @@ public final class PlayerData {
 
     public boolean load() {
         // Inserts default values into PlayerStats.
-        if (!DatabaseUtil.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
-            MessageUtil.log(Level.INFO, "Player doesn't exist, inserting into database.");
-
-            DatabaseUtil.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak, usingSoup, previousKit)"
-                                + " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + true + ", 'Knight')");
-
-            if (!DatabaseUtil.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
-                MessageUtil.log(Level.WARNING, "Player data '" + player.getName() + "' failed to load.");
-                return false;
-            }
-        }
+        DatabaseUtil.addDefaultDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("coins", 500);
+            put("experience", 0);
+            put("kills", 0);
+            put("deaths", 0);
+            put("killstreak", 0);
+            put("topKillstreak", 0);
+            put("usingSoup", false);
+            put("previousKit", "Knight");
+        }});
 
         // Loads values from PlayerStats.
         try {
-            setCoins((Integer) DatabaseUtil.get("coins", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setExperience((Integer) DatabaseUtil.get("experience", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setKills((Integer) DatabaseUtil.get("kills", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setDeaths((Integer) DatabaseUtil.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setKillstreak((Integer) DatabaseUtil.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setTopKillstreak((Integer) DatabaseUtil.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setUsingSoup((Boolean) DatabaseUtil.get("usingSoup", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
-            setPreviousKit(KitManager.getKit((String) DatabaseUtil.get("previousKit", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())));
-
-        } catch (NullPointerException ex) {
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats", "uuid = ?", Collections.singletonList(uuid));
+            if (!data.isEmpty()) {
+                HashMap<String, Object> playerData = data.get(0);
+                System.out.println(playerData.toString());
+                coins = (Integer) playerData.get("coins");
+                experience = (Integer) playerData.get("experience");
+                kills = (Integer) playerData.get("kills");
+                deaths = (Integer) playerData.get("deaths");
+                killstreak = (Integer) playerData.get("killstreak");
+                topKillstreak = (Integer) playerData.get("topKillstreak");
+                usingSoup = (Boolean) playerData.get("usingSoup");
+                previousKit = KitManager.getKit((String) playerData.get("previousKit"));
+            } else {
+                System.out.println("No player found with UUID " + uuid);
+            }
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         // Inserts default values into PlayerKits.
-        if (!DatabaseUtil.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
-            DatabaseUtil.update("INSERT INTO PlayerKits (uuid, kitName)" +
-                                " VALUES ('" + player.getUniqueId().toString() + "', 'Knight')");
-        } else {
-            // Loads values from PlayerKits.
-            try {
-                ResultSet playerKits = DatabaseUtil.query("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString());
+        DatabaseUtil.addDefaultDataToTable("PlayerKits", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("kitName", "Knight");
+        }});
 
-                while (playerKits.next()) {
-                    ownedKits.add(KitManager.getKit(playerKits.getString("kitName")));
+        // Loads values from PlayerKits.
+        try {
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(uuid));
+            if (!data.isEmpty()) {
+                for (HashMap<String, Object> row : data) {
+                    ownedKits.add(KitManager.getKit((String) row.get("kitName")));
                 }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            } else {
+                System.out.println("No player found with UUID " + uuid);
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
 
         // Loads values from Bounties.
         try {
-            if (DatabaseUtil.exists("*", "Bounties", "uuid", "=", player.getUniqueId().toString())) {
-                setBounty((Integer) DatabaseUtil.get("bounty", "*", "Bounties", "uuid", "=", player.getUniqueId().toString()));
-                setBenefactor(UUID.fromString((String) DatabaseUtil.get("benefactor", "*", "Bounties", "uuid", "=", player.getUniqueId().toString())));
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties", "uuid = ?", Collections.singletonList(uuid));
+            if (!data.isEmpty()) {
+                HashMap<String, Object> playerData = data.get(0);
+                bounty = (Integer) playerData.get("bounty");
+
+                if (!playerData.get("benefactor").equals("")) {
+                    benefactor = UUID.fromString((String) playerData.get("benefactor"));
+                }
             }
-        } catch (NullPointerException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         // Inserts default values into Enchants.
-        if (!DatabaseUtil.exists("*", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-            DatabaseUtil.update("INSERT INTO Enchants (uuid, featherFalling, thorns, protection, knockback, sharpness, punch, power)"
-                                + " VALUES ('" + player.getUniqueId().toString() + "', " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ", " + false + ")");
+        DatabaseUtil.addDefaultDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("featherFalling", false);
+            put("thorns", false);
+            put("protection", false);
+            put("knockback", false);
+            put("sharpness", false);
+            put("punch", false);
+            put("power", false);
+        }});
 
-            setFeatherFallingEnchant(false);
-            setThornsEnchant(false);
-            setProtectionEnchant(false);
-            setKnockbackEnchant(false);
-            setSharpnessEnchant(false);
-            setPunchEnchant(false);
-            setPowerEnchant(false);
-
-        } else {
-            // Loads values from Enchants.
-            try {
-                if (DatabaseUtil.exists("featherFalling", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setFeatherFallingEnchant((Boolean) DatabaseUtil.get("featherFalling", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("thorns", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setThornsEnchant((Boolean) DatabaseUtil.get("thorns", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("protection", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setProtectionEnchant((Boolean) DatabaseUtil.get("protection", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("knockback", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setKnockbackEnchant((Boolean) DatabaseUtil.get("knockback", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("sharpness", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setSharpnessEnchant((Boolean) DatabaseUtil.get("sharpness", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("punch", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setPunchEnchant((Boolean) DatabaseUtil.get("punch", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-                if (DatabaseUtil.exists("power", "Enchants", "uuid", "=", player.getUniqueId().toString())) {
-                    setPowerEnchant((Boolean) DatabaseUtil.get("power", "*", "Enchants", "uuid", "=", player.getUniqueId().toString()));
-                }
-
-            } catch (NullPointerException ex) {
-                ex.printStackTrace();
+        // Loads values from Enchants.
+        try {
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants", "uuid = ?", Collections.singletonList(uuid));
+            if (!data.isEmpty()) {
+                HashMap<String, Object> playerData = data.get(0);
+                featherFallingEnchant = (Boolean) playerData.get("featherFalling");
+                thornsEnchant = (Boolean) playerData.get("thorns");
+                protectionEnchant = (Boolean) playerData.get("protection");
+                knockbackEnchant = (Boolean) playerData.get("knockback");
+                sharpnessEnchant = (Boolean) playerData.get("sharpness");
+                punchEnchant = (Boolean) playerData.get("punch");
+                powerEnchant = (Boolean) playerData.get("power");
+            } else {
+                System.out.println("No player found with UUID " + uuid);
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
 
         return true;
     }
 
     public void saveAll() {
+        if (previousKit == null) {
+            previousKit = KitManager.getKit("Knight");
+        }
+
         if (!ownedKits.isEmpty()) {
-            DatabaseUtil.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'");
+            DatabaseUtil.deleteDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(player.getUniqueId().toString()));
 
             for (Kit kits : ownedKits) {
                 if (kits == null) {
                     continue;
                 }
 
-                DatabaseUtil.update("INSERT INTO PlayerKits (uuid, kitName)" +
-                                    " VALUES ('" + player.getUniqueId().toString() + "', '" + kits.getName() + "');");
+                DatabaseUtil.addDataToTable("PlayerKits", new HashMap<String, Object>() {{
+                    put("uuid", uuid);
+                    put("kitName", kits.getName());
+                }});
             }
         }
 
-        saveStats();
-    }
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("coins", coins);
+            put("experience", experience);
+            put("kills", kills);
+            put("deaths", deaths);
+            put("killstreak", killstreak);
+            put("topKillstreak", topKillstreak);
+            put("usingSoup", usingSoup);
+            put("previousKit", previousKit.getName());
+        }});
 
-    public void saveStats() {
-        if (previousKit == null) {
-            previousKit = KitManager.getKit("Knight");
+        if (bounty > 0 && benefactor != null) {
+            DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
+                put("uuid", uuid);
+                put("bounty", bounty);
+                put("benefactor", (benefactor == null ? "" : benefactor.toString()));
+            }});
         }
 
-        DatabaseUtil.update("UPDATE PlayerStats SET"
-                            + " coins=" + coins
-                            + ", experience=" + experience
-                            + ", kills=" + kills
-                            + ", deaths=" + deaths
-                            + ", killstreak=" + killstreak
-                            + ", topKillstreak=" + topKillstreak
-                            + ", usingSoup=" + usingSoup
-                            + ", previousKit='" + previousKit.getName()
-                            + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
-
-        DatabaseUtil.update("UPDATE Bounties SET"
-                            + " bounty=" + bounty
-                            + ", benefactor='" + benefactor
-                            + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
-
-        DatabaseUtil.update("UPDATE Enchants SET"
-                            + " featherFalling=" + featherFallingEnchant
-                            + ", thorns=" + thornsEnchant
-                            + ", protection=" + protectionEnchant
-                            + ", knockback=" + knockbackEnchant
-                            + ", sharpness=" + sharpnessEnchant
-                            + ", punch=" + punchEnchant
-                            + ", power=" + powerEnchant
-                            + " WHERE uuid='" + player.getUniqueId().toString() + "'");
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("featherFalling", featherFallingEnchant);
+            put("thorns", thornsEnchant);
+            put("protection", protectionEnchant);
+            put("knockback", knockbackEnchant);
+            put("sharpness", sharpnessEnchant);
+            put("punch", punchEnchant);
+            put("power", powerEnchant);
+        }});
     }
 
     public void addBounty(int bounty, UUID benefactor) {
@@ -298,8 +301,11 @@ public final class PlayerData {
         this.bounty = bounty;
         this.benefactor = benefactor;
 
-        DatabaseUtil.update("INSERT INTO Bounties (uuid, bounty, benefactor)" +
-                            " VALUES ('" + player.getUniqueId().toString() + "', " + bounty + ", '" + benefactor + "');");
+        DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("bounty", bounty);
+            put("benefactor", (benefactor == null ? "" : benefactor.toString()));
+        }});
     }
 
     public void removeBounty() {
@@ -307,7 +313,7 @@ public final class PlayerData {
             bounty = 0;
             benefactor = null;
 
-            DatabaseUtil.update("DELETE FROM Bounties WHERE uuid='" + player.getUniqueId().toString() + "'");
+            DatabaseUtil.deleteDataFromTable("Bounties", "uuid = ?", Collections.singletonList(player.getUniqueId().toString()));
         }
     }
 
@@ -321,19 +327,30 @@ public final class PlayerData {
 
     public void setKillstreak(int streak) {
         killstreak = streak;
-        setTopKillstreak();
+
+        if (killstreak > topKillstreak) {
+            topKillstreak = killstreak;
+        }
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("killstreak", killstreak);
+            put("topKillstreak", topKillstreak);
+        }});
     }
 
     public void addKillstreak() {
         killstreak += 1;
-        setTopKillstreak();
-    }
 
-    public void setTopKillstreak() {
         if (killstreak > topKillstreak) {
             topKillstreak = killstreak;
-            saveStats();
         }
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("killstreak", killstreak);
+            put("topKillstreak", topKillstreak);
+        }});
     }
 
     public double getKDR() {
@@ -343,13 +360,17 @@ public final class PlayerData {
     public String getKDRText() {
         String decimalFormatStr = "####0.00";
         DecimalFormat format = new DecimalFormat(decimalFormatStr);
-
         return format.format(getKDR());
     }
 
     public void setExperience(int exp) {
         experience = exp;
         calcLevel(false);
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("experience", experience);
+        }});
     }
 
     public void addExperience(int exp) {
@@ -359,6 +380,11 @@ public final class PlayerData {
 
         experience += exp;
         calcLevel(true);
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("experience", experience);
+        }});
     }
 
     public float getExpDecimal() {
@@ -413,20 +439,39 @@ public final class PlayerData {
         player.setExp(getExpDecimal());
     }
 
-    public void removeCoins(int coins) {
-        if (coins == 0) {
+    public void addCoins(int value) {
+        if (value == 0) {
             return;
         }
 
-        this.coins = Math.max(0, this.coins - coins);
+        this.coins += value;
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("coins", coins);
+        }});
     }
 
-    public void addCoins(int coins) {
-        if (coins == 0) {
+    public void removeCoins(int value) {
+        if (value == 0) {
             return;
         }
 
-        this.coins += coins;
+        this.coins = Math.max(0, this.coins - value);
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("coins", coins);
+        }});
+    }
+
+    public void setCoins(int value) {
+        this.coins = Math.max(0, value);
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("coins", coins);
+        }});
     }
 
     public void giveDefaultItems() {
@@ -442,7 +487,7 @@ public final class PlayerData {
         ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").getItem();
         player.getInventory().setItem(2, previousKit);
 
-        ItemStack yourStats = new ItemBuilder(SkullCreatorUtil.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
+        ItemStack yourStats = new ItemBuilder(SkullUtil.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
         player.getInventory().setItem(4, yourStats);
 
         ItemStack healingItem;
@@ -457,5 +502,110 @@ public final class PlayerData {
         player.getInventory().setItem(7, kitEnchanter);
 
         player.updateInventory();
+    }
+
+    public void setPreviousKit(Kit kit) {
+        previousKit = kit;
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("previousKit", previousKit.getName());
+        }});
+    }
+
+    public void setUsingSoup(boolean value) {
+        usingSoup = value;
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("usingSoup", usingSoup);
+        }});
+    }
+
+    public void setDeaths(int value) {
+        deaths = value;
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("deaths", deaths);
+        }});
+    }
+
+    public void setKills(int value) {
+        kills = value;
+
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("kills", kills);
+        }});
+    }
+
+    public void setFeatherFallingEnchant(boolean value) {
+        featherFallingEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("featherFalling", featherFallingEnchant);
+        }});
+    }
+
+    public void setThornsEnchant(boolean value) {
+        thornsEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("thorns", thornsEnchant);
+        }});
+    }
+
+    public void setProtectionEnchant(boolean value) {
+        protectionEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("protection", protectionEnchant);
+        }});
+    }
+
+    public void setKnockbackEnchant(boolean value) {
+        knockbackEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("knockback", knockbackEnchant);
+        }});
+    }
+
+    public void setSharpnessEnchant(boolean value) {
+        sharpnessEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("sharpness", sharpnessEnchant);
+        }});
+    }
+
+    public void setPunchEnchant(boolean value) {
+        punchEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("punch", punchEnchant);
+        }});
+    }
+
+    public void setPowerEnchant(boolean value) {
+        powerEnchant = value;
+
+        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+            put("uuid", uuid);
+            put("power", powerEnchant);
+        }});
+    }
+
+    public void addOwnedKit(Kit kit) {
+        if (!ownedKits.contains(kit)) {
+            ownedKits.add(kit);
+        }
     }
 }

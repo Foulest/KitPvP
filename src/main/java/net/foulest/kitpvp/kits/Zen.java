@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -49,7 +49,7 @@ public class Zen implements Kit {
                 + "g2ZDMxZTRkZDE2OWI0YzFjNjRkNDg1YjhlODRjN2IxY2NlYTdmNmZhYzg4ZTI1YTA4ZDJiN2ZmYmI4NDBhOCJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fZen's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fZen's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x3E7F2B)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).hideInfo()

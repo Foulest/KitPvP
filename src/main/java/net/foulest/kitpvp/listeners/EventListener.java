@@ -36,6 +36,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
+
 /**
  * @author Foulest
  * @project KitPvP
@@ -63,12 +65,13 @@ public class EventListener implements Listener {
         player.setHealth(20);
         player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().setHeldItemSlot(0);
+        playerData.calcLevel(false);
 
         for (Kit kit : KitManager.kits) {
             // Adds free kits to player's owned kits list.
             if (kit.enabled() && kit.getCost() == 0 && !playerData.getOwnedKits().contains(kit)
                 && (!kit.premiumOnly() || kit.premiumOnly() && Settings.premiumEnabled && player.hasPermission(Settings.premiumPermission))) {
-                playerData.getOwnedKits().add(kit);
+                playerData.addOwnedKit(kit);
             }
         }
 
@@ -274,6 +277,10 @@ public class EventListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         PlayerData playerData = PlayerData.getInstance(player);
 
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            return;
+        }
+
         // Fixes the weird hotbar swap bug.
         if (event.getAction() == InventoryAction.HOTBAR_SWAP
             && !event.getClickedInventory().getName().equals("container.inventory")) {
@@ -342,9 +349,9 @@ public class EventListener implements Listener {
                     return;
                 }
 
-                playerData.getOwnedKits().add(kit);
+                playerData.addOwnedKit(kit);
                 playerData.removeCoins(kit.getCost());
-                DatabaseUtil.update("INSERT INTO PlayerKits (uuid, kitName) VALUES ('" + player.getUniqueId().toString() + "', '" + kit.getName() + "')");
+
                 MessageUtil.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
                 player.closeInventory();
@@ -747,7 +754,6 @@ public class EventListener implements Listener {
                         player.updateInventory();
 
                         playerData.setUsingSoup(true);
-                        playerData.saveStats();
                         MessageUtil.messagePlayer(player, "&aYou are now using Soup.");
 
                         ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
@@ -767,7 +773,6 @@ public class EventListener implements Listener {
                         player.updateInventory();
 
                         playerData.setUsingSoup(false);
-                        playerData.saveStats();
                         MessageUtil.messagePlayer(player, "&aYou are now using Potions.");
 
                         ItemStack healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();

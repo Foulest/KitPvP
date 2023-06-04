@@ -23,7 +23,7 @@ import java.util.logging.Level;
  * @author minnymin3
  * @project KitPvP
  * <p>
- * https://github.com/mcardy/CommandFramework
+ * <a href="https://github.com/mcardy/CommandFramework">...</a>
  */
 public class CommandFramework implements CommandExecutor {
 
@@ -44,8 +44,9 @@ public class CommandFramework implements CommandExecutor {
                 Field field = SimplePluginManager.class.getDeclaredField("commandMap");
                 field.setAccessible(true);
                 map = (CommandMap) field.get(manager);
-            } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException | SecurityException e) {
-                e.printStackTrace();
+            } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException | SecurityException ex) {
+                MessageUtil.log(Level.SEVERE, "Failed to get command map");
+                ex.printStackTrace();
             }
         }
     }
@@ -96,12 +97,13 @@ public class CommandFramework implements CommandExecutor {
 
                 try {
                     method.invoke(methodObject, new CommandArgs(sender, cmd, label, args, cmdLabel.split("\\.").length - 1));
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.getTargetException().printStackTrace();
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    MessageUtil.log(Level.WARNING, "Command " + method.getName() + " in " + methodObject.getClass().getName() + " does not have the correct arguments.");
+                    ex.printStackTrace();
+                } catch (InvocationTargetException ex) {
+                    MessageUtil.log(Level.WARNING, "An error occurred while executing command " + cmdLabel + " in " + plugin.getName());
+                    ex.getTargetException().printStackTrace();
                 }
-
                 return;
             }
         }
@@ -121,7 +123,7 @@ public class CommandFramework implements CommandExecutor {
                 Command command = method.getAnnotation(Command.class);
 
                 if (method.getParameterTypes().length > 1 || method.getParameterTypes()[0] != CommandArgs.class) {
-                    MessageUtil.log(Level.WARNING, "&cUnable to register command " + method.getName() + ". Unexpected method arguments");
+                    MessageUtil.log(Level.WARNING, "Unable to register command " + method.getName() + ". Unexpected method arguments.");
                     continue;
                 }
 
@@ -172,7 +174,7 @@ public class CommandFramework implements CommandExecutor {
         }
     }
 
-    public void registerCompleter(String label, Method m, Object obj) {
+    public void registerCompleter(String label, Method method, Object obj) {
         String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
 
         if (map.getCommand(cmdLabel) == null) {
@@ -187,7 +189,7 @@ public class CommandFramework implements CommandExecutor {
                 command.completer = new BukkitCompleter();
             }
 
-            command.completer.addCompleter(label, m, obj);
+            command.completer.addCompleter(label, method, obj);
 
         } else if (map.getCommand(cmdLabel) instanceof PluginCommand) {
             try {
@@ -197,19 +199,19 @@ public class CommandFramework implements CommandExecutor {
 
                 if (field.get(command) == null) {
                     BukkitCompleter completer = new BukkitCompleter();
-                    completer.addCompleter(label, m, obj);
+                    completer.addCompleter(label, method, obj);
                     field.set(command, completer);
 
                 } else if (field.get(command) instanceof BukkitCompleter) {
                     BukkitCompleter completer = (BukkitCompleter) field.get(command);
-                    completer.addCompleter(label, m, obj);
+                    completer.addCompleter(label, method, obj);
 
                 } else {
-                    MessageUtil.log(Level.WARNING, "&cUnable to register tab completer " + m.getName()
-                            + ". A tab completer is already registered for that command!");
+                    MessageUtil.log(Level.WARNING, "Unable to register tab completer " + method.getName() + ". A tab completer is already registered for that command!");
                 }
 
             } catch (Exception ex) {
+                MessageUtil.log(Level.WARNING, "Unable to register tab completer " + method.getName() + ". Unexpected error occurred.");
                 ex.printStackTrace();
             }
         }

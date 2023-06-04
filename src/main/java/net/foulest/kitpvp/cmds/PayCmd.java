@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -52,7 +53,6 @@ public class PayCmd {
 
             targetData.setCoins(targetData.getCoins() + amount);
             senderData.removeCoins(amount);
-            targetData.saveStats();
 
             if ((args.getSender() instanceof Player) && player == args.getSender()) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);

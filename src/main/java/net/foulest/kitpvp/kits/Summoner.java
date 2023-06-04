@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +48,7 @@ public class Summoner implements Kit {
                 + "RiNTcxYWY0M2JhZjBkYmI2ODI0OTNiZGUxY2U0ZTg0N2RiNzU4ZGQ5Njg1ZTliZWMyYjdhYmJjYzcyNzcyNiJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fSummoner's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fSummoner's Head"),
                 new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).hideInfo()

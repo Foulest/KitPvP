@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +48,7 @@ public class Timelord implements Kit {
                 + "M3Mjc0ZWMyODg5YjdjYWZhYjc2OGFkMjE2YzNlM2FlNjZmODAwNTQ3MDljNDcwNTI3NGVhNDAyMDA1Yzk2YiJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fTimelord's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fTimelord's Head"),
                 new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).hideInfo()

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * @author deanveloper, Foulest
@@ -24,7 +26,7 @@ import java.util.UUID;
  * <p>
  * <a href="https://github.com/deanveloper/SkullCreator">...</a>
  */
-public final class SkullCreatorUtil {
+public final class SkullUtil {
 
     private static Field blockProfileField;
     private static Method metaSetProfileMethod;
@@ -89,9 +91,9 @@ public final class SkullCreatorUtil {
             mutateItemMeta(meta, base64);
             item.setItemMeta(meta);
             return item;
+        } else {
+            throw new IllegalArgumentException("Cannot set base64 on item. ItemMeta is not an instance of SkullMeta.");
         }
-
-        return null;
     }
 
     @Deprecated
@@ -107,6 +109,7 @@ public final class SkullCreatorUtil {
         notNull(block, "block");
         notNull(id, "id");
         setToSkull(block);
+
         Skull state = (Skull) block.getState();
         state.setOwner(Bukkit.getOfflinePlayer(id).getName());
         state.update(false, false);
@@ -122,9 +125,15 @@ public final class SkullCreatorUtil {
         notNull(block, "block");
         notNull(base64, "base64");
         setToSkull(block);
-        Skull state = (Skull) block.getState();
-        mutateBlockState(state, base64);
-        state.update(false, false);
+        BlockState state = block.getState();
+
+        if (state instanceof Skull) {
+            Skull skull = (Skull) state;
+            mutateBlockState(skull, base64);
+            skull.update(false, false);
+        } else {
+            throw new IllegalArgumentException("Cannot set base64 on block. Block state is not an instance of Skull.");
+        }
     }
 
     private static void setToSkull(Block block) {
@@ -138,8 +147,8 @@ public final class SkullCreatorUtil {
         }
     }
 
-    private static void notNull(Object o, String name) {
-        if (o == null) {
+    private static void notNull(Object obj, String name) {
+        if (obj == null) {
             throw new NullPointerException(name + " should not be null!");
         }
     }
@@ -149,8 +158,8 @@ public final class SkullCreatorUtil {
 
         try {
             actualUrl = new URI(url);
-        } catch (URISyntaxException var3) {
-            throw new RuntimeException(var3);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
         }
 
         String toEncode = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl + "\"}}}";
@@ -161,7 +170,6 @@ public final class SkullCreatorUtil {
         UUID id = new UUID(b64.substring(b64.length() - 20).hashCode(), b64.substring(b64.length() - 10).hashCode());
         GameProfile profile = new GameProfile(id, "aaaaa");
         profile.getProperties().put("textures", new Property("textures", b64));
-
         return profile;
     }
 
@@ -174,8 +182,9 @@ public final class SkullCreatorUtil {
 
             blockProfileField.set(block, makeProfile(b64));
 
-        } catch (IllegalAccessException | NoSuchFieldException var3) {
-            var3.printStackTrace();
+        } catch (ReflectiveOperationException ex) {
+            MessageUtil.log(Level.WARNING, "Failed to set block texture!");
+            ex.printStackTrace();
         }
     }
 
@@ -188,7 +197,7 @@ public final class SkullCreatorUtil {
 
             metaSetProfileMethod.invoke(meta, makeProfile(b64));
 
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException var5) {
+        } catch (ReflectiveOperationException e) {
             try {
                 if (metaProfileField == null) {
                     metaProfileField = meta.getClass().getDeclaredField("profile");
@@ -197,8 +206,9 @@ public final class SkullCreatorUtil {
 
                 metaProfileField.set(meta, makeProfile(b64));
 
-            } catch (IllegalAccessException | NoSuchFieldException var4) {
-                var4.printStackTrace();
+            } catch (ReflectiveOperationException ex) {
+                MessageUtil.log(Level.WARNING, "Failed to set item texture!");
+                ex.printStackTrace();
             }
         }
     }

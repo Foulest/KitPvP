@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -49,7 +49,7 @@ public class Pyro implements Kit {
                 + "mNTc2NDU0Y2I2NDFhNmU1OTVlZGY0ZTc3YTcwYzIwM2U4OGVjYWIwZjIyMGQzZmUzMGZiM2NjYzhjOGJhOCJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fPyro's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fPyro's Head"),
                 new ItemBuilder(Material.CHAINMAIL_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.GOLD_BOOTS).unbreakable(true).hideInfo().enchant(Enchantment.PROTECTION_FIRE, 4)

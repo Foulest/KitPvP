@@ -19,7 +19,7 @@ public final class MessageUtil {
     }
 
     public static void log(Level level, String message) {
-        Bukkit.getLogger().log(level, "[" + KitPvP.pluginName + " " + message);
+        Bukkit.getLogger().log(level, "[" + KitPvP.pluginName + "] " + message);
     }
 
     public static void broadcast(String message) {

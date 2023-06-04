@@ -17,7 +17,7 @@ import java.util.List;
  * @author nonamesldev, Foulest
  * @project KitPvP
  * <p>
- * https://www.spigotmc.org/threads/util-itembuilder-manage-items-easily.48397/
+ * <a href="https://www.spigotmc.org/threads/util-itembuilder-manage-items-easily.48397/">...</a>
  */
 @Getter
 public class ItemBuilder {

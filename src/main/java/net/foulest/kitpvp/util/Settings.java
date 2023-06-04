@@ -138,7 +138,7 @@ public class Settings {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             } catch (IOException ex) {
-                MessageUtil.log(Level.WARNING, "Couldn't create the config file.");
+                MessageUtil.log(Level.WARNING, "Failed to create settings.yml file.");
                 ex.printStackTrace();
                 return;
             }

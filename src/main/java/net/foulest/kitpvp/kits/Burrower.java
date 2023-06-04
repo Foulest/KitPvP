@@ -2,7 +2,7 @@ package net.foulest.kitpvp.kits;
 
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.SkullCreatorUtil;
+import net.foulest.kitpvp.util.SkullUtil;
 import net.foulest.kitpvp.util.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -47,7 +47,7 @@ public class Burrower implements Kit {
                 + "M0NDBlYWM4YmQ1MzA4YzMyY2Y5ODJjM2I5YzNjOWI0OWQzNDVkYjY0ODNlZDQ0Nzg0ZmQyZDk0ZmNhMzIyZSJ9fX0=";
 
         return new ItemBuilder[]{
-                new ItemBuilder(SkullCreatorUtil.itemFromBase64(base64)).name("&fBurrower's Head"),
+                new ItemBuilder(SkullUtil.itemFromBase64(base64)).name("&fBurrower's Head"),
                 new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).hideInfo()

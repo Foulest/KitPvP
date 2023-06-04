@@ -2,6 +2,7 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -40,7 +41,6 @@ public class SoupCmd {
         }
 
         playerData.setUsingSoup(true);
-        playerData.saveStats();
         MessageUtil.messagePlayer(player, "&aYou are now using Soup.");
 
         if (playerData.getKit() == null) {

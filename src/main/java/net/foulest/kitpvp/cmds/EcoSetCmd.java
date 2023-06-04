@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -38,9 +39,7 @@ public class EcoSetCmd {
         }
 
         int amount = Integer.parseInt(args.getArgs(1));
-
         targetData.setCoins(amount);
-        targetData.saveStats();
 
         if ((args.getSender() instanceof Player) && target == args.getSender()) {
             MessageUtil.messagePlayer(target, "&aYou set your balance to " + targetData.getCoins() + " coins.");

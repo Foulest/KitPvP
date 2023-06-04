@@ -5,6 +5,8 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.listeners.CombatLog;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+
 /**
  * @author Foulest
  * @project KitPvP
@@ -35,39 +37,39 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
         switch (identifier) {
             case "kills":
-                builder.append(player == null ? "0" : playerData.getKills());
+                builder.append(playerData.getKills());
                 break;
 
             case "deaths":
-                builder.append(player == null ? "0" : playerData.getDeaths());
+                builder.append(playerData.getDeaths());
                 break;
 
             case "kdr":
-                builder.append(player == null ? "0" : playerData.getKDRText());
+                builder.append(playerData.getKDRText());
                 break;
 
             case "killstreak":
-                builder.append(player == null ? "0" : playerData.getKillstreak());
+                builder.append(playerData.getKillstreak());
                 break;
 
             case "top_killstreak":
-                builder.append(player == null ? "0" : playerData.getTopKillstreak());
+                builder.append(playerData.getTopKillstreak());
                 break;
 
             case "coins":
-                builder.append(player == null ? "0" : playerData.getCoins());
+                builder.append(playerData.getCoins());
                 break;
 
             case "level":
-                builder.append(player == null ? "0" : playerData.getLevel());
+                builder.append(playerData.getLevel());
                 break;
 
             case "experience":
-                builder.append(player == null ? "0" : playerData.getExperience());
+                builder.append(playerData.getExperience());
                 break;
 
             case "experience_percent":
-                builder.append(player == null ? "0" : playerData.getExpPercent()).append("%");
+                builder.append(playerData.getExpPercent()).append("%");
                 break;
 
             case "combattag":
@@ -75,15 +77,15 @@ public class PlaceholderUtil extends PlaceholderExpansion {
                 break;
 
             case "activekit":
-                builder.append(player == null || playerData.getKit() == null ? "None" : playerData.getKit().getName());
+                builder.append(playerData.getKit() == null ? "None" : playerData.getKit().getName());
                 break;
 
             case "bounty":
-                builder.append(player == null || playerData.getBounty() == 0 ? "" : playerData.getBounty());
+                builder.append(playerData.getBounty() == 0 ? "" : playerData.getBounty());
                 break;
 
             case "bounty_tab":
-                builder.append(player == null || playerData.getBounty() == 0 ? "" : "&6Bounty: &e&l$" + playerData.getBounty());
+                builder.append(playerData.getBounty() == 0 ? "" : "&6Bounty: &e&l$" + playerData.getBounty());
                 break;
         }
 

@@ -2,6 +2,7 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -40,7 +41,6 @@ public class PotionsCmd {
         }
 
         playerData.setUsingSoup(false);
-        playerData.saveStats();
         MessageUtil.messagePlayer(player, "&aYou are now using Potions.");
 
         if (playerData.getKit() == null) {
