@@ -38,8 +38,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.sk89q.worldguard/worldguard-legacy
     compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-legacy', version: '6.2'
 
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 }
 
 jar {
