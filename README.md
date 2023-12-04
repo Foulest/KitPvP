@@ -45,4 +45,4 @@ KitPvP is an engaging Spigot plugin designed for the KitPvP game mode, offering 
 - [Usage](https://github.com/Foulest/KitPvP/wiki/Usage)
 
 ## Getting Help
-For support or queries, please open an issue in the [Issues](https://github.com/Foulest/KitPvP/issues) section.
+For support or queries, please open an issue in the [Issues section](https://github.com/Foulest/KitPvP/issues).
