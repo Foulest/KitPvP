@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -19,9 +21,9 @@ public class BalanceCmd {
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
             permission = "kitpvp.balance", usage = "/balance", inGameOnly = true)
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         Player player = args.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         CommandSender sender = args.getSender();
 
         if (args.length() != 1) {
@@ -30,9 +32,9 @@ public class BalanceCmd {
         }
 
         Player target = Bukkit.getPlayer(args.getArgs(0));
-        PlayerData targetData = PlayerData.getInstance(target);
+        PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
-        if (target == null) {
+        if (!target.isOnline()) {
             MessageUtil.messagePlayer(sender, "&cPlayer not found.");
             return;
         }

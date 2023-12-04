@@ -1,7 +1,9 @@
 package net.foulest.kitpvp.region;
 
 import lombok.Getter;
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.listeners.CombatLog;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
@@ -21,9 +23,9 @@ import java.util.logging.Level;
 public class Spawn {
 
     @Getter
-    private static Location location;
+    public static Location location;
 
-    public static void setLocation(Location loc) {
+    public static void setLocation(@NonNull Location loc) {
         Settings.spawnX = loc.getX();
         Settings.spawnY = loc.getY();
         Settings.spawnZ = loc.getZ();
@@ -40,8 +42,8 @@ public class Spawn {
      *
      * @param player The player to teleport.
      */
-    public static void teleport(Player player) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    public static void teleport(@NonNull Player player) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (location == null) {
             MessageUtil.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");

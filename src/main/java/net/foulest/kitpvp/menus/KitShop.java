@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.menus;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.kits.Kit;
@@ -25,11 +27,11 @@ public class KitShop {
     private static final Map<Player, Integer> pages = new HashMap<>();
     private final Inventory inventory;
 
-    public KitShop(Player player) {
+    public KitShop(@NonNull Player player) {
         this(player, 0);
     }
 
-    public KitShop(Player player, int page) {
+    public KitShop(@NonNull Player player, int page) {
         player.closeInventory();
 
         if (page > 0) {
@@ -61,7 +63,6 @@ public class KitShop {
         if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
-
         return ensureSize(++size);
     }
 
@@ -69,7 +70,7 @@ public class KitShop {
         return (Math.min(size, 36));
     }
 
-    private static ItemStack createKitItem(Kit kit) {
+    private static ItemStack createKitItem(@NonNull Kit kit) {
         List<String> lore = kit.getLore();
 
         if (kit.getCost() == 0) {
@@ -83,8 +84,8 @@ public class KitShop {
         return new ItemBuilder(kit.getDisplayItem()).name("&c" + kit.getName()).lore(lore).getItem();
     }
 
-    private boolean populateInventory(Player player, int page) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    private boolean populateInventory(@NonNull Player player, int page) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int paidKits = 0;
         int rowSize = 9;
@@ -127,7 +128,6 @@ public class KitShop {
                 paidKits++;
             }
         }
-
         return paidKits != 0;
     }
 }

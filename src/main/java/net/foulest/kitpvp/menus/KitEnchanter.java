@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.menus;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -22,7 +24,7 @@ public class KitEnchanter {
     private static final String inventoryName = MessageUtil.colorize("Kit Enchanter");
     private final Inventory inventory;
 
-    public KitEnchanter(Player player) {
+    public KitEnchanter(@NonNull Player player) {
         inventory = Bukkit.createInventory(player, 27, inventoryName);
 
         populateInventory(player);
@@ -33,8 +35,8 @@ public class KitEnchanter {
     /**
      * Populates the GUI's inventory.
      */
-    private void populateInventory(Player player) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    private void populateInventory(@NonNull Player player) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int maxSlots = 27;
 

@@ -1,7 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
-import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
@@ -22,9 +23,9 @@ public class BountyCmd {
     @Command(name = "bounty", aliases = {"bounties"},
             description = "Allows players to place bounties on each other.",
             permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         Player player = args.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
 
         if (args.length() == 0) {
@@ -41,7 +42,7 @@ public class BountyCmd {
             MessageUtil.messagePlayer(player, "");
 
             if (player.hasPermission("kitpvp.bounties.place")
-                || (Settings.premiumEnabled && Settings.bountiesPremiumOnly && player.hasPermission(Settings.premiumPermission))) {
+                    || (Settings.premiumEnabled && Settings.bountiesPremiumOnly && player.hasPermission(Settings.premiumPermission))) {
                 MessageUtil.messagePlayer(player, " &fYou can place one on another player");
                 MessageUtil.messagePlayer(player, " &fusing &e/bounty set <player> <amount>&f.");
                 MessageUtil.messagePlayer(player, "");
@@ -60,12 +61,7 @@ public class BountyCmd {
         }
 
         Player target = Bukkit.getPlayer(args.getArgs(1));
-        PlayerData targetData = PlayerData.getInstance(target);
-
-        if (target == null) {
-            MessageUtil.messagePlayer(player, "&cPlayer not found.");
-            return;
-        }
+        PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         if (target == player) {
             MessageUtil.messagePlayer(player, "&cYou can't set a bounty on yourself.");

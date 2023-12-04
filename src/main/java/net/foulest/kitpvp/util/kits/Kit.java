@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.util.kits;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
@@ -12,7 +14,6 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Foulest
@@ -70,8 +71,8 @@ public interface Kit {
      *
      * @param player The player to apply the kit to.
      */
-    default void apply(Player player) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    default void apply(@NonNull Player player) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Integer> airSlots = new ArrayList<>();
 
         // Checks if the player owns the kit they're trying to equip.

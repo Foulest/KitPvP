@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.listeners.CombatLog;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -20,7 +22,7 @@ import org.bukkit.potion.PotionEffect;
  */
 public class ClearKitCmd {
 
-    public static void clearKit(PlayerData playerData) {
+    public static void clearKit(@NonNull PlayerData playerData) {
         Player player = playerData.getPlayer();
 
         playerData.setPreviousKit(playerData.getKit());
@@ -41,14 +43,14 @@ public class ClearKitCmd {
 
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         if (!(args.getSender() instanceof Player)) {
             MessageUtil.messagePlayer(args.getSender(), "Only players can execute this command.");
             return;
         }
 
         Player player = args.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Clearing your own kit.
         if (args.length() == 0) {
@@ -75,9 +77,9 @@ public class ClearKitCmd {
         // Clearing kits from other players.
         if (args.getPlayer().hasPermission("kitpvp.clearkit.others")) {
             Player target = Bukkit.getPlayer(args.getArgs(1));
-            PlayerData targetData = PlayerData.getInstance(target);
+            PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
-            if (target == null) {
+            if (!target.isOnline()) {
                 MessageUtil.messagePlayer(player, "&cThat player is not online.");
                 return;
             }

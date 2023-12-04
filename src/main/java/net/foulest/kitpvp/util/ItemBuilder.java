@@ -1,6 +1,7 @@
 package net.foulest.kitpvp.util;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -25,19 +26,19 @@ public class ItemBuilder {
     private final ItemStack item;
     private int slot;
 
-    public ItemBuilder(Material mat) {
-        item = new ItemStack(mat);
+    public ItemBuilder(@NonNull Material material) {
+        item = new ItemStack(material);
     }
 
-    public ItemBuilder(ItemStack stack) {
-        item = new ItemStack(stack);
+    public ItemBuilder(@NonNull ItemStack itemStack) {
+        item = new ItemStack(itemStack);
     }
 
-    public ItemBuilder addTag(String name) {
+    public ItemBuilder addTag(@NonNull String name) {
         return this;
     }
 
-    public ItemBuilder name(String name) {
+    public ItemBuilder name(@NonNull String name) {
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(MessageUtil.colorize(name));
         item.setItemMeta(meta);
@@ -78,14 +79,14 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder lore(String lore) {
+    public ItemBuilder lore(@NonNull String lore) {
         List<String> itemLore = item.getItemMeta().hasLore() ? item.getItemMeta().getLore() : new ArrayList<>();
         itemLore.add(MessageUtil.colorize(lore));
         lore(itemLore);
         return this;
     }
 
-    public ItemBuilder lore(List<String> lore) {
+    public ItemBuilder lore(@NonNull List<String> lore) {
         ItemMeta meta = item.getItemMeta();
         List<String> loreList = new ArrayList<>();
 
@@ -109,23 +110,21 @@ public class ItemBuilder {
                 item.removeEnchantment(enchantments);
             }
         }
-
         return this;
     }
 
-    public ItemBuilder clearEnchantment(Enchantment enchant) {
+    public ItemBuilder clearEnchantment(@NonNull Enchantment enchantment) {
         ItemMeta meta;
 
-        if (item.getItemMeta().hasEnchants() && item.getEnchantments().containsKey(enchant)) {
+        if (item.getItemMeta().hasEnchants() && item.getEnchantments().containsKey(enchantment)) {
             meta = item.getItemMeta();
-            meta.removeEnchant(enchant);
+            meta.removeEnchant(enchantment);
             item.setItemMeta(meta);
         }
-
         return this;
     }
 
-    public ItemBuilder enchant(Enchantment enchantment, int level) {
+    public ItemBuilder enchant(@NonNull Enchantment enchantment, int level) {
         if (item.containsEnchantment(enchantment)) {
             item.addUnsafeEnchantment(enchantment, level + item.getEnchantmentLevel(enchantment));
         } else {
@@ -144,7 +143,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder color(Color color) {
+    public ItemBuilder color(@NonNull Color color) {
         LeatherArmorMeta meta;
 
         if (item.getType().toString().contains("LEATHER_")) {
@@ -152,7 +151,6 @@ public class ItemBuilder {
             meta.setColor(color);
             item.setItemMeta(meta);
         }
-
         return this;
     }
 }

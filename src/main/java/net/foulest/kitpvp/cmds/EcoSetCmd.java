@@ -1,7 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
-import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -19,16 +20,16 @@ public class EcoSetCmd {
 
     @Command(name = "ecoset", description = "Sets the balance of a player.",
             usage = "/ecoset <player> <amount>", permission = "kitpvp.ecoset")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         if (args.length() != 2) {
             MessageUtil.messagePlayer(args.getSender(), "&cUsage: /ecoset <player> <amount>");
             return;
         }
 
         Player target = Bukkit.getPlayer(args.getArgs(0));
-        PlayerData targetData = PlayerData.getInstance(target);
+        PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
-        if (target == null) {
+        if (!target.isOnline()) {
             MessageUtil.messagePlayer(args.getSender(), args.getArgs(0) + " is not online.");
             return;
         }

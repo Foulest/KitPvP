@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
@@ -15,9 +16,12 @@ import org.bukkit.command.CommandSender;
  */
 public class ReloadCfgCmd {
 
+    // TODO: Turn this into a /kitpvp command with a menu.
+    //  Take a look at the /vulture command for reference.
+
     @Command(name = "reloadcfg", description = "Reloads the plugin's config file.",
             permission = "kitpvp.reloadcfg", usage = "/reloadcfg")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         CommandSender sender = args.getSender();
 
         if (args.length() != 0) {

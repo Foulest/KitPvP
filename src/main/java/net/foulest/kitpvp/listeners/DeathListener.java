@@ -1,7 +1,9 @@
 package net.foulest.kitpvp.listeners;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Summoner;
 import net.foulest.kitpvp.kits.Tamer;
 import net.foulest.kitpvp.region.Spawn;
@@ -30,8 +32,8 @@ import org.bukkit.util.Vector;
  */
 public class DeathListener implements Listener {
 
-    public static void handleDeath(Player receiver, boolean onPlayerQuit) {
-        PlayerData receiverData = PlayerData.getInstance(receiver);
+    public static void handleDeath(@NonNull Player receiver, boolean onPlayerQuit) {
+        PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
         Kit currentKit = receiverData.getKit();
         Vector vec = new Vector();
 
@@ -74,7 +76,7 @@ public class DeathListener implements Listener {
         // Runs specific code if the player is killed by another player.
         if (CombatLog.getLastAttacker(receiver) != null && CombatLog.getLastAttacker(receiver) != receiver) {
             Player damager = CombatLog.getLastAttacker(receiver);
-            PlayerData damagerData = PlayerData.getInstance(damager);
+            PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
 
             // Adds a kill to the damager.
             damagerData.setKills(damagerData.getKills() + 1);
@@ -102,18 +104,18 @@ public class DeathListener implements Listener {
             // Removes the player's potential bounty.
             if (receiverData.getBounty() > 0 && Bukkit.getPlayer(receiverData.getBenefactor()) != damager) {
                 if (Bukkit.getPlayer(receiverData.getBenefactor()) != null
-                    && Bukkit.getPlayer(receiverData.getBenefactor()).isOnline()) {
+                        && Bukkit.getPlayer(receiverData.getBenefactor()).isOnline()) {
                     Player benefactor = Bukkit.getPlayer(receiverData.getBenefactor());
 
                     benefactor.playSound(benefactor.getLocation(), Sound.DONKEY_IDLE, 1.0f, 1.0f);
                     MessageUtil.messagePlayer(benefactor, "&aYour $" + receiverData.getBounty()
-                                                          + " bounty on " + receiver.getName() + " was claimed by " + damager.getName() + ".");
+                            + " bounty on " + receiver.getName() + " was claimed by " + damager.getName() + ".");
                 }
 
                 damager.playSound(damager.getLocation(), Sound.BLAZE_DEATH, 1.0f, 1.0f);
                 damager.playSound(damager.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
                 MessageUtil.messagePlayer(damager, "&eYou claimed the &a$" + receiverData.getBounty()
-                                                   + " &ebounty on &a" + receiver.getName() + "&e's head.");
+                        + " &ebounty on &a" + receiver.getName() + "&e's head.");
                 damagerData.setCoins(damagerData.getCoins() + receiverData.getBounty());
 
                 receiverData.removeBounty();
@@ -121,9 +123,9 @@ public class DeathListener implements Listener {
 
             // Prints kill messages to both the damager and receiver.
             MessageUtil.messagePlayer(receiver.getPlayer(), "&eYou were killed by &c" + damager.getName()
-                                                            + " &eon &6" + String.format("%.01f", damager.getHealth()) + "❤&e.");
+                    + " &eon &6" + String.format("%.01f", damager.getHealth()) + "❤&e.");
             MessageUtil.messagePlayer(damager, "&eYou killed &a" + receiver.getPlayer().getName()
-                                               + "&e for &a" + coinsGiven + " coins &eand &a" + experienceGiven + " exp&e.");
+                    + "&e for &a" + coinsGiven + " coins &eand &a" + experienceGiven + " exp&e.");
         } else {
             MessageUtil.messagePlayer(receiver, "&cYou killed yourself.");
         }
@@ -134,7 +136,7 @@ public class DeathListener implements Listener {
         // Sends all online players a killstreak message in chat.
         if (receiverData.getKillstreak() >= 5) {
             MessageUtil.broadcast("&a" + receiver.getPlayer().getName() + " &edied and lost their &a"
-                                  + receiverData.getKillstreak() + " &ekillstreak.");
+                    + receiverData.getKillstreak() + " &ekillstreak.");
         }
 
         // Removes the player's combat tag.
@@ -170,9 +172,9 @@ public class DeathListener implements Listener {
 
         // Removes enchantments from the player.
         if (receiverData.isFeatherFallingEnchant() || receiverData.isThornsEnchant()
-            || receiverData.isProtectionEnchant() || receiverData.isKnockbackEnchant()
-            || receiverData.isSharpnessEnchant() || receiverData.isPunchEnchant()
-            || receiverData.isPowerEnchant()) {
+                || receiverData.isProtectionEnchant() || receiverData.isKnockbackEnchant()
+                || receiverData.isSharpnessEnchant() || receiverData.isPunchEnchant()
+                || receiverData.isPowerEnchant()) {
             MessageUtil.messagePlayer(receiver, "&cYour enchantments were removed on death.");
             receiverData.setFeatherFallingEnchant(false);
             receiverData.setThornsEnchant(false);

@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.util;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.KitPvP;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,15 +15,15 @@ import java.util.logging.Level;
  */
 public final class MessageUtil {
 
-    public static void messagePlayer(CommandSender sender, String message) {
+    public static void messagePlayer(@NonNull CommandSender sender, @NonNull String message) {
         sender.sendMessage(colorize(message));
     }
 
-    public static void log(Level level, String message) {
+    public static void log(@NonNull Level level, @NonNull String message) {
         Bukkit.getLogger().log(level, "[" + KitPvP.pluginName + "] " + message);
     }
 
-    public static void broadcast(String message) {
+    public static void broadcast(@NonNull String message) {
         for (Player online : Bukkit.getOnlinePlayers()) {
             messagePlayer(online, message);
         }
@@ -30,7 +31,7 @@ public final class MessageUtil {
         messagePlayer(Bukkit.getConsoleSender(), message);
     }
 
-    public static void broadcastWithPerm(String message, String permission) {
+    public static void broadcastWithPerm(@NonNull String message, @NonNull String permission) {
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online.hasPermission(permission)) {
                 messagePlayer(online, message);
@@ -40,11 +41,11 @@ public final class MessageUtil {
         messagePlayer(Bukkit.getConsoleSender(), message);
     }
 
-    public static String colorize(String message) {
+    public static String colorize(@NonNull String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
-    public static String stripColor(String message) {
+    public static String stripColor(@NonNull String message) {
         return ChatColor.stripColor(message);
     }
 }

@@ -1,7 +1,9 @@
 package net.foulest.kitpvp.listeners;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,11 +23,11 @@ public class CombatLog {
     private static final Map<Player, Integer> combatHandler = new HashMap<>();
     private static final Map<Player, Player> lastAttacker = new HashMap<>();
 
-    public static void markForCombat(Player damager, Player receiver) {
+    public static void markForCombat(@NonNull Player damager, @NonNull Player receiver) {
         List<Player> players = new ArrayList<>(Arrays.asList(damager, receiver));
 
         for (Player player : players) {
-            PlayerData playerData = PlayerData.getInstance(player);
+            PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             // Handles combat tagging for the receiver.
             if (!isInCombat(player)) {
@@ -59,19 +61,19 @@ public class CombatLog {
         lastAttacker.put(receiver, damager);
     }
 
-    public static boolean isInCombat(Player player) {
+    public static boolean isInCombat(@NonNull Player player) {
         return combatHandler.containsKey(player);
     }
 
-    public static int getRemainingTime(Player player) {
+    public static int getRemainingTime(@NonNull Player player) {
         return !isInCombat(player) ? -1 : combatHandler.get(player);
     }
 
-    public static Player getLastAttacker(Player player) {
+    public static Player getLastAttacker(@NonNull Player player) {
         return lastAttacker.get(player);
     }
 
-    public static void remove(Player player) {
+    public static void remove(@NonNull Player player) {
         combatHandler.remove(player);
 
         if (combatScheduler.containsKey(player)) {

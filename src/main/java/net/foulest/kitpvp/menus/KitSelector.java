@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.menus;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.kits.Kit;
@@ -25,7 +27,7 @@ public class KitSelector {
     private static final Map<Player, Integer> pages = new HashMap<>();
     private final Inventory inventory;
 
-    public KitSelector(Player player) {
+    public KitSelector(@NonNull Player player) {
         inventory = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName);
 
         populateInventory(player, 0);
@@ -34,7 +36,7 @@ public class KitSelector {
         pages.put(player, 0);
     }
 
-    public KitSelector(Player player, int page) {
+    public KitSelector(@NonNull Player player, int page) {
         inventory = Bukkit.createInventory(player, ensureSize(KitManager.kits.size()) + 18, inventoryName + " - Page: " + (page + 1));
 
         populateInventory(player, page);
@@ -43,7 +45,7 @@ public class KitSelector {
         pages.put(player, page);
     }
 
-    public static int getPage(Player player) {
+    public static int getPage(@NonNull Player player) {
         return pages.get(player);
     }
 
@@ -62,7 +64,6 @@ public class KitSelector {
         if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
-
         return ensureSize(++size);
     }
 
@@ -87,8 +88,8 @@ public class KitSelector {
     /**
      * Populates the GUI's inventory.
      */
-    private void populateInventory(Player player, int page) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    private void populateInventory(@NonNull Player player, int page) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
         int rowSize = 9;
 
@@ -112,8 +113,7 @@ public class KitSelector {
             if (!futureCheck.isEmpty()) {
                 inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
             }
-        } catch (IllegalArgumentException ex) {
-            // ignored
+        } catch (IllegalArgumentException ignored) {
         }
 
         // Sort kits alphabetically using the kits.getName() function

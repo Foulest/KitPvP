@@ -1,6 +1,6 @@
 package net.foulest.kitpvp.util.command;
 
-import org.apache.commons.lang.Validate;
+import lombok.NonNull;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author minnymin3
  * @project KitPvP
  * <p>
- * https://github.com/mcardy/CommandFramework
+ * <a href="https://github.com/mcardy/CommandFramework">...</a>
  */
 public class BukkitCommand extends org.bukkit.command.Command {
 
@@ -20,7 +20,7 @@ public class BukkitCommand extends org.bukkit.command.Command {
     private final CommandExecutor executor;
     protected BukkitCompleter completer;
 
-    protected BukkitCommand(String label, CommandExecutor executor, Plugin owner) {
+    protected BukkitCommand(@NonNull String label, @NonNull CommandExecutor executor, @NonNull Plugin owner) {
         super(label);
         this.executor = executor;
         owningPlugin = owner;
@@ -28,7 +28,7 @@ public class BukkitCommand extends org.bukkit.command.Command {
     }
 
     @Override
-    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+    public boolean execute(@NonNull CommandSender sender, @NonNull String commandLabel, @NonNull String[] args) {
         boolean success;
 
         if (!owningPlugin.isEnabled()) {
@@ -41,21 +41,16 @@ public class BukkitCommand extends org.bukkit.command.Command {
 
         success = executor.onCommand(sender, this, commandLabel, args);
 
-        if (!success && usageMessage.length() > 0) {
+        if (!success && !usageMessage.isEmpty()) {
             for (String line : usageMessage.replace("<command>", commandLabel).split("\n")) {
                 sender.sendMessage(line);
             }
         }
-
         return success;
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        Validate.notNull(sender, "Sender cannot be null.");
-        Validate.notNull(args, "Arguments cannot be null.");
-        Validate.notNull(alias, "Alias cannot be null.");
-
+    public List<String> tabComplete(@NonNull CommandSender sender, @NonNull String alias, @NonNull String[] args) {
         List<String> completions = null;
 
         if (completer != null) {
@@ -69,7 +64,6 @@ public class BukkitCommand extends org.bukkit.command.Command {
         if (completions == null) {
             return super.tabComplete(sender, alias, args);
         }
-
         return completions;
     }
 }

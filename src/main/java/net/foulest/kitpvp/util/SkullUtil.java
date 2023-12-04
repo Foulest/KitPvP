@@ -2,6 +2,7 @@ package net.foulest.kitpvp.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,51 +41,42 @@ public final class SkullUtil {
     }
 
     @Deprecated
-    public static ItemStack itemFromName(String name) {
+    public static ItemStack itemFromName(@NonNull String name) {
         return itemWithName(createSkull(), name);
     }
 
-    public static ItemStack itemFromUuid(UUID id) {
+    public static ItemStack itemFromUuid(@NonNull UUID id) {
         return itemWithUuid(createSkull(), id);
     }
 
-    public static ItemStack itemFromUrl(String url) {
+    public static ItemStack itemFromUrl(@NonNull String url) {
         return itemWithUrl(createSkull(), url);
     }
 
-    public static ItemStack itemFromBase64(String base64) {
+    public static ItemStack itemFromBase64(@NonNull String base64) {
         return itemWithBase64(createSkull(), base64);
     }
 
     @Deprecated
-    public static ItemStack itemWithName(ItemStack item, String name) {
-        notNull(item, "item");
-        notNull(name, "name");
+    public static ItemStack itemWithName(@NonNull ItemStack item, @NonNull String name) {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner(name);
         item.setItemMeta(meta);
         return item;
     }
 
-    public static ItemStack itemWithUuid(ItemStack item, UUID id) {
-        notNull(item, "item");
-        notNull(id, "id");
+    public static ItemStack itemWithUuid(@NonNull ItemStack item, @NonNull UUID id) {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner(Bukkit.getOfflinePlayer(id).getName());
         item.setItemMeta(meta);
         return item;
     }
 
-    public static ItemStack itemWithUrl(ItemStack item, String url) {
-        notNull(item, "item");
-        notNull(url, "url");
+    public static ItemStack itemWithUrl(@NonNull ItemStack item, @NonNull String url) {
         return itemWithBase64(item, urlToBase64(url));
     }
 
-    public static ItemStack itemWithBase64(ItemStack item, String base64) {
-        notNull(item, "item");
-        notNull(base64, "base64");
-
+    public static ItemStack itemWithBase64(@NonNull ItemStack item, @NonNull String base64) {
         if (item.getItemMeta() instanceof SkullMeta) {
             SkullMeta meta = (SkullMeta) item.getItemMeta();
             mutateItemMeta(meta, base64);
@@ -97,33 +88,24 @@ public final class SkullUtil {
     }
 
     @Deprecated
-    public static void blockWithName(Block block, String name) {
-        notNull(block, "block");
-        notNull(name, "name");
+    public static void blockWithName(@NonNull Block block, @NonNull String name) {
         Skull state = (Skull) block.getState();
         state.setOwner(name);
         state.update(false, false);
     }
 
-    public static void blockWithUuid(Block block, UUID id) {
-        notNull(block, "block");
-        notNull(id, "id");
+    public static void blockWithUuid(@NonNull Block block, @NonNull UUID id) {
         setToSkull(block);
-
         Skull state = (Skull) block.getState();
         state.setOwner(Bukkit.getOfflinePlayer(id).getName());
         state.update(false, false);
     }
 
-    public static void blockWithUrl(Block block, String url) {
-        notNull(block, "block");
-        notNull(url, "url");
+    public static void blockWithUrl(@NonNull Block block, @NonNull String url) {
         blockWithBase64(block, urlToBase64(url));
     }
 
-    public static void blockWithBase64(Block block, String base64) {
-        notNull(block, "block");
-        notNull(base64, "base64");
+    public static void blockWithBase64(@NonNull Block block, @NonNull String base64) {
         setToSkull(block);
         BlockState state = block.getState();
 
@@ -136,7 +118,7 @@ public final class SkullUtil {
         }
     }
 
-    private static void setToSkull(Block block) {
+    private static void setToSkull(@NonNull Block block) {
         try {
             block.setType(Material.valueOf("PLAYER_HEAD"), false);
         } catch (IllegalArgumentException var3) {
@@ -147,13 +129,7 @@ public final class SkullUtil {
         }
     }
 
-    private static void notNull(Object obj, String name) {
-        if (obj == null) {
-            throw new NullPointerException(name + " should not be null!");
-        }
-    }
-
-    private static String urlToBase64(String url) {
+    private static String urlToBase64(@NonNull String url) {
         URI actualUrl;
 
         try {
@@ -166,14 +142,15 @@ public final class SkullUtil {
         return Base64.getEncoder().encodeToString(toEncode.getBytes());
     }
 
-    private static GameProfile makeProfile(String b64) {
-        UUID id = new UUID(b64.substring(b64.length() - 20).hashCode(), b64.substring(b64.length() - 10).hashCode());
+    private static GameProfile makeProfile(@NonNull String b64) {
+        UUID id = new UUID(b64.substring(b64.length() - 20).hashCode(),
+                b64.substring(b64.length() - 10).hashCode());
         GameProfile profile = new GameProfile(id, "aaaaa");
         profile.getProperties().put("textures", new Property("textures", b64));
         return profile;
     }
 
-    private static void mutateBlockState(Skull block, String b64) {
+    private static void mutateBlockState(@NonNull Skull block, @NonNull String b64) {
         try {
             if (blockProfileField == null) {
                 blockProfileField = block.getClass().getDeclaredField("profile");
@@ -181,14 +158,13 @@ public final class SkullUtil {
             }
 
             blockProfileField.set(block, makeProfile(b64));
-
         } catch (ReflectiveOperationException ex) {
             MessageUtil.log(Level.WARNING, "Failed to set block texture!");
             ex.printStackTrace();
         }
     }
 
-    private static void mutateItemMeta(SkullMeta meta, String b64) {
+    private static void mutateItemMeta(@NonNull SkullMeta meta, @NonNull String b64) {
         try {
             if (metaSetProfileMethod == null) {
                 metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
@@ -197,7 +173,7 @@ public final class SkullUtil {
 
             metaSetProfileMethod.invoke(meta, makeProfile(b64));
 
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException ignored) {
             try {
                 if (metaProfileField == null) {
                     metaProfileField = meta.getClass().getDeclaredField("profile");

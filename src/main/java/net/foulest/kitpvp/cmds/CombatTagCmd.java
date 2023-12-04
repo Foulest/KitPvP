@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.listeners.CombatLog;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -17,7 +18,7 @@ public class CombatTagCmd {
     @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
             description = "Displays your current combat tag timer.",
             permission = "kitpvp.combattag", usage = "/combatlog", inGameOnly = true)
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         Player player = args.getPlayer();
 
         if (CombatLog.isInCombat(player)) {

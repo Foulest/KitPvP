@@ -7,7 +7,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import lombok.Getter;
+import lombok.NonNull;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -24,7 +24,6 @@ import java.util.logging.Level;
  * <p>
  * Handles regions
  */
-@Getter
 public class Regions {
 
     private static final WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
@@ -42,7 +41,7 @@ public class Regions {
         regionMap = regionManager.getRegions();
     }
 
-    public static boolean isInSafezone(Location loc) {
+    public static boolean isInSafezone(@NonNull Location loc) {
         for (Map.Entry<String, ProtectedRegion> regions : regionMap.entrySet()) {
             ProtectedRegion region = regions.getValue();
             BlockVector regionMin = region.getMinimumPoint();
@@ -56,7 +55,6 @@ public class Regions {
                 return true;
             }
         }
-
         return false;
     }
 }

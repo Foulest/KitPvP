@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -15,7 +16,7 @@ public class KitEnchanterCmd {
 
     @Command(name = "enchanter", aliases = {"kitenchanter"}, description = "Opens the Kit Enchanter.",
             usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         if (args.length() != 0) {
             MessageUtil.messagePlayer(args.getSender(), "&cUsage: /enchanter");
             return;

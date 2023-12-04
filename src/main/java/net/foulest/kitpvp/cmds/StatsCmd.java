@@ -1,6 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -19,7 +21,7 @@ public class StatsCmd {
 
     @Command(name = "stats", description = "Shows a player's statistics.",
             usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         Player player;
         Player sender = args.getPlayer();
         PlayerData playerData;
@@ -30,7 +32,7 @@ public class StatsCmd {
         }
 
         if (args.length() == 0) {
-            playerData = PlayerData.getInstance(sender);
+            playerData = PlayerDataManager.getPlayerData(sender);
 
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &a&lYour Stats");
@@ -57,7 +59,7 @@ public class StatsCmd {
                 return;
             }
 
-            playerData = PlayerData.getInstance(player);
+            playerData = PlayerDataManager.getPlayerData(player);
 
             MessageUtil.messagePlayer(sender, "");
             MessageUtil.messagePlayer(sender, " &a&l" + player.getName() + " Stats");

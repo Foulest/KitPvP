@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.util.command;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -21,18 +22,19 @@ public class BukkitCompleter implements TabCompleter {
 
     private final Map<String, Entry<Method, Object>> completers = new HashMap<>();
 
-    public void addCompleter(String label, Method m, Object obj) {
-        completers.put(label, new AbstractMap.SimpleEntry<>(m, obj));
+    public void addCompleter(@NonNull String label, @NonNull Method method, @NonNull Object obj) {
+        completers.put(label, new AbstractMap.SimpleEntry<>(method, obj));
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command,
+                                      @NonNull String label, @NonNull String[] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
             buffer.append(label.toLowerCase());
 
             for (int x = 0; x < i; x++) {
-                if (!("").equals(args[x]) && !(" ").equals(args[x])) {
+                if (!args[x].isEmpty() && !(" ").equals(args[x])) {
                     buffer.append(".").append(args[x].toLowerCase());
                 }
             }
@@ -46,13 +48,12 @@ public class BukkitCompleter implements TabCompleter {
                     return (List<String>) entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
-                    MessageUtil.log(Level.WARNING,"Could not tab complete " + entry.getKey().getName() + " for " + entry
+                    MessageUtil.log(Level.WARNING, "Could not tab complete " + entry.getKey().getName() + " for " + entry
                             .getValue().getClass().getName());
                     ex.printStackTrace();
                 }
             }
         }
-
         return Collections.emptyList();
     }
 }

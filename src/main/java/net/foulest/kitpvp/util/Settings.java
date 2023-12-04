@@ -130,149 +130,23 @@ public class Settings {
     public static String database;
     public static int port;
 
+    /**
+     * Initialize and set up default configuration values.
+     */
     public static void setupSettings() {
-        file = new File(KitPvP.instance.getDataFolder(), "settings.yml");
-
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                MessageUtil.log(Level.WARNING, "Failed to create settings.yml file.");
-                ex.printStackTrace();
-                return;
-            }
-        }
-
-        config = YamlConfiguration.loadConfiguration(file);
-
-        config.addDefault("spawn.world", "world");
-        config.addDefault("spawn.x", 0.5);
-        config.addDefault("spawn.y", 64.0);
-        config.addDefault("spawn.z", 0.5);
-        config.addDefault("spawn.yaw", 90.0);
-        config.addDefault("spawn.pitch", 0.0);
-
-        config.addDefault("kill.coins-on-kill", 10);
-        config.addDefault("kill.exp-on-kill", 15);
-
-        config.addDefault("killstreaks.enabled", true);
-        config.addDefault("killstreaks.coins-bonus", 5);
-        config.addDefault("killstreaks.exp-bonus", 10);
-
-        config.addDefault("kits.starting-coins", 500);
-
-        config.addDefault("kits.archer.enabled", true);
-        config.addDefault("kits.archer.premium-only", false);
-        config.addDefault("kits.archer.cost", 250);
-
-        config.addDefault("kits.burrower.enabled", true);
-        config.addDefault("kits.burrower.premium-only", false);
-        config.addDefault("kits.burrower.cost", 250);
-
-        config.addDefault("kits.cactus.enabled", true);
-        config.addDefault("kits.cactus.premium-only", false);
-        config.addDefault("kits.cactus.cost", 250);
-
-        config.addDefault("kits.dragon.enabled", true);
-        config.addDefault("kits.dragon.premium-only", false);
-        config.addDefault("kits.dragon.cost", 250);
-
-        config.addDefault("kits.fisherman.enabled", true);
-        config.addDefault("kits.fisherman.premium-only", false);
-        config.addDefault("kits.fisherman.cost", 250);
-
-        config.addDefault("kits.ghost.enabled", true);
-        config.addDefault("kits.ghost.premium-only", false);
-        config.addDefault("kits.ghost.cost", 250);
-
-        config.addDefault("kits.hulk.enabled", true);
-        config.addDefault("kits.hulk.premium-only", false);
-        config.addDefault("kits.hulk.cost", 250);
-
-        config.addDefault("kits.imprisoner.enabled", true);
-        config.addDefault("kits.imprisoner.premium-only", false);
-        config.addDefault("kits.imprisoner.cost", 250);
-
-        config.addDefault("kits.kangaroo.enabled", true);
-        config.addDefault("kits.kangaroo.premium-only", false);
-        config.addDefault("kits.kangaroo.cost", 250);
-
-        config.addDefault("kits.knight.enabled", true);
-        config.addDefault("kits.knight.premium-only", false);
-        config.addDefault("kits.knight.cost", 0);
-
-        config.addDefault("kits.mage.enabled", true);
-        config.addDefault("kits.mage.premium-only", false);
-        config.addDefault("kits.mage.cost", 250);
-
-        config.addDefault("kits.monk.enabled", true);
-        config.addDefault("kits.monk.premium-only", false);
-        config.addDefault("kits.monk.cost", 250);
-
-        config.addDefault("kits.ninja.enabled", true);
-        config.addDefault("kits.ninja.premium-only", false);
-        config.addDefault("kits.ninja.cost", 250);
-
-        config.addDefault("kits.pyro.enabled", true);
-        config.addDefault("kits.pyro.premium-only", false);
-        config.addDefault("kits.pyro.cost", 250);
-
-        config.addDefault("kits.spiderman.enabled", true);
-        config.addDefault("kits.spiderman.premium-only", false);
-        config.addDefault("kits.spiderman.cost", 250);
-
-        config.addDefault("kits.summoner.enabled", true);
-        config.addDefault("kits.summoner.premium-only", false);
-        config.addDefault("kits.summoner.cost", 250);
-
-        config.addDefault("kits.tamer.enabled", true);
-        config.addDefault("kits.tamer.premium-only", false);
-        config.addDefault("kits.tamer.cost", 250);
-
-        config.addDefault("kits.tank.enabled", true);
-        config.addDefault("kits.tank.premium-only", false);
-        config.addDefault("kits.tank.cost", 250);
-
-        config.addDefault("kits.thor.enabled", true);
-        config.addDefault("kits.thor.premium-only", false);
-        config.addDefault("kits.thor.cost", 250);
-
-        config.addDefault("kits.timelord.enabled", true);
-        config.addDefault("kits.timelord.premium-only", false);
-        config.addDefault("kits.timelord.cost", 250);
-
-        config.addDefault("kits.vampire.enabled", true);
-        config.addDefault("kits.vampire.premium-only", false);
-        config.addDefault("kits.vampire.cost", 250);
-
-        config.addDefault("kits.zen.enabled", true);
-        config.addDefault("kits.zen.premium-only", false);
-        config.addDefault("kits.zen.cost", 250);
-
-        config.addDefault("premium.enabled", true);
-        config.addDefault("premium.rank-name", "Premium");
-        config.addDefault("premium.permission", "kitpvp.premium");
-        config.addDefault("premium.store-link", "store.kitpvp.io");
-        config.addDefault("premium.non-premium-kit-limit", 10);
-        config.addDefault("premium.bounties-premium-only", true);
-
-        config.addDefault("storage.host", "host");
-        config.addDefault("storage.user", "user");
-        config.addDefault("storage.password", "password");
-        config.addDefault("storage.database", "database");
-        config.addDefault("storage.port", 3306);
-
-        config.options().copyDefaults(true);
-
-        try {
-            config.save(file);
-        } catch (IOException ex) {
-            MessageUtil.log(Level.WARNING, "Couldn't save the config file.");
-        }
+        initConfig();
+        setDefaultConfigValues();
+        saveConfig();
     }
 
+    /**
+     * Loads configuration values into the relevant static fields.
+     */
     public static void loadSettings() {
+        if (!file.exists()) {
+            setupSettings();
+        }
+
         config = YamlConfiguration.loadConfiguration(file);
 
         spawnWorld = config.getString("spawn.world");
@@ -393,6 +267,9 @@ public class Settings {
         port = config.getInt("storage.port");
     }
 
+    /**
+     * Saves the current settings into the configuration file.
+     */
     public static void saveSettings() {
         config.set("spawn.world", spawnWorld);
         config.set("spawn.x", spawnX);
@@ -511,6 +388,156 @@ public class Settings {
         config.set("storage.database", database);
         config.set("storage.port", port);
 
+        saveConfig();
+    }
+
+    /**
+     * Initializes the configuration file.
+     */
+    private static void initConfig() {
+        file = new File(KitPvP.instance.getDataFolder(), "settings.yml");
+
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (IOException ex) {
+                MessageUtil.log(Level.WARNING, "Couldn't create the config file.");
+                ex.printStackTrace();
+            }
+        }
+
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
+    /**
+     * Sets the default values for the configuration file.
+     */
+    private static void setDefaultConfigValues() {
+        config.addDefault("spawn.world", "world");
+        config.addDefault("spawn.x", 0.5);
+        config.addDefault("spawn.y", 64.0);
+        config.addDefault("spawn.z", 0.5);
+        config.addDefault("spawn.yaw", 90.0);
+        config.addDefault("spawn.pitch", 0.0);
+
+        config.addDefault("kill.coins-on-kill", 10);
+        config.addDefault("kill.exp-on-kill", 15);
+
+        config.addDefault("killstreaks.enabled", true);
+        config.addDefault("killstreaks.coins-bonus", 5);
+        config.addDefault("killstreaks.exp-bonus", 10);
+
+        config.addDefault("kits.starting-coins", 500);
+
+        config.addDefault("kits.archer.enabled", true);
+        config.addDefault("kits.archer.premium-only", false);
+        config.addDefault("kits.archer.cost", 250);
+
+        config.addDefault("kits.burrower.enabled", true);
+        config.addDefault("kits.burrower.premium-only", false);
+        config.addDefault("kits.burrower.cost", 250);
+
+        config.addDefault("kits.cactus.enabled", true);
+        config.addDefault("kits.cactus.premium-only", false);
+        config.addDefault("kits.cactus.cost", 250);
+
+        config.addDefault("kits.dragon.enabled", true);
+        config.addDefault("kits.dragon.premium-only", false);
+        config.addDefault("kits.dragon.cost", 250);
+
+        config.addDefault("kits.fisherman.enabled", true);
+        config.addDefault("kits.fisherman.premium-only", false);
+        config.addDefault("kits.fisherman.cost", 250);
+
+        config.addDefault("kits.ghost.enabled", true);
+        config.addDefault("kits.ghost.premium-only", false);
+        config.addDefault("kits.ghost.cost", 250);
+
+        config.addDefault("kits.hulk.enabled", true);
+        config.addDefault("kits.hulk.premium-only", false);
+        config.addDefault("kits.hulk.cost", 250);
+
+        config.addDefault("kits.imprisoner.enabled", true);
+        config.addDefault("kits.imprisoner.premium-only", false);
+        config.addDefault("kits.imprisoner.cost", 250);
+
+        config.addDefault("kits.kangaroo.enabled", true);
+        config.addDefault("kits.kangaroo.premium-only", false);
+        config.addDefault("kits.kangaroo.cost", 250);
+
+        config.addDefault("kits.knight.enabled", true);
+        config.addDefault("kits.knight.premium-only", false);
+        config.addDefault("kits.knight.cost", 0);
+
+        config.addDefault("kits.mage.enabled", true);
+        config.addDefault("kits.mage.premium-only", false);
+        config.addDefault("kits.mage.cost", 250);
+
+        config.addDefault("kits.monk.enabled", true);
+        config.addDefault("kits.monk.premium-only", false);
+        config.addDefault("kits.monk.cost", 250);
+
+        config.addDefault("kits.ninja.enabled", true);
+        config.addDefault("kits.ninja.premium-only", false);
+        config.addDefault("kits.ninja.cost", 250);
+
+        config.addDefault("kits.pyro.enabled", true);
+        config.addDefault("kits.pyro.premium-only", false);
+        config.addDefault("kits.pyro.cost", 250);
+
+        config.addDefault("kits.spiderman.enabled", true);
+        config.addDefault("kits.spiderman.premium-only", false);
+        config.addDefault("kits.spiderman.cost", 250);
+
+        config.addDefault("kits.summoner.enabled", true);
+        config.addDefault("kits.summoner.premium-only", false);
+        config.addDefault("kits.summoner.cost", 250);
+
+        config.addDefault("kits.tamer.enabled", true);
+        config.addDefault("kits.tamer.premium-only", false);
+        config.addDefault("kits.tamer.cost", 250);
+
+        config.addDefault("kits.tank.enabled", true);
+        config.addDefault("kits.tank.premium-only", false);
+        config.addDefault("kits.tank.cost", 250);
+
+        config.addDefault("kits.thor.enabled", true);
+        config.addDefault("kits.thor.premium-only", false);
+        config.addDefault("kits.thor.cost", 250);
+
+        config.addDefault("kits.timelord.enabled", true);
+        config.addDefault("kits.timelord.premium-only", false);
+        config.addDefault("kits.timelord.cost", 250);
+
+        config.addDefault("kits.vampire.enabled", true);
+        config.addDefault("kits.vampire.premium-only", false);
+        config.addDefault("kits.vampire.cost", 250);
+
+        config.addDefault("kits.zen.enabled", true);
+        config.addDefault("kits.zen.premium-only", false);
+        config.addDefault("kits.zen.cost", 250);
+
+        config.addDefault("premium.enabled", true);
+        config.addDefault("premium.rank-name", "Premium");
+        config.addDefault("premium.permission", "kitpvp.premium");
+        config.addDefault("premium.store-link", "store.kitpvp.io");
+        config.addDefault("premium.non-premium-kit-limit", 10);
+        config.addDefault("premium.bounties-premium-only", true);
+
+        config.addDefault("storage.host", "host");
+        config.addDefault("storage.user", "user");
+        config.addDefault("storage.password", "password");
+        config.addDefault("storage.database", "database");
+        config.addDefault("storage.port", 3306);
+
+        config.options().copyDefaults(true);
+    }
+
+    /**
+     * Saves the configuration file.
+     */
+    private static void saveConfig() {
         try {
             config.save(file);
         } catch (IOException ex) {

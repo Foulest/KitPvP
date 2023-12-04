@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.util.command;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
@@ -34,7 +35,7 @@ public class CommandFramework implements CommandExecutor {
     /**
      * Initializes the command framework and sets up the command maps
      */
-    public CommandFramework(Plugin plugin) {
+    public CommandFramework(@NonNull Plugin plugin) {
         this.plugin = plugin;
 
         if (plugin.getServer().getPluginManager() instanceof SimplePluginManager) {
@@ -51,12 +52,13 @@ public class CommandFramework implements CommandExecutor {
         }
     }
 
-    private static void defaultCommand(CommandArgs args) {
+    private static void defaultCommand(@NonNull CommandArgs args) {
         args.getSender().sendMessage(args.getLabel() + " is disabled on this server.");
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
+    public boolean onCommand(@NonNull CommandSender sender, @NonNull org.bukkit.command.Command cmd,
+                             @NonNull String label, @NonNull String[] args) {
         handleCommand(sender, cmd, label, args);
         return true;
     }
@@ -69,7 +71,8 @@ public class CommandFramework implements CommandExecutor {
      * @param label  The label parsed from onCommand
      * @param args   The arguments parsed from onCommand
      */
-    public void handleCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
+    public void handleCommand(@NonNull CommandSender sender, @NonNull org.bukkit.command.Command cmd,
+                              @NonNull String label, @NonNull String[] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
             buffer.append(label.toLowerCase());
@@ -86,7 +89,7 @@ public class CommandFramework implements CommandExecutor {
                 Command command = method.getAnnotation(Command.class);
 
                 if (!("").equals(command.permission()) && !sender.hasPermission(command.permission())) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, command.noPermission());
                     return;
                 }
 
@@ -117,7 +120,7 @@ public class CommandFramework implements CommandExecutor {
      *
      * @param obj The object to register the commands of
      */
-    public void registerCommands(Object obj) {
+    public void registerCommands(@NonNull Object obj) {
         for (Method method : obj.getClass().getMethods()) {
             if (method.getAnnotation(Command.class) != null) {
                 Command command = method.getAnnotation(Command.class);
@@ -128,6 +131,7 @@ public class CommandFramework implements CommandExecutor {
                 }
 
                 registerCommand(command, command.name(), method, obj);
+
                 for (String alias : command.aliases()) {
                     registerCommand(command, alias, method, obj);
                 }
@@ -154,9 +158,10 @@ public class CommandFramework implements CommandExecutor {
         }
     }
 
-    public void registerCommand(Command command, String label, Method m, Object obj) {
-        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
-        commandMap.put(plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
+    public void registerCommand(@NonNull Command command, @NonNull String label,
+                                @NonNull Method method, @NonNull Object obj) {
+        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(method, obj));
+        commandMap.put(plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<>(method, obj));
 
         String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
 
@@ -174,7 +179,7 @@ public class CommandFramework implements CommandExecutor {
         }
     }
 
-    public void registerCompleter(String label, Method method, Object obj) {
+    public void registerCompleter(@NonNull String label, @NonNull Method method, @NonNull Object obj) {
         String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
 
         if (map.getCommand(cmdLabel) == null) {

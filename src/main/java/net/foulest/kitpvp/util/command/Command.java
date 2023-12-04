@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * @author minnymin3
  * @project KitPvP
  * <p>
- * https://github.com/mcardy/CommandFramework
+ * <a href="https://github.com/mcardy/CommandFramework">...</a>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

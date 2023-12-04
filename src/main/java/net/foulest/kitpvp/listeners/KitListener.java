@@ -1,7 +1,9 @@
 package net.foulest.kitpvp.listeners;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.*;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -42,14 +44,14 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onBurrowerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Location> roomLocations = getRoomLocations(player.getLocation());
 
         if (playerData.getKit() instanceof Burrower
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.BRICK
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.BRICK
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Location loc : roomLocations) {
                 if (loc.getBlock().getType() != Material.AIR) {
@@ -90,14 +92,14 @@ public class KitListener implements Listener {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
             Player damager = (Player) event.getDamager();
             Player receiver = (Player) event.getEntity();
-            PlayerData damagerData = PlayerData.getInstance(damager);
-            PlayerData receiverData = PlayerData.getInstance(receiver);
+            PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
+            PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
             if (damagerData.getKit() instanceof Cactus
-                && receiverData.getKit() != null
-                && !Regions.isInSafezone(damager.getLocation())
-                && !Regions.isInSafezone(receiver.getLocation())
-                && damager.getItemInHand().getType() == Material.CACTUS) {
+                    && receiverData.getKit() != null
+                    && !Regions.isInSafezone(damager.getLocation())
+                    && !Regions.isInSafezone(receiver.getLocation())
+                    && damager.getItemInHand().getType() == Material.CACTUS) {
 
                 receiver.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 80, 0, false, false));
             }
@@ -107,13 +109,13 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onDragonAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Dragon
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.FIREBALL
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.FIREBALL
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
             player.playEffect(player.getEyeLocation(), Effect.MOBSPAWNER_FLAMES, 1);
@@ -122,10 +124,10 @@ public class KitListener implements Listener {
             for (Entity entity : player.getNearbyEntities(5, 3, 5)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
                     Player receiver = (Player) entity;
-                    PlayerData receiverData = PlayerData.getInstance(receiver);
+                    PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
                     if (player.hasLineOfSight(entity) && receiverData.getKit() != null
-                        && !Regions.isInSafezone(receiver.getLocation())) {
+                            && !Regions.isInSafezone(receiver.getLocation())) {
                         receiver.damage(8, player);
                         receiver.setFireTicks(150);
                     }
@@ -140,18 +142,18 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onFishermanAbility(PlayerFishEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (event.getCaught() instanceof Player) {
             Player receiver = (Player) event.getCaught();
-            PlayerData receiverData = PlayerData.getInstance(receiver);
+            PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
             CombatLog.markForCombat(player, receiver);
 
             if (playerData.getKit() instanceof Fisherman
-                && event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY)
-                && !playerData.hasCooldown(true)
-                && !Regions.isInSafezone(player.getLocation())) {
+                    && event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY)
+                    && !playerData.hasCooldown(true)
+                    && !Regions.isInSafezone(player.getLocation())) {
 
                 if (receiverData.getKit() != null && !Regions.isInSafezone(receiver.getLocation())) {
                     MessageUtil.messagePlayer(player, "&aYour ability has been used.");
@@ -168,11 +170,11 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onGhostMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Ghost
-            && !player.isSneaking()
-            && !Regions.isInSafezone(player.getLocation())) {
+                && !player.isSneaking()
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(6, 3, 6)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -185,13 +187,13 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onTamerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Tamer
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.BONE
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.BONE
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
             playerData.setCooldown(playerData.getKit(), 30, true);
@@ -219,14 +221,14 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onHulkAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
 
         if (playerData.getKit() instanceof Hulk
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -247,7 +249,7 @@ public class KitListener implements Listener {
             player.getWorld().createExplosion(player.getLocation(), 0.0f, false);
 
             for (Player playerInList : playerList) {
-                PlayerData playerInListData = PlayerData.getInstance(playerInList);
+                PlayerData playerInListData = PlayerDataManager.getPlayerData(playerInList);
 
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     playerInList.damage(10, player);
@@ -267,13 +269,13 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onImprisonerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Imprisoner
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.DISPENSER
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.DISPENSER
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
             playerData.setCooldown(playerData.getKit(), 30, true);
@@ -288,17 +290,17 @@ public class KitListener implements Listener {
 
             if (snowball.getShooter() instanceof Player) {
                 Player damager = (Player) snowball.getShooter();
-                PlayerData damagerData = PlayerData.getInstance(damager);
+                PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
 
                 if (event.getEntity() instanceof Player) {
                     Player receiver = (Player) event.getEntity();
-                    PlayerData receiverData = PlayerData.getInstance(damager);
+                    PlayerData receiverData = PlayerDataManager.getPlayerData(damager);
 
                     if (damagerData.getKit() instanceof Imprisoner
-                        && snowball.hasMetadata("prison")
-                        && !imprisonedPlayers.containsKey(receiver.getUniqueId())
-                        && receiverData.getKit() != null
-                        && !Regions.isInSafezone(receiver.getLocation())) {
+                            && snowball.hasMetadata("prison")
+                            && !imprisonedPlayers.containsKey(receiver.getUniqueId())
+                            && receiverData.getKit() != null
+                            && !Regions.isInSafezone(receiver.getLocation())) {
 
                         List<Block> cageBlocks = getCageBlocks(receiver.getLocation().add(0.0, 9.0, 0.0));
                         for (Block cageBlock : cageBlocks) {
@@ -352,14 +354,14 @@ public class KitListener implements Listener {
     public static void onKangarooAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Entity entityPlayer = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Kangaroo
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.FIREWORK
-            && !playerData.hasCooldown(true)
-            && entityPlayer.isOnGround()
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.FIREWORK
+                && !playerData.hasCooldown(true)
+                && entityPlayer.isOnGround()
+                && !Regions.isInSafezone(player.getLocation())) {
 
             Vector direction = player.getEyeLocation().getDirection();
 
@@ -379,13 +381,13 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onMageAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Mage
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.GLOWSTONE_DUST
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.GLOWSTONE_DUST
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             if (drainedEffects.containsKey(player.getUniqueId())) {
                 MessageUtil.messagePlayer(player, "&cAbility failed; your effects are still drained.");
@@ -397,9 +399,9 @@ public class KitListener implements Listener {
             int duration = Math.max(5, (RANDOM.nextInt(30) + 1)) * 20;
 
             if (PotionEffectType.getById(effect) == null
-                || PotionEffectType.getById(effect).getName() == null
-                || PotionEffectType.getById(effect).getName().equals("HUNGER")
-                || PotionEffectType.getById(effect).getName().equals("SATURATION")) {
+                    || PotionEffectType.getById(effect).getName() == null
+                    || PotionEffectType.getById(effect).getName().equals("HUNGER")
+                    || PotionEffectType.getById(effect).getName().equals("SATURATION")) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, amplifier, false, false));
             } else {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.getById(effect), duration, amplifier, false, false));
@@ -414,18 +416,18 @@ public class KitListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public static void onMonkAbility(PlayerInteractEntityEvent event) {
         Player damager = event.getPlayer();
-        PlayerData damagerData = PlayerData.getInstance(damager);
+        PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
 
         if (event.getRightClicked() instanceof Player) {
             Player receiver = (Player) event.getRightClicked();
-            PlayerData receiverData = PlayerData.getInstance(receiver);
+            PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
             if (damagerData.getKit() instanceof Monk
-                && damager.getItemInHand().getType() == Material.BLAZE_ROD
-                && !damagerData.hasCooldown(true)
-                && receiverData.getKit() != null
-                && !Regions.isInSafezone(damager.getLocation())
-                && !Regions.isInSafezone(receiver.getLocation())) {
+                    && damager.getItemInHand().getType() == Material.BLAZE_ROD
+                    && !damagerData.hasCooldown(true)
+                    && receiverData.getKit() != null
+                    && !Regions.isInSafezone(damager.getLocation())
+                    && !Regions.isInSafezone(receiver.getLocation())) {
 
                 int random = RANDOM.nextInt(9);
                 int heldItemSlot = receiver.getInventory().getHeldItemSlot();
@@ -445,13 +447,13 @@ public class KitListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public static void onSpidermanAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getKit() instanceof Spiderman
-            && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.WEB
-            && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && event.getAction().toString().contains("RIGHT")
+                && player.getItemInHand().getType() == Material.WEB
+                && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
             playerData.setCooldown(playerData.getKit(), 15, true);
@@ -467,8 +469,8 @@ public class KitListener implements Listener {
             if (snowball.getShooter() instanceof Player && event.getEntity() instanceof Player) {
                 Player damager = (Player) snowball.getShooter();
                 Player receiver = (Player) event.getEntity();
-                PlayerData damagerData = PlayerData.getInstance(damager);
-                PlayerData receiverData = PlayerData.getInstance(receiver);
+                PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
+                PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
                 if (damagerData.getKit() instanceof Spiderman) {
                     if (receiverData.getKit() == null || Regions.isInSafezone(receiver.getLocation())) {
@@ -526,12 +528,12 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onSummonerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
 
         if (playerData.getKit() instanceof Summoner && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.IRON_BLOCK && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && player.getItemInHand().getType() == Material.IRON_BLOCK && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(15, 5, 15)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -553,7 +555,7 @@ public class KitListener implements Listener {
             ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 50, false, false));
 
             for (Player playerInList : playerList) {
-                PlayerData playerInListData = PlayerData.getInstance(playerInList);
+                PlayerData playerInListData = PlayerDataManager.getPlayerData(playerInList);
 
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     ironGolem.setTarget(playerInList);
@@ -575,12 +577,12 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onThorAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
 
         if (playerData.getKit() instanceof Thor && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.IRON_AXE && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && player.getItemInHand().getType() == Material.IRON_AXE && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(6, 6, 6)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -596,7 +598,7 @@ public class KitListener implements Listener {
             }
 
             for (Player playerInList : playerList) {
-                PlayerData playerInListData = PlayerData.getInstance(playerInList);
+                PlayerData playerInListData = PlayerDataManager.getPlayerData(playerInList);
 
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     player.getWorld().strikeLightningEffect(playerInList.getLocation());
@@ -613,12 +615,12 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onTimelordAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
 
         if (playerData.getKit() instanceof Timelord && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.WATCH && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && player.getItemInHand().getType() == Material.WATCH && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(6, 6, 6)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
@@ -634,7 +636,7 @@ public class KitListener implements Listener {
             }
 
             for (Player playerInList : playerList) {
-                PlayerData playerInListData = PlayerData.getInstance(playerInList);
+                PlayerData playerInListData = PlayerDataManager.getPlayerData(playerInList);
 
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     playerInList.getWorld().playEffect(playerInList.getLocation(), Effect.STEP_SOUND, 152);
@@ -654,18 +656,18 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onVampireAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
         List<PotionEffect> playerEffects = new ArrayList<>();
 
         if (playerData.getKit() instanceof Vampire && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.REDSTONE && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && player.getItemInHand().getType() == Material.REDSTONE && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof Player && Bukkit.getOnlinePlayers().contains(entity)) {
                     Player nearby = (Player) entity;
-                    PlayerData nearbyData = PlayerData.getInstance(nearby);
+                    PlayerData nearbyData = PlayerDataManager.getPlayerData(nearby);
 
                     if (nearbyData.getKit() != null && !Regions.isInSafezone(nearby.getLocation())) {
                         playerList.add((Player) entity);
@@ -703,7 +705,7 @@ public class KitListener implements Listener {
                     }
                 }
 
-                PlayerData listPlayerData = PlayerData.getInstance(listPlayer);
+                PlayerData listPlayerData = PlayerDataManager.getPlayerData(listPlayer);
 
                 Kit currentKit = listPlayerData.getKit();
 
@@ -718,9 +720,9 @@ public class KitListener implements Listener {
                         }
 
                         if (listPlayer.isOnline() && drainedEffects.get(listPlayer.getUniqueId()) != null
-                            && !drainedEffects.get(listPlayer.getUniqueId()).isEmpty()
-                            && listPlayerData.getKit() != null && currentKit != null
-                            && currentKit == listPlayerData.getKit()) {
+                                && !drainedEffects.get(listPlayer.getUniqueId()).isEmpty()
+                                && listPlayerData.getKit() != null && currentKit != null
+                                && currentKit == listPlayerData.getKit()) {
                             if (drainedEffects.get(listPlayer.getUniqueId()) != null) {
                                 for (PotionEffect effect : drainedEffects.get(listPlayer.getUniqueId())) {
                                     listPlayer.addPotionEffect(effect);
@@ -746,11 +748,11 @@ public class KitListener implements Listener {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
             Player damager = (Player) event.getDamager();
             Player receiver = (Player) event.getEntity();
-            PlayerData damagerData = PlayerData.getInstance(damager);
-            PlayerData receiverData = PlayerData.getInstance(receiver);
+            PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
+            PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
 
             if (damagerData.getKit() instanceof Vampire && receiverData.getKit() != null
-                && !Regions.isInSafezone(damager.getLocation()) && !Regions.isInSafezone(receiver.getLocation())) {
+                    && !Regions.isInSafezone(damager.getLocation()) && !Regions.isInSafezone(receiver.getLocation())) {
                 damager.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 0, false, false));
             }
         }
@@ -759,12 +761,12 @@ public class KitListener implements Listener {
     @EventHandler
     public static void onZenAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerData.getInstance(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         List<Player> playerList = new ArrayList<>();
 
         if (playerData.getKit() instanceof Zen && event.getAction().toString().contains("RIGHT")
-            && player.getItemInHand().getType() == Material.SLIME_BALL && !playerData.hasCooldown(true)
-            && !Regions.isInSafezone(player.getLocation())) {
+                && player.getItemInHand().getType() == Material.SLIME_BALL && !playerData.hasCooldown(true)
+                && !Regions.isInSafezone(player.getLocation())) {
 
             Player closest = null;
             double closestDistance = 0;
@@ -783,7 +785,7 @@ public class KitListener implements Listener {
             }
 
             for (Player listPlayer : playerList) {
-                PlayerData listPlayerData = PlayerData.getInstance(listPlayer);
+                PlayerData listPlayerData = PlayerDataManager.getPlayerData(listPlayer);
 
                 if (listPlayerData.getKit() != null && !Regions.isInSafezone(listPlayer.getLocation())) {
                     double distance = listPlayer.getLocation().distanceSquared(player.getLocation());
@@ -809,8 +811,8 @@ public class KitListener implements Listener {
         }
     }
 
-    public static List<Block> getCageBlocks(Location location) {
-        ArrayList<Block> list = new ArrayList<>();
+    public static List<Block> getCageBlocks(@NonNull Location location) {
+        List<Block> list = new ArrayList<>();
 
         list.add(location.clone().add(0.0, -1.0, 0.0).getBlock());
         list.add(location.clone().add(-1.0, 0.0, 0.0).getBlock());
@@ -827,8 +829,8 @@ public class KitListener implements Listener {
         return list;
     }
 
-    public static List<Location> getPlatform(Location location) {
-        ArrayList<Location> list = new ArrayList<>();
+    public static List<Location> getPlatform(@NonNull Location location) {
+        List<Location> list = new ArrayList<>();
 
         list.add(location.clone());
         list.add(location.clone().add(-1.0, 0.0, 0.0));
@@ -842,10 +844,10 @@ public class KitListener implements Listener {
         return list;
     }
 
-    public static List<Location> getRoomLocations(Location location) {
+    public static List<Location> getRoomLocations(@NonNull Location location) {
         location.add(0.0, 9.0, 0.0);
 
-        ArrayList<Location> list = new ArrayList<>(getPlatform(location));
+        List<Location> list = new ArrayList<>(getPlatform(location));
 
         for (int i = 0; i < 3; ++i) {
             location.add(0.0, 1.0, 0.0);
@@ -871,8 +873,8 @@ public class KitListener implements Listener {
         return list;
     }
 
-    public static List<Location> getSurroundingLocations(Location location) {
-        ArrayList<Location> list = new ArrayList<>();
+    public static List<Location> getSurroundingLocations(@NonNull Location location) {
+        List<Location> list = new ArrayList<>();
 
         list.add(location.clone().add(-1.0, 0.0, 0.0));
         list.add(location.clone().add(0.0, 0.0, 1.0));
@@ -881,7 +883,7 @@ public class KitListener implements Listener {
         return list;
     }
 
-    public static void rollback(BlockState blockState) {
+    public static void rollback(@NonNull BlockState blockState) {
         if (blockState instanceof Sign) {
             Sign sign = (Sign) blockState;
             Location location = sign.getLocation();
@@ -889,6 +891,7 @@ public class KitListener implements Listener {
             location.getWorld().getBlockAt(location).setType(blockState.getType());
 
             Sign sign2 = (Sign) location.getWorld().getBlockAt(location).getState();
+
             for (int i = 0; i < 4; ++i) {
                 sign2.setLine(i, sign.getLines()[i]);
             }

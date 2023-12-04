@@ -1,11 +1,12 @@
 package net.foulest.kitpvp.util;
 
+import lombok.NonNull;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.listeners.CombatLog;
 import org.bukkit.entity.Player;
-
-import java.util.logging.Level;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Foulest
@@ -16,23 +17,23 @@ import java.util.logging.Level;
 public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "kitpvp";
     }
 
     @Override
-    public String getAuthor() {
+    public @NonNull String getAuthor() {
         return "Foulest";
     }
 
     @Override
-    public String getVersion() {
+    public @NonNull String getVersion() {
         return "1.0.0";
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, String identifier) {
-        PlayerData playerData = PlayerData.getInstance(player);
+    public String onPlaceholderRequest(@NonNull Player player, @NonNull String identifier) {
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         StringBuilder builder = new StringBuilder();
 
         switch (identifier) {
@@ -88,7 +89,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
                 builder.append(playerData.getBounty() == 0 ? "" : "&6Bounty: &e&l$" + playerData.getBounty());
                 break;
         }
-
         return builder.toString();
     }
 }

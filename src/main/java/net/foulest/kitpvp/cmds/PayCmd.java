@@ -1,7 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
-import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -20,7 +21,7 @@ public class PayCmd {
 
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NonNull CommandArgs args) {
         if (args.length() == 2) {
             Player target = Bukkit.getPlayer(args.getArgs(0));
 
@@ -43,8 +44,8 @@ public class PayCmd {
 
             Player player = args.getPlayer();
             Player sender = (Player) args.getSender();
-            PlayerData targetData = PlayerData.getInstance(player);
-            PlayerData senderData = PlayerData.getInstance(sender);
+            PlayerData targetData = PlayerDataManager.getPlayerData(player);
+            PlayerData senderData = PlayerDataManager.getPlayerData(sender);
 
             if (senderData.getCoins() - amount <= 0) {
                 MessageUtil.messagePlayer(sender, "&cYou don't have enough coins.");
