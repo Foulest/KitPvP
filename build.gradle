@@ -31,7 +31,7 @@ configurations {
 dependencies {
     // MariaDB - for database connection
     // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-    provided group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.1.4'
+    provided group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.3.1'
 
     // HikariCP - for database connection pooling
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
