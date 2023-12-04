@@ -55,8 +55,8 @@ dependencies {
 
     // Lombok - for reducing boilerplate code
     // https://projectlombok.org
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 }
 
 jar {
