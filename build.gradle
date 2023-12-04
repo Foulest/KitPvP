@@ -35,7 +35,7 @@ dependencies {
 
     // HikariCP - for database connection pooling
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    provided group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    provided group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
 
     // Spigot 1.8.8 - necessary for project; provided in libs
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
