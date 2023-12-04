@@ -23,6 +23,10 @@ Spigot plugin for the KitPvP game mode that has custom kits, stats, and features
 - Custom regions with WorldGuard
 
 ## Dependencies
+- [Spigot 1.8.9](https://papermc.io/downloads/all) *(included)*
 - [PlaceholderAPI](https://spigotmc.org/resources/placeholderapi.6245)
 - [WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2269655) *(included)*
 - [WorldGuard 6.1](https://dev.bukkit.org/projects/worldguard/files/2269654) *(included)*
+
+## Getting Help
+For support or queries, please open an issue in the [Issues](https://github.com/Foulest/KitPvP/issues) section.
