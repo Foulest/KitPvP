@@ -17,7 +17,7 @@ public class CombatTagCmd {
 
     @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
             description = "Displays your current combat tag timer.",
-            permission = "kitpvp.combattag", usage = "/combatlog", inGameOnly = true)
+            permission = "kitpvp.combattag", usage = "/combattag", inGameOnly = true)
     public void onCommand(@NonNull CommandArgs args) {
         Player player = args.getPlayer();
 

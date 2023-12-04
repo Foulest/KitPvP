@@ -20,7 +20,7 @@ public class BalanceCmd {
 
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
-            permission = "kitpvp.balance", usage = "/balance", inGameOnly = true)
+            permission = "kitpvp.balance", usage = "/balance [player]", inGameOnly = true)
     public void onCommand(@NonNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);

@@ -50,10 +50,7 @@ permissions:
   kitpvp.potions:
     description: Allows players to use potions.
     default: true
-  kitpvp.punish:
-    description: Allows players to punish other players.
-    default: false
-  kitpvp.reloadcfg:
+  kitpvp.reload:
     description: Allows players to reload the config.
     default: false
   kitpvp.setspawn:
