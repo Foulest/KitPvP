@@ -160,7 +160,7 @@ public class EventListener implements Listener {
                 Player damager = (Player) arrow.getShooter();
                 Player receiver = (Player) event.getEntity();
 
-                if (receiver == damager) {
+                if (receiver.equals(damager)) {
                     event.setCancelled(true);
                     return;
                 }

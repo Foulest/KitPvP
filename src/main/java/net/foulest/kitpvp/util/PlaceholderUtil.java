@@ -88,6 +88,9 @@ public class PlaceholderUtil extends PlaceholderExpansion {
             case "bounty_tab":
                 builder.append(playerData.getBounty() == 0 ? "" : "&6Bounty: &e&l$" + playerData.getBounty());
                 break;
+
+            default:
+                break;
         }
         return builder.toString();
     }

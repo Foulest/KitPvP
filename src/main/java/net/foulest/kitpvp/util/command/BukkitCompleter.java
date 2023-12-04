@@ -45,11 +45,15 @@ public class BukkitCompleter implements TabCompleter {
                 Entry<Method, Object> entry = completers.get(cmdLabel);
 
                 try {
-                    return (List<String>) entry.getKey().invoke(entry.getValue(),
+                    Object result = entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
+
+                    if (result instanceof List) {
+                        return (List<String>) result;
+                    } else {
+                        MessageUtil.log(Level.WARNING, "Method did not return List<String>: " + entry.getKey().getName());
+                    }
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
-                    MessageUtil.log(Level.WARNING, "Could not tab complete " + entry.getKey().getName() + " for " + entry
-                            .getValue().getClass().getName());
                     ex.printStackTrace();
                 }
             }

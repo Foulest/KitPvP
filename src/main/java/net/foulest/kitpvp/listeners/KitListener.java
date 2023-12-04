@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -28,6 +29,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Foulest
@@ -41,6 +44,11 @@ public class KitListener implements Listener {
     public static final Map<UUID, Location> imprisonedPlayers = new HashMap<>();
     private static final Random RANDOM = new Random();
 
+    /**
+     * Handles the Burrower ability, which creates a room of bricks above the player.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onBurrowerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -87,6 +95,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Cactus ability, which poisons the target on hit.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onCactusHit(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
@@ -100,12 +113,16 @@ public class KitListener implements Listener {
                     && !Regions.isInSafezone(damager.getLocation())
                     && !Regions.isInSafezone(receiver.getLocation())
                     && damager.getItemInHand().getType() == Material.CACTUS) {
-
                 receiver.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 80, 0, false, false));
             }
         }
     }
 
+    /**
+     * Handles the Dragon ability, which shoots a wave of fire that damages nearby players.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onDragonAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -117,8 +134,8 @@ public class KitListener implements Listener {
                 && !playerData.hasCooldown(true)
                 && !Regions.isInSafezone(player.getLocation())) {
 
-            player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
-            player.playEffect(player.getEyeLocation(), Effect.MOBSPAWNER_FLAMES, 1);
+            player.getWorld().playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
+            player.getWorld().playEffect(player.getEyeLocation(), Effect.MOBSPAWNER_FLAMES, 1);
             player.playSound(player.getEyeLocation(), Sound.GHAST_FIREBALL, 1.0f, 0.0f);
 
             for (Entity entity : player.getNearbyEntities(5, 3, 5)) {
@@ -139,6 +156,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Fisherman ability, which pulls the target towards the player.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onFishermanAbility(PlayerFishEvent event) {
         Player player = event.getPlayer();
@@ -167,6 +189,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Ghost ability, which plays a sound when the player moves.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onGhostMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -184,6 +211,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Tamer ability, which spawns wolves that follow the player.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onTamerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -218,6 +250,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Hulk ability, which launches other players into the air.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onHulkAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -266,6 +303,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Imprisoner ability, which shoots a projectile that imprisons the target in a cage.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onImprisonerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -283,6 +325,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Imprisoner ability, which imprisons the target in a cage when hit.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onImprisonerHit(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Snowball) {
@@ -350,6 +397,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Kangaroo ability, which launches the player into the air.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onKangarooAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -378,6 +430,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Mage ability, which gives the player a random potion effect.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onMageAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -394,25 +451,38 @@ public class KitListener implements Listener {
                 return;
             }
 
-            int effect = RANDOM.nextInt(21);
+            // List of available potion effects
+            List<PotionEffectType> effects = Arrays.asList(
+                    PotionEffectType.SPEED, PotionEffectType.SLOW,
+                    PotionEffectType.FAST_DIGGING, PotionEffectType.SLOW_DIGGING,
+                    PotionEffectType.INCREASE_DAMAGE, PotionEffectType.HEAL,
+                    PotionEffectType.HARM, PotionEffectType.JUMP,
+                    PotionEffectType.CONFUSION, PotionEffectType.REGENERATION,
+                    PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.FIRE_RESISTANCE,
+                    PotionEffectType.WATER_BREATHING, PotionEffectType.INVISIBILITY,
+                    PotionEffectType.BLINDNESS, PotionEffectType.NIGHT_VISION,
+                    PotionEffectType.WEAKNESS, PotionEffectType.POISON,
+                    PotionEffectType.WITHER, PotionEffectType.HEALTH_BOOST,
+                    PotionEffectType.ABSORPTION);
+
+            // Randomly select an effect from the list
+            PotionEffectType randomEffect = effects.get(RANDOM.nextInt(effects.size()));
             int amplifier = RANDOM.nextInt(3);
             int duration = Math.max(5, (RANDOM.nextInt(30) + 1)) * 20;
 
-            if (PotionEffectType.getById(effect) == null
-                    || PotionEffectType.getById(effect).getName() == null
-                    || PotionEffectType.getById(effect).getName().equals("HUNGER")
-                    || PotionEffectType.getById(effect).getName().equals("SATURATION")) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, amplifier, false, false));
-            } else {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.getById(effect), duration, amplifier, false, false));
-            }
+            // Apply the effect to the player
+            player.addPotionEffect(new PotionEffect(randomEffect, duration, amplifier, false, false));
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
             playerData.setCooldown(playerData.getKit(), 30, true);
         }
     }
 
-    // TODO: make monk swap sword as well
+    /**
+     * Handles the Monk ability, which swaps the items in the target's hotbar.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onMonkAbility(PlayerInteractEntityEvent event) {
         Player damager = event.getPlayer();
@@ -429,21 +499,37 @@ public class KitListener implements Listener {
                     && !Regions.isInSafezone(damager.getLocation())
                     && !Regions.isInSafezone(receiver.getLocation())) {
 
-                int random = RANDOM.nextInt(9);
-                int heldItemSlot = receiver.getInventory().getHeldItemSlot();
-                ItemStack itemInHand = receiver.getItemInHand();
+                // Generate a shuffled list of hotbar indices (0-8)
+                List<Integer> slots = IntStream.range(0, 9).boxed().collect(Collectors.toList());
+                Collections.shuffle(slots);
 
-                receiver.getInventory().setItem(heldItemSlot, receiver.getInventory().getItem(random));
-                receiver.getInventory().setItem(random, itemInHand);
+                // Swap items in the hotbar based on the shuffled indices
+                PlayerInventory inventory = receiver.getInventory();
+                ItemStack[] hotbar = new ItemStack[9];
+
+                // Store the current items in a temporary array
+                for (int i = 0; i < 9; i++) {
+                    hotbar[i] = inventory.getItem(i);
+                }
+
+                // Swap items based on the shuffled list
+                for (int i = 0; i < 9; i++) {
+                    inventory.setItem(i, hotbar[slots.get(i)]);
+                }
+
                 receiver.updateInventory();
                 MessageUtil.messagePlayer(receiver, "&cYour items have been swapped by a Monk!");
-
                 MessageUtil.messagePlayer(damager, "&aYour ability has been used.");
                 damagerData.setCooldown(damagerData.getKit(), 30, true);
             }
         }
     }
 
+    /**
+     * Handles the Spiderman ability, which shoots a projectile that creates a web.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onSpidermanAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -461,6 +547,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Spiderman ability, which traps the target in webs when hit.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onSpidermanHit(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Snowball) {
@@ -525,6 +616,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Summoner ability, which summons an iron golem that attacks nearby players.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onSummonerAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -574,6 +670,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Thor ability, which strikes nearby players with lightning.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onThorAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -612,6 +713,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Timelord ability, which freezes nearby players.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onTimelordAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -641,6 +747,7 @@ public class KitListener implements Listener {
                 if (playerInListData.getKit() != null && !Regions.isInSafezone(playerInList.getLocation())) {
                     playerInList.getWorld().playEffect(playerInList.getLocation(), Effect.STEP_SOUND, 152);
                     playerInList.getWorld().playEffect(playerInList.getLocation().add(0.0, 1.0, 0.0), Effect.STEP_SOUND, 152);
+                    playerInList.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100, 128, false, false));
                     playerInList.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 10, false, false));
                     playerInList.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 254, false, false));
                     playerInList.playSound(playerInList.getLocation(), Sound.GHAST_FIREBALL, 1, 1);
@@ -653,6 +760,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Vampire ability, which drains the target's potion effects.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onVampireAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -721,15 +833,14 @@ public class KitListener implements Listener {
 
                         if (listPlayer.isOnline() && drainedEffects.get(listPlayer.getUniqueId()) != null
                                 && !drainedEffects.get(listPlayer.getUniqueId()).isEmpty()
+                                && drainedEffects.get(listPlayer.getUniqueId()) != null
                                 && listPlayerData.getKit() != null && currentKit != null
                                 && currentKit == listPlayerData.getKit()) {
-                            if (drainedEffects.get(listPlayer.getUniqueId()) != null) {
-                                for (PotionEffect effect : drainedEffects.get(listPlayer.getUniqueId())) {
-                                    listPlayer.addPotionEffect(effect);
-                                }
-
-                                MessageUtil.messagePlayer(listPlayer, "&aYour drained effects were restored.");
+                            for (PotionEffect effect : drainedEffects.get(listPlayer.getUniqueId())) {
+                                listPlayer.addPotionEffect(effect);
                             }
+
+                            MessageUtil.messagePlayer(listPlayer, "&aYour drained effects were restored.");
                         }
 
                         drainedEffects.remove(listPlayer.getUniqueId());
@@ -743,6 +854,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Vampire ability, which gives the player regeneration when hitting another player.
+     *
+     * @param event The event.
+     */
     @EventHandler(ignoreCancelled = true)
     public static void onVampireHit(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
@@ -758,6 +874,11 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Handles the Zen ability, which teleports the player to the nearest player.
+     *
+     * @param event The event.
+     */
     @EventHandler
     public static void onZenAbility(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -811,6 +932,12 @@ public class KitListener implements Listener {
         }
     }
 
+    /**
+     * Gets the blocks that make up a cage.
+     *
+     * @param location The location of the cage.
+     * @return The blocks that make up the cage.
+     */
     public static List<Block> getCageBlocks(@NonNull Location location) {
         List<Block> list = new ArrayList<>();
 
@@ -829,6 +956,12 @@ public class KitListener implements Listener {
         return list;
     }
 
+    /**
+     * Gets the locations of the blocks that make up a cage.
+     *
+     * @param location The location of the cage.
+     * @return The locations of the blocks that make up the cage.
+     */
     public static List<Location> getPlatform(@NonNull Location location) {
         List<Location> list = new ArrayList<>();
 
@@ -844,6 +977,12 @@ public class KitListener implements Listener {
         return list;
     }
 
+    /**
+     * Gets the locations of the blocks that make up a room.
+     *
+     * @param location The location of the room.
+     * @return The locations of the blocks that make up the room.
+     */
     public static List<Location> getRoomLocations(@NonNull Location location) {
         location.add(0.0, 9.0, 0.0);
 
@@ -873,6 +1012,12 @@ public class KitListener implements Listener {
         return list;
     }
 
+    /**
+     * Gets the locations of the blocks surrounding a location.
+     *
+     * @param location The location.
+     * @return The locations of the blocks surrounding the location.
+     */
     public static List<Location> getSurroundingLocations(@NonNull Location location) {
         List<Location> list = new ArrayList<>();
 
@@ -883,13 +1028,16 @@ public class KitListener implements Listener {
         return list;
     }
 
+    /**
+     * Rolls back a block state.
+     *
+     * @param blockState The block state.
+     */
     public static void rollback(@NonNull BlockState blockState) {
         if (blockState instanceof Sign) {
             Sign sign = (Sign) blockState;
             Location location = sign.getLocation();
-
             location.getWorld().getBlockAt(location).setType(blockState.getType());
-
             Sign sign2 = (Sign) location.getWorld().getBlockAt(location).getState();
 
             for (int i = 0; i < 4; ++i) {
@@ -897,7 +1045,6 @@ public class KitListener implements Listener {
             }
 
             sign2.update(true);
-
         } else {
             blockState.update(true);
         }

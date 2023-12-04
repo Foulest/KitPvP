@@ -63,7 +63,7 @@ public class BountyCmd {
         Player target = Bukkit.getPlayer(args.getArgs(1));
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
-        if (target == player) {
+        if (target.equals(player)) {
             MessageUtil.messagePlayer(player, "&cYou can't set a bounty on yourself.");
             return;
         }
@@ -98,7 +98,7 @@ public class BountyCmd {
         MessageUtil.messagePlayer(target, "");
 
         for (Player online : Bukkit.getOnlinePlayers()) {
-            if (online != target && online != player) {
+            if (!online.equals(target) && !online.equals(player)) {
                 MessageUtil.messagePlayer(online, "&c" + player.getName() + " &eset a &c$" + amount + " &ebounty on &c" + target.getName() + "&e's head.");
             }
         }
