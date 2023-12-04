@@ -8,19 +8,28 @@
 KitPvP is an engaging Spigot plugin designed for the KitPvP game mode, offering a thrilling and polished experience with a variety of custom kits, stats tracking, and exclusive features.
 
 ## Features
+
+### Unique Kits and Customization
 - **22 Unique Kits**: Choose from a diverse range of kits, each with distinct abilities and playstyles.
 - **Interactive GUIs**: Seamless interfaces for kit selection, purchasing, and enchantments.
-- **Flexible Kit Management**: Set custom prices, restrict access based on ranks, and enable/disable kits as needed.
-- **Killstreak System**: Track killstreaks and unlock rewards for consistent performance.
-- **Combat Log Prevention**: Implements combat tagging and logging to maintain fair play.
-- **Bounty System**: Players can place bounties on others for an added thrill.
-- **Advanced Death Handling**: Comprehensive death handling to ensure a smooth experience.
-- **Diverse Healing Options**: Supports both soup-based and potion-based healing.
-- **Integrated Economy**: Features an economy system with support for transactions and balances.
-- **Premium Features**: Option to gate premium features for monetization.
-- **Database Integration**: Uses MariaDB/MySQL for robust data management.
-- **PlaceholderAPI Compatibility**: Extends functionality with PlaceholderAPI.
-- **Custom Regions**: Define and manage areas with WorldGuard integration.
+- **Flexible Kit Management**: Customize kit prices, restrict access based on ranks, and toggle kits on/off as needed.
+
+### Gameplay and Experience
+- **Killstreak System**: Keep track of killstreaks and unlock rewards for consistent performance.
+- **Combat Log Prevention**: Combat tagging and logging maintain fair play.
+- **Bounty System**: Enhance the thrill with player-placed bounties.
+
+### Advanced Features
+- **Advanced Death Handling**: Comprehensive system ensuring a smooth player experience on death.
+- **Diverse Healing Options**: Choose between soup-based and potion-based healing methods.
+- **Integrated Economy**: In-game economy system supporting transactions and balances.
+
+### Integration and Management
+- **Premium Features**: Monetize with gated premium features.
+- **Database Integration**: Utilize MariaDB/MySQL for robust data management.
+- **PlaceholderAPI Compatibility**: Enhance functionality using PlaceholderAPI.
+- **Custom Regions**: Create and manage areas with WorldGuard integration.
+
 
 ## Dependencies
 - [Spigot 1.8.9](https://papermc.io/downloads/all)
