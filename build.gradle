@@ -39,7 +39,7 @@ dependencies {
 
     // Spigot 1.8.8 - necessary for project; provided in libs
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
-    compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
+    compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.20.4-R0.1-SNAPSHOT'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
