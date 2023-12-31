@@ -32,10 +32,10 @@ KitPvP is an engaging Spigot plugin designed for the KitPvP game mode, offering 
 
 
 ## Dependencies
-- [Spigot 1.8.9](https://papermc.io/downloads/all)
-- [PlaceholderAPI](https://spigotmc.org/resources/placeholderapi.6245)
-- [WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2597538)
-- [WorldGuard 6.1](https://dev.bukkit.org/projects/worldguard/files/881691)
+- **[Spigot 1.8.9](https://papermc.io/downloads/all)**
+- **[PlaceholderAPI](https://spigotmc.org/resources/placeholderapi.6245)**
+- **[WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2597538)**
+- **[WorldGuard 6.1](https://dev.bukkit.org/projects/worldguard/files/881691)**
 
 ## Useful Links
 - [Contribution Guidelines](https://github.com/Foulest/KitPvP/wiki/Contribution-Guidelines)
