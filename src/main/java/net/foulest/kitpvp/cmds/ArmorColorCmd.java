@@ -1,28 +1,28 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
-import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for coloring leather armor with an RGB hex.
+ * Useful for testing armor colors for new kits.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for applying RGB hex colors to any dyable leather armor
- * you have equipped. For testing new colors for new kits.
  */
 public class ArmorColorCmd {
 
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         CommandSender sender = args.getSender();
 

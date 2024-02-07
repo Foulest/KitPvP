@@ -2,43 +2,44 @@ package net.foulest.kitpvp;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.kits.*;
-import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.kits.KitManager;
+import net.foulest.kitpvp.kits.type.*;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.listeners.DeathListener;
 import net.foulest.kitpvp.listeners.EventListener;
 import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.PlaceholderUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.CommandFramework;
-import net.foulest.kitpvp.util.kits.Kit;
-import net.foulest.kitpvp.util.kits.KitManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.logging.Level;
 
 /**
+ * Main class for KitPvP.
+ *
  * @author Foulest
  * @project KitPvP
  */
 @Getter
 public class KitPvP extends JavaPlugin {
 
-    // TODO: Add admin command to remove a bounty and refund coins.
-
+    @Getter
     public static KitPvP instance;
-    public static String pluginName = "KitPvP";
-    public static boolean loaded = false;
     private CommandFramework framework;
 
     @Override
@@ -50,91 +51,87 @@ public class KitPvP extends JavaPlugin {
     @Override
     @SneakyThrows
     public void onEnable() {
-        // Kick all online players.
+        // Kicks all online players.
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
 
         // Initializes the Command Framework.
-        Bukkit.getLogger().info("[" + pluginName + "] Initializing Command Framework...");
+        MessageUtil.log(Level.INFO, "Initializing Command Framework...");
         framework = new CommandFramework(this);
 
         // Registers placeholders with PlaceholderAPI.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Placeholders...");
-        new PlaceholderUtil().register();
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            MessageUtil.log(Level.INFO, "Integrating with PlaceholderAPI...");
+            new PlaceholderUtil().register();
+        }
 
         // Creates the default settings config.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Settings...");
-        Settings.setupSettings();
+        MessageUtil.log(Level.INFO, "Loading Settings...");
         Settings.loadSettings();
 
         // Sets up the Hikari instance.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Database...");
+        MessageUtil.log(Level.INFO, "Loading Database...");
         loadDatabase();
 
         // Loads the plugin's listeners.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Listeners...");
+        MessageUtil.log(Level.INFO, "Loading Listeners...");
         loadListeners(new DeathListener(), new EventListener(), new KitListener());
 
         // Loads the plugin's commands.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Commands...");
-        loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatTagCmd(), new EcoGiveCmd(),
-                new EcoSetCmd(), new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
-                new KitShopCmd(), new EcoTakeCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
-                new PotionsCmd(), new ReloadCfgCmd());
+        MessageUtil.log(Level.INFO, "Loading Commands...");
+        loadCommands(new BalanceCmd(), new BountyCmd(), new ClearKitCmd(), new CombatTagCmd(), new EcoCmd(),
+                new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(),
+                new KitShopCmd(), new ArmorColorCmd(), new KitEnchanterCmd(), new SoupCmd(),
+                new PotionsCmd(), new KitPvPCmd());
 
         // Loads the plugin's kits.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Kits...");
+        MessageUtil.log(Level.INFO, "Loading Kits...");
         loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
                 new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(), new Ninja(),
                 new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(), new Vampire(),
                 new Zen());
 
         // Loads the spawn.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Spawn...");
+        MessageUtil.log(Level.INFO, "Loading Spawn...");
         Spawn.load();
 
         // Checks if the world difficulty is set to Peaceful.
         if (Spawn.getLocation().getWorld().getDifficulty() == Difficulty.PEACEFUL) {
-            Bukkit.getLogger().warning("[" + pluginName + "] The world difficulty is set to Peaceful."
+            MessageUtil.log(Level.WARNING, "The world difficulty is set to Peaceful."
                     + " This will cause issues with hostile mobs in certain kits.");
         }
 
         // Loads online players' user data.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Player Data...");
+        MessageUtil.log(Level.INFO, "Loading Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
             Objects.requireNonNull(PlayerDataManager.getPlayerData(player)).load();
             Spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
         }
 
-        Bukkit.getLogger().info("[" + pluginName + "] Loaded successfully.");
-        loaded = true;
+        MessageUtil.log(Level.INFO, "Loaded successfully.");
     }
 
     @Override
     public void onDisable() {
         // Unloads the kits saved in the Kit Manager.
-        Bukkit.getLogger().info("[" + pluginName + "] Unloading Kits...");
+        MessageUtil.log(Level.INFO, "Unloading Kits...");
         KitManager.kits.clear();
 
-        // Saves the settings.
-        Bukkit.getLogger().info("[" + pluginName + "] Saving Settings...");
-        Settings.saveSettings();
-
         // Saves online players' data.
-        Bukkit.getLogger().info("[" + pluginName + "] Saving Player Data...");
+        MessageUtil.log(Level.INFO, "Saving Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (CombatLog.isInCombat(player)) {
-                CombatLog.remove(player);
+            if (CombatTag.isInCombat(player)) {
+                CombatTag.remove(player);
             }
 
             PlayerDataManager.removePlayerData(player);
         }
 
         // Closes the MySQL connection.
-        Bukkit.getLogger().info("[" + pluginName + "] Saving Database...");
+        MessageUtil.log(Level.INFO, "Saving Database...");
         DatabaseUtil.closeHikari();
 
-        Bukkit.getLogger().info("[" + pluginName + "] Shut down successfully.");
+        MessageUtil.log(Level.INFO, "Shut down successfully.");
     }
 
     /**
@@ -198,7 +195,7 @@ public class KitPvP extends JavaPlugin {
      *
      * @param listeners Listener to load.
      */
-    private void loadListeners(@NonNull Listener... listeners) {
+    private void loadListeners(Listener @NotNull ... listeners) {
         for (Listener listener : listeners) {
             Bukkit.getPluginManager().registerEvents(listener, this);
         }
@@ -209,7 +206,7 @@ public class KitPvP extends JavaPlugin {
      *
      * @param commands Command to load.
      */
-    private void loadCommands(@NonNull Object... commands) {
+    private void loadCommands(Object @NotNull ... commands) {
         for (Object command : commands) {
             framework.registerCommands(command);
         }
@@ -220,7 +217,7 @@ public class KitPvP extends JavaPlugin {
      *
      * @param kits Kit to load.
      */
-    private void loadKits(@NonNull Kit... kits) {
+    private void loadKits(Kit... kits) {
         Collections.addAll(KitManager.kits, kits);
     }
 }

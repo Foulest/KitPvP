@@ -1,34 +1,57 @@
 package net.foulest.kitpvp.util.command;
 
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 /**
+ * Custom Bukkit TabCompleter class that implements the TabCompleter interface.
+ * This class is part of the CommandFramework.
+ *
  * @author minnymin3
- * @project KitPvP
- * <p>
- * <a href="https://github.com/mcardy/CommandFramework">...</a>
+ * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
+@Getter
+@Setter
 public class BukkitCompleter implements TabCompleter {
 
     private final Map<String, Entry<Method, Object>> completers = new HashMap<>();
 
-    public void addCompleter(@NonNull String label, @NonNull Method method, @NonNull Object obj) {
+    /**
+     * Adds a TabCompleter method for a specific label.
+     *
+     * @param label  The label associated with the TabCompleter.
+     * @param method The method to invoke for tab-completion.
+     * @param obj    The object that contains the method to be invoked.
+     */
+    public void addCompleter(String label, Method method, Object obj) {
         completers.put(label, new AbstractMap.SimpleEntry<>(method, obj));
     }
 
+    /**
+     * Handles tab-completion for commands.
+     *
+     * @param sender  The CommandSender requesting tab-completion.
+     * @param command The Command object being tab-completed.
+     * @param label   The label used for the command.
+     * @param args    The arguments provided for tab-completion.
+     * @return A list of tab-completions or an empty list if no completions are available.
+     */
     @Override
-    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command,
-                                      @NonNull String label, @NonNull String[] args) {
+    @SuppressWarnings("unchecked")
+    public List<String> onTabComplete(@NotNull CommandSender sender,
+                                      @NotNull Command command,
+                                      @NotNull String label,
+                                      String @NotNull [] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
             buffer.append(label.toLowerCase());
@@ -45,16 +68,10 @@ public class BukkitCompleter implements TabCompleter {
                 Entry<Method, Object> entry = completers.get(cmdLabel);
 
                 try {
-                    Object result = entry.getKey().invoke(entry.getValue(),
+                    return (List<String>) entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
-
-                    if (result instanceof List) {
-                        return (List<String>) result;
-                    } else {
-                        MessageUtil.log(Level.WARNING, "Method did not return List<String>: " + entry.getKey().getName());
-                    }
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
-                    ex.printStackTrace();
+                    MessageUtil.printException(ex);
                 }
             }
         }

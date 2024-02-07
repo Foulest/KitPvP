@@ -1,28 +1,28 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ItemBuilder;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for setting your healing item to Potions.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for setting your healing item to Potions.
  */
 public class PotionsCmd {
 
     @Command(name = "potions", aliases = {"pots"}, description = "Sets your healing item to Potions.",
             usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -44,11 +44,11 @@ public class PotionsCmd {
         playerData.setUsingSoup(false);
         MessageUtil.messagePlayer(player, "&aYou are now using Potions.");
 
-        if (playerData.getKit() == null) {
+        if (playerData.getActiveKit() == null) {
             ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
             player.getInventory().setItem(6, healingItem);
         } else {
-            playerData.getKit().apply(player);
+            playerData.getActiveKit().apply(player);
         }
     }
 }

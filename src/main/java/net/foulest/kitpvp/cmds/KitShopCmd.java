@@ -1,24 +1,24 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.menus.KitShop;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for opening the Kit Shop.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for opening the Kit Shop menu.
  */
 public class KitShopCmd {
 
     @Command(name = "kitshop", aliases = {"shop"}, description = "Opens the Kit Shop.",
             usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
 
         if (!Regions.isInSafezone(player.getLocation())) {

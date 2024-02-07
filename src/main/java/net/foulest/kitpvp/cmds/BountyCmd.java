@@ -1,29 +1,27 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for placing bounties on other players.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for setting bounties on players, and checking your bounty status.
- * Some part of this is locked behind a paywall (permissions based).
  */
 public class BountyCmd {
 
     @Command(name = "bounty", aliases = {"bounties"},
             description = "Allows players to place bounties on each other.",
             permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
@@ -41,15 +39,9 @@ public class BountyCmd {
 
             MessageUtil.messagePlayer(player, "");
 
-            if (player.hasPermission("kitpvp.bounties.place")
-                    || (Settings.premiumEnabled && Settings.bountiesPremiumOnly && player.hasPermission(Settings.premiumPermission))) {
+            if (player.hasPermission("kitpvp.bounties.place")) {
                 MessageUtil.messagePlayer(player, " &fYou can place one on another player");
                 MessageUtil.messagePlayer(player, " &fusing &e/bounty set <player> <amount>&f.");
-                MessageUtil.messagePlayer(player, "");
-
-            } else if (Settings.premiumEnabled && Settings.bountiesPremiumOnly && !player.hasPermission(Settings.premiumPermission)) {
-                MessageUtil.messagePlayer(player, " &eOnly &6" + Settings.premiumRankName + " &emembers can set bounties.");
-                MessageUtil.messagePlayer(player, " &eStore: &6" + Settings.premiumStoreLink);
                 MessageUtil.messagePlayer(player, "");
             }
             return;

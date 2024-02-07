@@ -1,0 +1,56 @@
+# KitPvP
+# Version: ${project.version}
+#
+# Created by: Foulest (https://github.com/Foulest/KitPvP)
+# License: GPLv3 (https://github.com/Foulest/KitPvP/LICENSE)
+kitpvp:
+  spawn:
+    world: "world"
+    x: 0.5
+    y: 64.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+  combat-tag:
+    enabled: true
+    duration: 15
+    cancel-teleport: true
+    punish-logout: true
+    deny-entering-spawn: true
+  economy:
+    starting-coins: 500
+    coins-on-kill: 10
+    exp-on-kill: 15
+  killstreaks:
+    enabled: true
+    coins-bonus: 5
+    exp-bonus: 10
+  kit-enchanter:
+    enabled: true
+    feather-falling:
+      enabled: true
+      cost: 100
+    thorns:
+      enabled: true
+      cost: 100
+    protection:
+      enabled: true
+      cost: 100
+    knockback:
+      enabled: true
+      cost: 100
+    sharpness:
+      enabled: true
+      cost: 100
+    punch:
+      enabled: true
+      cost: 100
+    power:
+      enabled: true
+      cost: 100
+  storage:
+    host: "localhost"
+    port: 3306
+    database: "kitpvp"
+    username: "username"
+    password: "password"

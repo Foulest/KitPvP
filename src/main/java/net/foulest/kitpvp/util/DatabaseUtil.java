@@ -1,8 +1,8 @@
 package net.foulest.kitpvp.util;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.NonNull;
 import lombok.Synchronized;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,9 +12,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
+ * Utility class for database operations.
+ *
  * @author Foulest
  * @project KitPvP
  */
+@SuppressWarnings("SqlSourceToSinkFlow")
 public class DatabaseUtil {
 
     private static HikariDataSource hikari;
@@ -25,18 +28,9 @@ public class DatabaseUtil {
      * @param source The Hikari data source.
      */
     @Synchronized
-    public static void initialize(@NonNull HikariDataSource source) {
+    public static void initialize(HikariDataSource source) {
         if (hikari == null) {
             hikari = source;
-        }
-    }
-
-    /**
-     * Closes the Hikari instance.
-     */
-    public static void closeHikari() {
-        if (hikari != null) {
-            hikari.close();
         }
     }
 
@@ -52,9 +46,9 @@ public class DatabaseUtil {
      * @param useUnicode          The use unicode.
      * @param connectionTestQuery The connection test query.
      */
-    public static void setupHikari(@NonNull String poolName, @NonNull String jdbcUrl, @NonNull String driverClassName,
-                                   @NonNull String user, @NonNull String password, @NonNull String characterEncoding,
-                                   @NonNull String useUnicode, @NonNull String connectionTestQuery) {
+    public static void setupHikari(String poolName, String jdbcUrl, String driverClassName,
+                                   String user, String password, String characterEncoding,
+                                   String useUnicode, String connectionTestQuery) {
         hikari.setPoolName(poolName);
         hikari.setJdbcUrl(jdbcUrl);
         hikari.setDriverClassName(driverClassName);
@@ -66,12 +60,21 @@ public class DatabaseUtil {
     }
 
     /**
+     * Closes the Hikari instance.
+     */
+    public static void closeHikari() {
+        if (hikari != null) {
+            hikari.close();
+        }
+    }
+
+    /**
      * Creates a table if it doesn't exist.
      *
      * @param tableName    The table name.
      * @param tableColumns The table column definition.
      */
-    public static void createTableIfNotExists(@NonNull String tableName, @NonNull String tableColumns) {
+    public static void createTableIfNotExists(String tableName, String tableColumns) {
         try (Connection connection = hikari.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             ResultSet tables = metaData.getTables(null, null, tableName, null);
@@ -84,7 +87,7 @@ public class DatabaseUtil {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 
@@ -94,7 +97,7 @@ public class DatabaseUtil {
      * @param tableName The table name.
      * @throws SQLException If a database access error occurs.
      */
-    public static void deleteTableIfExists(@NonNull String tableName) throws SQLException {
+    public static void deleteTableIfExists(String tableName) throws SQLException {
         try (Connection connection = hikari.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             ResultSet tables = metaData.getTables(null, null, tableName, null);
@@ -115,7 +118,7 @@ public class DatabaseUtil {
      * @param tableName The table name.
      * @param tableData The data to be added.
      */
-    public static void addDataToTable(@NonNull String tableName, @NonNull HashMap<String, Object> tableData) {
+    public static void addDataToTable(String tableName, @NotNull HashMap<String, Object> tableData) {
         String columns = String.join(", ", tableData.keySet());
         String placeholders = IntStream.range(0, tableData.size())
                 .mapToObj(i -> "?")
@@ -138,7 +141,7 @@ public class DatabaseUtil {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 
@@ -148,7 +151,7 @@ public class DatabaseUtil {
      * @param tableName The table name.
      * @param tableData The data to be added.
      */
-    public static void addDefaultDataToTable(@NonNull String tableName, @NonNull HashMap<String, Object> tableData) {
+    public static void addDefaultDataToTable(String tableName, @NotNull HashMap<String, Object> tableData) {
         String columns = String.join(", ", tableData.keySet());
         String placeholders = IntStream.range(0, tableData.size())
                 .mapToObj(i -> "?")
@@ -175,12 +178,12 @@ public class DatabaseUtil {
                 insertStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 
     /**
-     * Load data from a table.
+     * Loads data from a table.
      *
      * @param tableName  The table name.
      * @param condition  The condition for the SQL query.
@@ -188,8 +191,9 @@ public class DatabaseUtil {
      * @return A list of HashMaps representing the rows fetched.
      * @throws SQLException If a database access error occurs.
      */
-    public static List<HashMap<String, Object>> loadDataFromTable(@NonNull String tableName, @NonNull String condition,
-                                                                  @NonNull List<Object> parameters) throws SQLException {
+    public static @NotNull List<HashMap<String, Object>> loadDataFromTable(String tableName,
+                                                                           String condition,
+                                                                           @NotNull List<Object> parameters) throws SQLException {
         String selectSQL = String.format("SELECT * FROM %s WHERE %s", tableName, condition);
 
         try (Connection connection = hikari.getConnection()) {
@@ -215,14 +219,15 @@ public class DatabaseUtil {
     }
 
     /**
-     * Delete data from a table.
+     * Deletes data from a table.
      *
      * @param tableName  The table name.
      * @param condition  The condition for the SQL query.
      * @param parameters The parameters to replace placeholders in the condition.
      */
-    public static void deleteDataFromTable(@NonNull String tableName, @NonNull String condition,
-                                           @NonNull List<Object> parameters) {
+    public static void deleteDataFromTable(String tableName,
+                                           String condition,
+                                           @NotNull List<Object> parameters) {
         String deleteSQL = String.format("DELETE FROM %s WHERE %s", tableName, condition);
 
         try (Connection connection = hikari.getConnection();
@@ -232,7 +237,7 @@ public class DatabaseUtil {
             }
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 }

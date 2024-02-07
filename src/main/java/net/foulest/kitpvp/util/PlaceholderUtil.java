@@ -1,18 +1,17 @@
 package net.foulest.kitpvp.util;
 
-import lombok.NonNull;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.combattag.CombatTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Sets up placeholders with PlaceholderAPI.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Sets up placeholders with PlaceholderAPI
  */
 public class PlaceholderUtil extends PlaceholderExpansion {
 
@@ -22,17 +21,17 @@ public class PlaceholderUtil extends PlaceholderExpansion {
     }
 
     @Override
-    public @NonNull String getAuthor() {
+    public @NotNull String getAuthor() {
         return "Foulest";
     }
 
     @Override
-    public @NonNull String getVersion() {
+    public @NotNull String getVersion() {
         return "1.0.0";
     }
 
     @Override
-    public String onPlaceholderRequest(@NonNull Player player, @NonNull String identifier) {
+    public String onPlaceholderRequest(Player player, @NotNull String identifier) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         StringBuilder builder = new StringBuilder();
 
@@ -74,11 +73,11 @@ public class PlaceholderUtil extends PlaceholderExpansion {
                 break;
 
             case "combattag":
-                builder.append(CombatLog.isInCombat(player) ? "&c00:" + String.format("%02d", CombatLog.getRemainingTime(player)) : "&aSafe");
+                builder.append(CombatTag.isInCombat(player) ? "&c00:" + String.format("%02d", CombatTag.getRemainingTime(player)) : "&aSafe");
                 break;
 
             case "activekit":
-                builder.append(playerData.getKit() == null ? "None" : playerData.getKit().getName());
+                builder.append(playerData.getActiveKit() == null ? "None" : playerData.getActiveKit().getName());
                 break;
 
             case "bounty":

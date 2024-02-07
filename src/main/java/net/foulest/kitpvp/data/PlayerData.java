@@ -1,18 +1,22 @@
 package net.foulest.kitpvp.data;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.util.*;
-import net.foulest.kitpvp.util.kits.Kit;
-import net.foulest.kitpvp.util.kits.KitManager;
+import net.foulest.kitpvp.enchants.Enchants;
+import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.kits.KitManager;
+import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.item.ItemBuilder;
+import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,11 +24,13 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import static net.foulest.kitpvp.util.Settings.startingCoins;
+
 /**
+ * Main class for storing player data.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Main class for storing player data.
  */
 @Getter
 @Setter
@@ -37,11 +43,11 @@ public final class PlayerData {
 
     // Kit data
     private List<Kit> ownedKits = new ArrayList<>();
-    private Kit kit;
+    private Kit activeKit;
     private Kit previousKit = KitManager.getKit("Knight");
 
     // Player stats
-    private int coins = Settings.startingCoins;
+    private int coins = startingCoins;
     private int kills;
     private int experience;
     private int level;
@@ -56,39 +62,30 @@ public final class PlayerData {
     // Cooldowns and timers
     private final Map<Kit, Long> cooldowns = new HashMap<>();
     private BukkitTask abilityCooldownNotifier;
-    private BukkitTask teleportingToSpawn;
+    private BukkitTask teleportToSpawnTask;
 
     // Enchant data
-    private boolean featherFallingEnchant;
-    private boolean thornsEnchant;
-    private boolean protectionEnchant;
-    private boolean knockbackEnchant;
-    private boolean sharpnessEnchant;
-    private boolean punchEnchant;
-    private boolean powerEnchant;
+    private Set<Enchants> enchants = new HashSet<>();
 
     // Other data
     private boolean usingSoup;
     private boolean noFall;
     private boolean pendingNoFallRemoval;
 
-    public PlayerData(UUID uniqueId, Player player) {
+    public PlayerData(@NotNull UUID uniqueId, Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
         uuid = uniqueId.toString();
     }
 
-    /**
-     * Checks if a player has a cooldown for the kit they have equipped.
-     */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasCooldown(boolean sendMessage) {
-        long cooldown = cooldowns.containsKey(kit) ? (cooldowns.get(kit) - System.currentTimeMillis()) : 0L;
+        long cooldown = cooldowns.containsKey(activeKit) ? (cooldowns.get(activeKit) - System.currentTimeMillis()) : 0L;
 
         if (cooldown > 0) {
             if (sendMessage) {
-                MessageUtil.messagePlayer(player, "&cYou are still on cooldown for %time% seconds.".replace("%time%",
-                        String.valueOf(BigDecimal.valueOf((double) cooldown / 1000)
+                MessageUtil.messagePlayer(player, "&cYou are still on cooldown for %time% seconds."
+                        .replace("%time%", String.valueOf(BigDecimal.valueOf((double) cooldown / 1000)
                                 .setScale(1, RoundingMode.HALF_UP).doubleValue())));
             }
             return true;
@@ -96,9 +93,6 @@ public final class PlayerData {
         return false;
     }
 
-    /**
-     * Clears a player's cooldowns for their kit.
-     */
     public void clearCooldowns() {
         cooldowns.clear();
 
@@ -108,7 +102,7 @@ public final class PlayerData {
         }
     }
 
-    public void setCooldown(@NonNull Kit kit, int cooldownTime, boolean notify) {
+    public void setCooldown(Kit kit, int cooldownTime, boolean notify) {
         cooldowns.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
 
         if (notify) {
@@ -139,6 +133,7 @@ public final class PlayerData {
         // Loads values from PlayerStats.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats", "uuid = ?", Collections.singletonList(uuid));
+
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
                 System.out.println(playerData.toString());
@@ -154,7 +149,7 @@ public final class PlayerData {
                 System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         // Inserts default values into PlayerKits.
@@ -174,7 +169,7 @@ public final class PlayerData {
                 System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         // Loads values from Bounties.
@@ -189,7 +184,7 @@ public final class PlayerData {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         // Inserts default values into Enchants.
@@ -207,22 +202,23 @@ public final class PlayerData {
         // Loads values from Enchants.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants", "uuid = ?", Collections.singletonList(uuid));
+
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
-                featherFallingEnchant = (Boolean) playerData.get("featherFalling");
-                thornsEnchant = (Boolean) playerData.get("thorns");
-                protectionEnchant = (Boolean) playerData.get("protection");
-                knockbackEnchant = (Boolean) playerData.get("knockback");
-                sharpnessEnchant = (Boolean) playerData.get("sharpness");
-                punchEnchant = (Boolean) playerData.get("punch");
-                powerEnchant = (Boolean) playerData.get("power");
+
+                for (Enchants enchant : Enchants.values()) {
+                    String key = enchant.getDatabaseName();
+
+                    if (playerData.containsKey(key)) {
+                        enchants.add(enchant);
+                    }
+                }
             } else {
                 System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
-
         return true;
     }
 
@@ -231,6 +227,7 @@ public final class PlayerData {
             previousKit = KitManager.getKit("Knight");
         }
 
+        // Saves values to PlayerKits.
         if (!ownedKits.isEmpty()) {
             DatabaseUtil.deleteDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(player.getUniqueId().toString()));
 
@@ -246,6 +243,7 @@ public final class PlayerData {
             }
         }
 
+        // Saves values to PlayerStats.
         DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
             put("uuid", uuid);
             put("coins", coins);
@@ -258,6 +256,7 @@ public final class PlayerData {
             put("previousKit", previousKit.getName());
         }});
 
+        // Saves values to Bounties.
         if (bounty > 0 && benefactor != null) {
             DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
                 put("uuid", uuid);
@@ -266,19 +265,17 @@ public final class PlayerData {
             }});
         }
 
+        // Saves values to Enchants.
         DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put("featherFalling", featherFallingEnchant);
-            put("thorns", thornsEnchant);
-            put("protection", protectionEnchant);
-            put("knockback", knockbackEnchant);
-            put("sharpness", sharpnessEnchant);
-            put("punch", punchEnchant);
-            put("power", powerEnchant);
+
+            for (Enchants enchant : Enchants.values()) {
+                put(enchant.getDatabaseName(), enchants.contains(enchant));
+            }
         }});
     }
 
-    public void addBounty(int bounty, @NonNull UUID benefactor) {
+    public void addBounty(int bounty, UUID benefactor) {
         if (bounty > 0) {
             removeBounty();
         }
@@ -462,7 +459,7 @@ public final class PlayerData {
         ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").getItem();
         player.getInventory().setItem(2, previousKit);
 
-        ItemStack yourStats = new ItemBuilder(SkullUtil.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
+        ItemStack yourStats = new ItemBuilder(SkullBuilder.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
         player.getInventory().setItem(4, yourStats);
 
         ItemStack healingItem;
@@ -479,7 +476,7 @@ public final class PlayerData {
         player.updateInventory();
     }
 
-    public void setPreviousKit(@NonNull Kit kit) {
+    public void setPreviousKit(Kit kit) {
         previousKit = kit;
 
         DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
@@ -515,70 +512,25 @@ public final class PlayerData {
         }});
     }
 
-    public void setFeatherFallingEnchant(boolean value) {
-        featherFallingEnchant = value;
+    public void addEnchant(Enchants enchant) {
+        enchants.add(enchant);
 
         DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put("featherFalling", featherFallingEnchant);
+            put(enchant.getDatabaseName(), true);
         }});
     }
 
-    public void setThornsEnchant(boolean value) {
-        thornsEnchant = value;
+    public void removeEnchant(Enchants enchant) {
+        enchants.remove(enchant);
 
         DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put("thorns", thornsEnchant);
+            put(enchant.getDatabaseName(), false);
         }});
     }
 
-    public void setProtectionEnchant(boolean value) {
-        protectionEnchant = value;
-
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("protection", protectionEnchant);
-        }});
-    }
-
-    public void setKnockbackEnchant(boolean value) {
-        knockbackEnchant = value;
-
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("knockback", knockbackEnchant);
-        }});
-    }
-
-    public void setSharpnessEnchant(boolean value) {
-        sharpnessEnchant = value;
-
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("sharpness", sharpnessEnchant);
-        }});
-    }
-
-    public void setPunchEnchant(boolean value) {
-        punchEnchant = value;
-
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("punch", punchEnchant);
-        }});
-    }
-
-    public void setPowerEnchant(boolean value) {
-        powerEnchant = value;
-
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("power", powerEnchant);
-        }});
-    }
-
-    public void addOwnedKit(@NonNull Kit kit) {
+    public void addOwnedKit(Kit kit) {
         if (!ownedKits.contains(kit)) {
             ownedKits.add(kit);
         }

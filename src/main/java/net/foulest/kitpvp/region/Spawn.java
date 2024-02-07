@@ -1,37 +1,43 @@
 package net.foulest.kitpvp.region;
 
 import lombok.Getter;
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
 /**
+ * Handles the spawn point.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Handles the spawn point
  */
 public class Spawn {
 
     @Getter
     public static Location location;
 
-    public static void setLocation(@NonNull Location loc) {
+    /**
+     * Sets the spawn point.
+     *
+     * @param loc The location to set the spawn point to.
+     */
+    public static void setLocation(@NotNull Location loc) {
         Settings.spawnX = loc.getX();
         Settings.spawnY = loc.getY();
         Settings.spawnZ = loc.getZ();
         Settings.spawnYaw = loc.getYaw();
         Settings.spawnPitch = loc.getPitch();
         Settings.spawnWorld = loc.getWorld().getName();
+        Settings.saveConfig();
 
         location = loc;
         loc.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
@@ -42,7 +48,7 @@ public class Spawn {
      *
      * @param player The player to teleport.
      */
-    public static void teleport(@NonNull Player player) {
+    public static void teleport(Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (location == null) {
@@ -51,8 +57,8 @@ public class Spawn {
         }
 
         playerData.clearCooldowns();
-        CombatLog.remove(player);
-        playerData.setKit(null);
+        CombatTag.remove(player);
+        playerData.setActiveKit(null);
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
@@ -65,7 +71,7 @@ public class Spawn {
     }
 
     /**
-     * Loads the spawn point data from config files.
+     * Loads the spawn point data.
      */
     public static void load() {
         if (Settings.config.get("spawn") == null) {

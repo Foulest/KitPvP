@@ -1,45 +1,44 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
     id 'java'
 }
 
 group = 'net.foulest'
-version = '1.3.2'
+version = '1.3.3'
 description = 'KitPvP'
+
 compileJava.options.encoding = 'UTF-8'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    // Maven central repository
+    // Maven repositories
     mavenCentral()
+    mavenLocal()
 
     // Local libraries
     flatDir {
         dirs 'libs'
     }
 
-    // Needed for PlaceholderAPI
     maven {
         url 'https://repo.minebench.de'
+        name 'Minebench'
     }
 }
 
-configurations {
-    provided // Custom configuration for compile-only dependencies
-    implementation.extendsFrom(provided)
-}
-
 dependencies {
-    // MariaDB - for database connection
-    // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-    provided group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.3.2'
-
-    // HikariCP - for database connection pooling
-    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    provided group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
-
     // Spigot 1.8.8 - necessary for project; provided in libs
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
     compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
+
+    // MariaDB - for database connection
+    // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.3.2'
+
+    // HikariCP - for database connection pooling
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
@@ -55,17 +54,56 @@ dependencies {
 
     // Lombok - for reducing boilerplate code
     // https://projectlombok.org
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 }
 
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+tasks {
+    shadowJar {
+        archiveFileName.set("${project.name}-${project.version}.jar")
 
-    // Include compile-only dependencies in the JAR
-    from {
-        configurations.provided.collect { file ->
-            zipTree(file)
+        minimize()
+        relocate 'org.mariadb', 'net.foulest.kitpvp.shaded.org.mariadb'
+        relocate 'com.zaxxer', 'net.foulest.kitpvp.shaded.com.zaxxer'
+    }
+
+    compileJava {
+        dependsOn(clean)
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+
+    processResources {
+        filesMatching('**/*.yml') {
+            filter { line ->
+                line.replace('${project.version}', project.version)
+            }
+        }
+    }
+
+    tasks.register('sourceJar', Jar) {
+        from sourceSets.main.allJava
+    }
+
+    jar.configure {
+        archiveClassifier = 'default'
+    }
+
+    shadowJar.configure {
+        archiveClassifier = null
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "net.foulest.vulture"
+            artifactId = project.name
+            version = project.version
+
+            from components.java
         }
     }
 }

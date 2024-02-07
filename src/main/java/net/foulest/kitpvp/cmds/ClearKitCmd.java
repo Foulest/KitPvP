@@ -1,9 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.listeners.CombatLog;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -12,38 +11,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for clearing your kit.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for setting bounties on players, and checking your bounty status.
- * Some part of this is locked behind a paywall (permissions based).
  */
 public class ClearKitCmd {
 
-    public static void clearKit(@NonNull PlayerData playerData) {
-        Player player = playerData.getPlayer();
-
-        playerData.setPreviousKit(playerData.getKit());
-        playerData.clearCooldowns();
-        playerData.setKit(null);
-
-        player.setHealth(20);
-        player.getInventory().setHeldItemSlot(0);
-
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
-
-        playerData.giveDefaultItems();
-
-        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
-    }
-
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         if (!(args.getSender() instanceof Player)) {
             MessageUtil.messagePlayer(args.getSender(), "Only players can execute this command.");
             return;
@@ -54,13 +34,13 @@ public class ClearKitCmd {
 
         // Clearing your own kit.
         if (args.length() == 0) {
-            if (CombatLog.isInCombat(args.getPlayer())) {
+            if (CombatTag.isInCombat(args.getPlayer())) {
                 MessageUtil.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");
                 return;
             }
 
             if (Regions.isInSafezone(player.getLocation())) {
-                if (playerData.getKit() == null) {
+                if (playerData.getActiveKit() == null) {
                     MessageUtil.messagePlayer(player, "&cYou do not have a kit selected.");
                     return;
                 }
@@ -84,7 +64,7 @@ public class ClearKitCmd {
                 return;
             }
 
-            if (targetData.getKit() == null) {
+            if (targetData.getActiveKit() == null) {
                 MessageUtil.messagePlayer(target, "&cYou do not have a kit selected.");
                 return;
             }
@@ -93,5 +73,29 @@ public class ClearKitCmd {
             MessageUtil.messagePlayer(target, "&aYour kit has been cleared by a staff member.");
             MessageUtil.messagePlayer(player, "&aYou cleared " + target.getName() + "'s kit.");
         }
+    }
+
+    /**
+     * Clears a player's kit.
+     *
+     * @param playerData The player's data.
+     */
+    public static void clearKit(@NotNull PlayerData playerData) {
+        Player player = playerData.getPlayer();
+
+        playerData.setPreviousKit(playerData.getActiveKit());
+        playerData.clearCooldowns();
+        playerData.setActiveKit(null);
+
+        player.setHealth(20);
+        player.getInventory().setHeldItemSlot(0);
+
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+
+        playerData.giveDefaultItems();
+
+        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
     }
 }

@@ -1,6 +1,5 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -9,19 +8,20 @@ import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for checking a player's balance.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for displaying your current balance.
  */
 public class BalanceCmd {
 
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
             permission = "kitpvp.balance", usage = "/balance [player]", inGameOnly = true)
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         CommandSender sender = args.getSender();

@@ -1,6 +1,5 @@
 package net.foulest.kitpvp.cmds;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -10,18 +9,19 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Command for paying other players.
+ *
  * @author Foulest
  * @project KitPvP
- * <p>
- * Command for sending coins to other players.
  */
 public class PayCmd {
 
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         if (args.length() == 2) {
             Player target = Bukkit.getPlayer(args.getArgs(0));
 

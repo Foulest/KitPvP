@@ -1,16 +1,16 @@
 package net.foulest.kitpvp.listeners;
 
-import lombok.NonNull;
 import net.foulest.kitpvp.KitPvP;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.kits.Summoner;
-import net.foulest.kitpvp.kits.Tamer;
+import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.kits.type.Summoner;
+import net.foulest.kitpvp.kits.type.Tamer;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.NMSUtil;
 import net.foulest.kitpvp.util.Settings;
-import net.foulest.kitpvp.util.kits.Kit;
 import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -24,17 +24,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-/**
- * @author Foulest
- * @project KitPvP
- * <p>
- * Handles all deaths
- */
 public class DeathListener implements Listener {
 
-    public static void handleDeath(@NonNull Player receiver, boolean onPlayerQuit) {
+    /**
+     * Handles a player's death.
+     *
+     * @param receiver     The player that died.
+     * @param onPlayerQuit Whether the player died from quitting.
+     */
+    public static void handleDeath(Player receiver, boolean onPlayerQuit) {
         PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
-        Kit currentKit = receiverData.getKit();
+        Kit currentKit = receiverData.getActiveKit();
         Vector vec = new Vector();
 
         // Cancels deaths while in flying.
@@ -74,8 +74,8 @@ public class DeathListener implements Listener {
         receiverData.setDeaths(receiverData.getDeaths() + 1);
 
         // Runs specific code if the player is killed by another player.
-        if (CombatLog.getLastAttacker(receiver) != null && CombatLog.getLastAttacker(receiver) != receiver) {
-            Player damager = CombatLog.getLastAttacker(receiver);
+        if (CombatTag.getLastAttacker(receiver) != null && CombatTag.getLastAttacker(receiver) != receiver) {
+            Player damager = CombatTag.getLastAttacker(receiver);
             PlayerData damagerData = PlayerDataManager.getPlayerData(damager);
 
             // Adds a kill to the damager.
@@ -90,7 +90,7 @@ public class DeathListener implements Listener {
 
                 // Re-adds the damager's kit items.
                 damager.getInventory().clear();
-                damagerData.getKit().apply(damager);
+                damagerData.getActiveKit().apply(damager);
                 damager.updateInventory();
             }
 
@@ -140,7 +140,7 @@ public class DeathListener implements Listener {
         }
 
         // Removes the player's combat tag.
-        CombatLog.remove(receiver);
+        CombatTag.remove(receiver);
 
         // Removes the player from a Vampire's drained effects list.
         KitListener.drainedEffects.remove(receiver.getUniqueId());
@@ -171,18 +171,9 @@ public class DeathListener implements Listener {
         }
 
         // Removes enchantments from the player.
-        if (receiverData.isFeatherFallingEnchant() || receiverData.isThornsEnchant()
-                || receiverData.isProtectionEnchant() || receiverData.isKnockbackEnchant()
-                || receiverData.isSharpnessEnchant() || receiverData.isPunchEnchant()
-                || receiverData.isPowerEnchant()) {
+        if (!receiverData.getEnchants().isEmpty()) {
+            receiverData.getEnchants().clear();
             MessageUtil.messagePlayer(receiver, "&cYour enchantments were removed on death.");
-            receiverData.setFeatherFallingEnchant(false);
-            receiverData.setThornsEnchant(false);
-            receiverData.setProtectionEnchant(false);
-            receiverData.setKnockbackEnchant(false);
-            receiverData.setSharpnessEnchant(false);
-            receiverData.setPunchEnchant(false);
-            receiverData.setPowerEnchant(false);
         }
 
         // Resets the player's killstreak.
