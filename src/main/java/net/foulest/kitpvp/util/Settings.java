@@ -452,7 +452,7 @@ public class Settings {
         zenKitRange = config.getInt("kitpvp.kits.zen.ability.range");
 
         // Database settings
-        usingFlatFile = config.getString("kitpvp.storage.type").toLowerCase().trim().equals("sqlite");
+        usingFlatFile = config.getString("kitpvp.storage.type").trim().equalsIgnoreCase("sqlite");
         flatFilePath = config.getString("kitpvp.storage.sqlite.file");
         host = config.getString("kitpvp.storage.mariadb.host");
         port = config.getInt("kitpvp.storage.mariadb.port");
