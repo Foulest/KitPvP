@@ -70,53 +70,139 @@ public class Settings {
     public static boolean powerEnabled;
     public static int powerCost;
 
-    // Kit enabled settings
-    public static boolean archerKitEnabled;
-    public static boolean burrowerKitEnabled;
-    public static boolean cactusKitEnabled;
-    public static boolean dragonKitEnabled;
-    public static boolean fishermanKitEnabled;
-    public static boolean ghostKitEnabled;
-    public static boolean hulkKitEnabled;
-    public static boolean imprisonerKitEnabled;
-    public static boolean kangarooKitEnabled;
+    // Knight kit settings
     public static boolean knightKitEnabled;
-    public static boolean mageKitEnabled;
-    public static boolean monkKitEnabled;
-    public static boolean ninjaKitEnabled;
-    public static boolean pyroKitEnabled;
-    public static boolean spidermanKitEnabled;
-    public static boolean summonerKitEnabled;
-    public static boolean tamerKitEnabled;
-    public static boolean tankKitEnabled;
-    public static boolean thorKitEnabled;
-    public static boolean timelordKitEnabled;
-    public static boolean vampireKitEnabled;
-    public static boolean zenKitEnabled;
-
-    // Kit cost settings
-    public static int archerKitCost;
-    public static int burrowerKitCost;
-    public static int cactusKitCost;
-    public static int dragonKitCost;
-    public static int fishermanKitCost;
-    public static int ghostKitCost;
-    public static int hulkKitCost;
-    public static int imprisonerKitCost;
-    public static int kangarooKitCost;
     public static int knightKitCost;
+
+    // Archer kit settings
+    public static boolean archerKitEnabled;
+    public static int archerKitCost;
+
+    // Burrower kit settings
+    public static boolean burrowerKitEnabled;
+    public static int burrowerKitCost;
+    public static int burrowerKitCooldown;
+    public static int burrowerKitDuration;
+
+    // Cactus kit settings
+    public static boolean cactusKitEnabled;
+    public static int cactusKitCost;
+    public static int cactusKitPassiveDuration;
+
+    // Dragon kit settings
+    public static boolean dragonKitEnabled;
+    public static int dragonKitCost;
+    public static int dragonKitCooldown;
+    public static int dragonKitDuration;
+    public static int dragonKitRange;
+    public static int dragonKitDamage;
+
+    // Fisherman kit settings
+    public static boolean fishermanKitEnabled;
+    public static int fishermanKitCost;
+    public static int fishermanKitCooldown;
+
+    // Ghost kit settings
+    public static boolean ghostKitEnabled;
+    public static int ghostKitCost;
+    public static int ghostKitRange;
+
+    // Hulk kit settings
+    public static boolean hulkKitEnabled;
+    public static int hulkKitCost;
+    public static int hulkKitCooldown;
+    public static int hulkKitRange;
+    public static int hulkKitDamage;
+    public static double hulkKitMultiplier;
+
+    // Imprisoner kit settings
+    public static boolean imprisonerKitEnabled;
+    public static int imprisonerKitCost;
+    public static int imprisonerKitCooldown;
+    public static int imprisonerKitDuration;
+    public static int imprisonerKitDamage;
+    public static int imprisonerKitHeight;
+
+    // Kangaroo kit settings
+    public static boolean kangarooKitEnabled;
+    public static int kangarooKitCost;
+    public static int kangarooKitCooldown;
+    public static double kangarooKitSneakingHeight;
+    public static double kangarooKitSneakingMultiplier;
+    public static double kangarooKitNormalHeight;
+    public static double kangarooKitNormalMultiplier;
+
+    // Mage kit settings
+    public static boolean mageKitEnabled;
     public static int mageKitCost;
+    public static int mageKitCooldown;
+
+    // Monk kit settings
+    public static boolean monkKitEnabled;
     public static int monkKitCost;
+    public static int monkKitCooldown;
+
+    // Ninja kit settings
+    public static boolean ninjaKitEnabled;
     public static int ninjaKitCost;
+
+    // Pyro kit settings
+    public static boolean pyroKitEnabled;
     public static int pyroKitCost;
+
+    // Spiderman kit settings
+    public static boolean spidermanKitEnabled;
     public static int spidermanKitCost;
+    public static int spidermanKitCooldown;
+    public static int spidermanKitDuration;
+
+    // Summoner kit settings
+    public static boolean summonerKitEnabled;
     public static int summonerKitCost;
+    public static int summonerKitCooldown;
+    public static int summonerKitDuration;
+    public static int summonerKitRange;
+
+    // Tamer kit settings
+    public static boolean tamerKitEnabled;
     public static int tamerKitCost;
+    public static int tamerKitCooldown;
+    public static int tamerKitDuration;
+    public static int tamerKitAmount;
+
+    // Tank kit settings
+    public static boolean tankKitEnabled;
     public static int tankKitCost;
+
+    // Thor kit settings
+    public static boolean thorKitEnabled;
     public static int thorKitCost;
+    public static int thorKitCooldown;
+    public static int thorKitDuration;
+    public static int thorKitRange;
+    public static int thorKitDamage;
+
+    // Timelord kit settings
+    public static boolean timelordKitEnabled;
     public static int timelordKitCost;
+    public static int timelordKitCooldown;
+    public static int timelordKitDuration;
+    public static int timelordKitRange;
+
+    // Vampire kit settings
+    public static boolean vampireKitEnabled;
     public static int vampireKitCost;
+    public static int vampireKitPassiveDuration;
+    public static int vampireKitCooldown;
+    public static int vampireKitDuration;
+    public static int vampireKitRange;
+
+    // Zen kit settings
+    public static boolean zenKitEnabled;
     public static int zenKitCost;
+    public static int zenKitCooldown;
+    public static int zenKitDuration;
+    public static int zenKitRange;
 
     // Database settings
     public static String host;
@@ -214,55 +300,154 @@ public class Settings {
         killStreaksExpBonus = config.getInt("kitpvp.killstreaks.exp-bonus");
 
         // Kit enchanter settings
+        kitEnchanterEnabled = config.getBoolean("kitpvp.kit-enchanter.enabled");
+        featherFallingEnabled = config.getBoolean("kitpvp.kit-enchanter.feather-falling.enabled");
+        featherFallingCost = config.getInt("kitpvp.kit-enchanter.feather-falling.cost");
+        thornsEnabled = config.getBoolean("kitpvp.kit-enchanter.thorns.enabled");
+        thornsCost = config.getInt("kitpvp.kit-enchanter.thorns.cost");
+        protectionEnabled = config.getBoolean("kitpvp.kit-enchanter.protection.enabled");
+        protectionCost = config.getInt("kitpvp.kit-enchanter.protection.cost");
+        knockbackEnabled = config.getBoolean("kitpvp.kit-enchanter.knockback.enabled");
+        knockbackCost = config.getInt("kitpvp.kit-enchanter.knockback.cost");
+        sharpnessEnabled = config.getBoolean("kitpvp.kit-enchanter.sharpness.enabled");
+        sharpnessCost = config.getInt("kitpvp.kit-enchanter.sharpness.cost");
+        punchEnabled = config.getBoolean("kitpvp.kit-enchanter.punch.enabled");
+        punchCost = config.getInt("kitpvp.kit-enchanter.punch.cost");
+        powerEnabled = config.getBoolean("kitpvp.kit-enchanter.power.enabled");
+        powerCost = config.getInt("kitpvp.kit-enchanter.power.cost");
 
+        // Knight kit settings
+        knightKitEnabled = config.getBoolean("kitpvp.kits.knight.enabled");
+        knightKitCost = config.getInt("kitpvp.kits.knight.cost");
 
-        // Kit enabled settings
-        archerKitEnabled = config.getBoolean("kits.archer.enabled");
-        burrowerKitEnabled = config.getBoolean("kits.burrower.enabled");
-        cactusKitEnabled = config.getBoolean("kits.cactus.enabled");
-        dragonKitEnabled = config.getBoolean("kits.dragon.enabled");
-        fishermanKitEnabled = config.getBoolean("kits.fisherman.enabled");
-        ghostKitEnabled = config.getBoolean("kits.ghost.enabled");
-        hulkKitEnabled = config.getBoolean("kits.hulk.enabled");
-        imprisonerKitEnabled = config.getBoolean("kits.imprisoner.enabled");
-        kangarooKitEnabled = config.getBoolean("kits.kangaroo.enabled");
-        knightKitEnabled = config.getBoolean("kits.knight.enabled");
-        mageKitEnabled = config.getBoolean("kits.mage.enabled");
-        monkKitEnabled = config.getBoolean("kits.monk.enabled");
-        ninjaKitEnabled = config.getBoolean("kits.ninja.enabled");
-        pyroKitEnabled = config.getBoolean("kits.pyro.enabled");
-        spidermanKitEnabled = config.getBoolean("kits.spiderman.enabled");
-        summonerKitEnabled = config.getBoolean("kits.summoner.enabled");
-        tamerKitEnabled = config.getBoolean("kits.tamer.enabled");
-        tankKitEnabled = config.getBoolean("kits.tank.enabled");
-        thorKitEnabled = config.getBoolean("kits.thor.enabled");
-        timelordKitEnabled = config.getBoolean("kits.timelord.enabled");
-        vampireKitEnabled = config.getBoolean("kits.vampire.enabled");
-        zenKitEnabled = config.getBoolean("kits.zen.enabled");
+        // Archer kit settings
+        archerKitEnabled = config.getBoolean("kitpvp.kits.archer.enabled");
+        archerKitCost = config.getInt("kitpvp.kits.archer.cost");
 
-        // Kit cost settings
-        archerKitCost = config.getInt("kits.archer.cost");
-        burrowerKitCost = config.getInt("kits.burrower.cost");
-        cactusKitCost = config.getInt("kits.cactus.cost");
-        dragonKitCost = config.getInt("kits.dragon.cost");
-        fishermanKitCost = config.getInt("kits.fisherman.cost");
-        ghostKitCost = config.getInt("kits.ghost.cost");
-        hulkKitCost = config.getInt("kits.hulk.cost");
-        imprisonerKitCost = config.getInt("kits.imprisoner.cost");
-        kangarooKitCost = config.getInt("kits.kangaroo.cost");
-        knightKitCost = config.getInt("kits.knight.cost");
-        mageKitCost = config.getInt("kits.mage.cost");
-        monkKitCost = config.getInt("kits.monk.cost");
-        ninjaKitCost = config.getInt("kits.ninja.cost");
-        pyroKitCost = config.getInt("kits.pyro.cost");
-        spidermanKitCost = config.getInt("kits.spiderman.cost");
-        summonerKitCost = config.getInt("kits.summoner.cost");
-        tamerKitCost = config.getInt("kits.tamer.cost");
-        tankKitCost = config.getInt("kits.tank.cost");
-        thorKitCost = config.getInt("kits.thor.cost");
-        timelordKitCost = config.getInt("kits.timelord.cost");
-        vampireKitCost = config.getInt("kits.vampire.cost");
-        zenKitCost = config.getInt("kits.zen.cost");
+        // Burrower kit settings
+        burrowerKitEnabled = config.getBoolean("kitpvp.kits.burrower.enabled");
+        burrowerKitCost = config.getInt("kitpvp.kits.burrower.cost");
+        burrowerKitCooldown = config.getInt("kitpvp.kits.burrower.ability.cooldown");
+        burrowerKitDuration = config.getInt("kitpvp.kits.burrower.ability.duration");
+
+        // Cactus kit settings
+        cactusKitEnabled = config.getBoolean("kitpvp.kits.cactus.enabled");
+        cactusKitCost = config.getInt("kitpvp.kits.cactus.cost");
+        cactusKitPassiveDuration = config.getInt("kitpvp.kits.cactus.passive.duration");
+
+        // Dragon kit settings
+        dragonKitEnabled = config.getBoolean("kitpvp.kits.dragon.enabled");
+        dragonKitCost = config.getInt("kitpvp.kits.dragon.cost");
+        dragonKitCooldown = config.getInt("kitpvp.kits.dragon.ability.cooldown");
+        dragonKitDuration = config.getInt("kitpvp.kits.dragon.ability.duration");
+        dragonKitRange = config.getInt("kitpvp.kits.dragon.ability.range");
+        dragonKitDamage = config.getInt("kitpvp.kits.dragon.ability.damage");
+
+        // Fisherman kit settings
+        fishermanKitEnabled = config.getBoolean("kitpvp.kits.fisherman.enabled");
+        fishermanKitCost = config.getInt("kitpvp.kits.fisherman.cost");
+        fishermanKitCooldown = config.getInt("kitpvp.kits.fisherman.ability.cooldown");
+
+        // Ghost kit settings
+        ghostKitEnabled = config.getBoolean("kitpvp.kits.ghost.enabled");
+        ghostKitCost = config.getInt("kitpvp.kits.ghost.cost");
+
+        // Hulk kit settings
+        hulkKitEnabled = config.getBoolean("kitpvp.kits.hulk.enabled");
+        hulkKitCost = config.getInt("kitpvp.kits.hulk.cost");
+        hulkKitCooldown = config.getInt("kitpvp.kits.hulk.ability.cooldown");
+        hulkKitRange = config.getInt("kitpvp.kits.hulk.ability.range");
+        hulkKitDamage = config.getInt("kitpvp.kits.hulk.ability.damage");
+        hulkKitMultiplier = config.getDouble("kitpvp.kits.hulk.ability.multiplier");
+
+        // Imprisoner kit settings
+        imprisonerKitEnabled = config.getBoolean("kitpvp.kits.imprisoner.enabled");
+        imprisonerKitCost = config.getInt("kitpvp.kits.imprisoner.cost");
+        imprisonerKitCooldown = config.getInt("kitpvp.kits.imprisoner.ability.cooldown");
+        imprisonerKitDuration = config.getInt("kitpvp.kits.imprisoner.ability.duration");
+        imprisonerKitDamage = config.getInt("kitpvp.kits.imprisoner.ability.damage");
+        imprisonerKitHeight = config.getInt("kitpvp.kits.imprisoner.ability.height");
+
+        // Kangaroo kit settings
+        kangarooKitEnabled = config.getBoolean("kitpvp.kits.kangaroo.enabled");
+        kangarooKitCost = config.getInt("kitpvp.kits.kangaroo.cost");
+        kangarooKitCooldown = config.getInt("kitpvp.kits.kangaroo.ability.cooldown");
+        kangarooKitSneakingHeight = config.getDouble("kitpvp.kits.kangaroo.ability.sneaking.height");
+        kangarooKitSneakingMultiplier = config.getDouble("kitpvp.kits.kangaroo.ability.sneaking.multiplier");
+        kangarooKitNormalHeight = config.getDouble("kitpvp.kits.kangaroo.ability.normal.height");
+        kangarooKitNormalMultiplier = config.getDouble("kitpvp.kits.kangaroo.ability.normal.multiplier");
+
+        // Mage kit settings
+        mageKitEnabled = config.getBoolean("kitpvp.kits.mage.enabled");
+        mageKitCost = config.getInt("kitpvp.kits.mage.cost");
+        mageKitCooldown = config.getInt("kitpvp.kits.mage.ability.cooldown");
+
+        // Monk kit settings
+        monkKitEnabled = config.getBoolean("kitpvp.kits.monk.enabled");
+        monkKitCost = config.getInt("kitpvp.kits.monk.cost");
+        monkKitCooldown = config.getInt("kitpvp.kits.monk.ability.cooldown");
+
+        // Ninja kit settings
+        ninjaKitEnabled = config.getBoolean("kitpvp.kits.ninja.enabled");
+        ninjaKitCost = config.getInt("kitpvp.kits.ninja.cost");
+
+        // Pyro kit settings
+        pyroKitEnabled = config.getBoolean("kitpvp.kits.pyro.enabled");
+        pyroKitCost = config.getInt("kitpvp.kits.pyro.cost");
+
+        // Spiderman kit settings
+        spidermanKitEnabled = config.getBoolean("kitpvp.kits.spiderman.enabled");
+        spidermanKitCost = config.getInt("kitpvp.kits.spiderman.cost");
+        spidermanKitCooldown = config.getInt("kitpvp.kits.spiderman.ability.cooldown");
+        spidermanKitDuration = config.getInt("kitpvp.kits.spiderman.ability.duration");
+
+        // Summoner kit settings
+        summonerKitEnabled = config.getBoolean("kitpvp.kits.summoner.enabled");
+        summonerKitCost = config.getInt("kitpvp.kits.summoner.cost");
+        summonerKitCooldown = config.getInt("kitpvp.kits.summoner.ability.cooldown");
+        summonerKitDuration = config.getInt("kitpvp.kits.summoner.ability.duration");
+        summonerKitRange = config.getInt("kitpvp.kits.summoner.ability.range");
+
+        // Tamer kit settings
+        tamerKitEnabled = config.getBoolean("kitpvp.kits.tamer.enabled");
+        tamerKitCost = config.getInt("kitpvp.kits.tamer.cost");
+        tamerKitCooldown = config.getInt("kitpvp.kits.tamer.ability.cooldown");
+        tamerKitDuration = config.getInt("kitpvp.kits.tamer.ability.duration");
+        tamerKitAmount = config.getInt("kitpvp.kits.tamer.ability.amount");
+
+        // Tank kit settings
+        tankKitEnabled = config.getBoolean("kitpvp.kits.tank.enabled");
+        tankKitCost = config.getInt("kitpvp.kits.tank.cost");
+
+        // Thor kit settings
+        thorKitEnabled = config.getBoolean("kitpvp.kits.thor.enabled");
+        thorKitCost = config.getInt("kitpvp.kits.thor.cost");
+        thorKitCooldown = config.getInt("kitpvp.kits.thor.ability.cooldown");
+        thorKitDuration = config.getInt("kitpvp.kits.thor.ability.duration");
+        thorKitRange = config.getInt("kitpvp.kits.thor.ability.range");
+        thorKitDamage = config.getInt("kitpvp.kits.thor.ability.damage");
+
+        // Timelord kit settings
+        timelordKitEnabled = config.getBoolean("kitpvp.kits.timelord.enabled");
+        timelordKitCost = config.getInt("kitpvp.kits.timelord.cost");
+        timelordKitCooldown = config.getInt("kitpvp.kits.timelord.ability.cooldown");
+        timelordKitDuration = config.getInt("kitpvp.kits.timelord.ability.duration");
+        timelordKitRange = config.getInt("kitpvp.kits.timelord.ability.range");
+
+        // Vampire kit settings
+        vampireKitEnabled = config.getBoolean("kitpvp.kits.vampire.enabled");
+        vampireKitCost = config.getInt("kitpvp.kits.vampire.cost");
+        vampireKitPassiveDuration = config.getInt("kitpvp.kits.vampire.passive.duration");
+        vampireKitCooldown = config.getInt("kitpvp.kits.vampire.ability.cooldown");
+        vampireKitDuration = config.getInt("kitpvp.kits.vampire.ability.duration");
+        vampireKitRange = config.getInt("kitpvp.kits.vampire.ability.range");
+
+        // Zen kit settings
+        zenKitEnabled = config.getBoolean("kitpvp.kits.zen.enabled");
+        zenKitCost = config.getInt("kitpvp.kits.zen.cost");
+        zenKitCooldown = config.getInt("kitpvp.kits.zen.ability.cooldown");
+        zenKitDuration = config.getInt("kitpvp.kits.zen.ability.duration");
+        zenKitRange = config.getInt("kitpvp.kits.zen.ability.range");
 
         // Database settings
         host = config.getString("storage.host");
@@ -270,113 +455,5 @@ public class Settings {
         database = config.getString("storage.database");
         user = config.getString("storage.user");
         password = config.getString("storage.password");
-    }
-
-    /**
-     * Sets the default values for the configuration file.
-     */
-    private static void setDefaultConfigValues() {
-        config.addDefault("kits.archer.enabled", true);
-        config.addDefault("kits.archer.premium-only", false);
-        config.addDefault("kits.archer.cost", 250);
-
-        config.addDefault("kits.burrower.enabled", true);
-        config.addDefault("kits.burrower.premium-only", false);
-        config.addDefault("kits.burrower.cost", 250);
-
-        config.addDefault("kits.cactus.enabled", true);
-        config.addDefault("kits.cactus.premium-only", false);
-        config.addDefault("kits.cactus.cost", 250);
-
-        config.addDefault("kits.dragon.enabled", true);
-        config.addDefault("kits.dragon.premium-only", false);
-        config.addDefault("kits.dragon.cost", 250);
-
-        config.addDefault("kits.fisherman.enabled", true);
-        config.addDefault("kits.fisherman.premium-only", false);
-        config.addDefault("kits.fisherman.cost", 250);
-
-        config.addDefault("kits.ghost.enabled", true);
-        config.addDefault("kits.ghost.premium-only", false);
-        config.addDefault("kits.ghost.cost", 250);
-
-        config.addDefault("kits.hulk.enabled", true);
-        config.addDefault("kits.hulk.premium-only", false);
-        config.addDefault("kits.hulk.cost", 250);
-
-        config.addDefault("kits.imprisoner.enabled", true);
-        config.addDefault("kits.imprisoner.premium-only", false);
-        config.addDefault("kits.imprisoner.cost", 250);
-
-        config.addDefault("kits.kangaroo.enabled", true);
-        config.addDefault("kits.kangaroo.premium-only", false);
-        config.addDefault("kits.kangaroo.cost", 250);
-
-        config.addDefault("kits.knight.enabled", true);
-        config.addDefault("kits.knight.premium-only", false);
-        config.addDefault("kits.knight.cost", 0);
-
-        config.addDefault("kits.mage.enabled", true);
-        config.addDefault("kits.mage.premium-only", false);
-        config.addDefault("kits.mage.cost", 250);
-
-        config.addDefault("kits.monk.enabled", true);
-        config.addDefault("kits.monk.premium-only", false);
-        config.addDefault("kits.monk.cost", 250);
-
-        config.addDefault("kits.ninja.enabled", true);
-        config.addDefault("kits.ninja.premium-only", false);
-        config.addDefault("kits.ninja.cost", 250);
-
-        config.addDefault("kits.pyro.enabled", true);
-        config.addDefault("kits.pyro.premium-only", false);
-        config.addDefault("kits.pyro.cost", 250);
-
-        config.addDefault("kits.spiderman.enabled", true);
-        config.addDefault("kits.spiderman.premium-only", false);
-        config.addDefault("kits.spiderman.cost", 250);
-
-        config.addDefault("kits.summoner.enabled", true);
-        config.addDefault("kits.summoner.premium-only", false);
-        config.addDefault("kits.summoner.cost", 250);
-
-        config.addDefault("kits.tamer.enabled", true);
-        config.addDefault("kits.tamer.premium-only", false);
-        config.addDefault("kits.tamer.cost", 250);
-
-        config.addDefault("kits.tank.enabled", true);
-        config.addDefault("kits.tank.premium-only", false);
-        config.addDefault("kits.tank.cost", 250);
-
-        config.addDefault("kits.thor.enabled", true);
-        config.addDefault("kits.thor.premium-only", false);
-        config.addDefault("kits.thor.cost", 250);
-
-        config.addDefault("kits.timelord.enabled", true);
-        config.addDefault("kits.timelord.premium-only", false);
-        config.addDefault("kits.timelord.cost", 250);
-
-        config.addDefault("kits.vampire.enabled", true);
-        config.addDefault("kits.vampire.premium-only", false);
-        config.addDefault("kits.vampire.cost", 250);
-
-        config.addDefault("kits.zen.enabled", true);
-        config.addDefault("kits.zen.premium-only", false);
-        config.addDefault("kits.zen.cost", 250);
-
-        config.addDefault("premium.enabled", true);
-        config.addDefault("premium.rank-name", "Premium");
-        config.addDefault("premium.permission", "kitpvp.premium");
-        config.addDefault("premium.store-link", "store.kitpvp.io");
-        config.addDefault("premium.non-premium-kit-limit", 10);
-        config.addDefault("premium.bounties-premium-only", true);
-
-        config.addDefault("storage.host", "host");
-        config.addDefault("storage.user", "user");
-        config.addDefault("storage.password", "password");
-        config.addDefault("storage.database", "database");
-        config.addDefault("storage.port", 3306);
-
-        config.options().copyDefaults(true);
     }
 }
