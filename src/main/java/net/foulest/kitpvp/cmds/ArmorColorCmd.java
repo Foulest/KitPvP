@@ -26,6 +26,7 @@ public class ArmorColorCmd {
         Player player = args.getPlayer();
         CommandSender sender = args.getSender();
 
+        // Prints the usage message.
         if (args.length() != 1) {
             MessageUtil.messagePlayer(sender, "&cUsage: /armorcolor [hex]");
             return;

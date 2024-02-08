@@ -22,6 +22,12 @@ public class CombatTagCmd {
     public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
 
+        // Prints the usage message.
+        if (args.length() != 0) {
+            MessageUtil.messagePlayer(player, "&cUsage: /combattag");
+            return;
+        }
+
         // Checks if the combat tag feature is enabled.
         if (!Settings.combatTagEnabled) {
             MessageUtil.messagePlayer(player, "&cThat command is disabled.");

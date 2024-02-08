@@ -26,6 +26,7 @@ public class BalanceCmd {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         CommandSender sender = args.getSender();
 
+        // Prints the usage message.
         if (args.length() != 1) {
             MessageUtil.messagePlayer(sender, "&fCoins: &6" + playerData.getCoins());
             return;

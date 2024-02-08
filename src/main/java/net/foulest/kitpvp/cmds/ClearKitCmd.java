@@ -32,7 +32,7 @@ public class ClearKitCmd {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
-        // Clearing your own kit.
+        // Handles clearing your own kit.
         if (args.length() == 0) {
             if (CombatTag.isInCombat(args.getPlayer())) {
                 MessageUtil.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");
@@ -54,7 +54,7 @@ public class ClearKitCmd {
             return;
         }
 
-        // Clearing kits from other players.
+        // Handles clearing kits from other players.
         if (args.getPlayer().hasPermission("kitpvp.clearkit.others")) {
             Player target = Bukkit.getPlayer(args.getArgs(1));
             PlayerData targetData = PlayerDataManager.getPlayerData(target);
