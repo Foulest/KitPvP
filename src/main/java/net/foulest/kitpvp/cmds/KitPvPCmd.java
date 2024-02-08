@@ -35,6 +35,7 @@ public class KitPvPCmd {
 
         // Handle sub-commands.
         String subCommand = args.getArgs(0);
+
         switch (subCommand.toLowerCase()) {
             case "reload":
                 if (!sender.hasPermission("kitpvp.reload")) {

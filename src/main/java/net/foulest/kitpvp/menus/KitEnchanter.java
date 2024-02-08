@@ -89,7 +89,7 @@ public class KitEnchanter {
         ItemStack knockback = new ItemBuilder(Material.DIAMOND_SWORD).hideInfo().addGlow().name("&aKnockback").lore(Arrays.asList(
                 "&7Adds the &fKnockback II &7enchantment.",
                 "",
-                (playerData.getEnchants().contains(Enchants.KNOCKBACK) ? "&cYou have this equipped."
+                (playerData.getEnchants().contains(Enchants.KNOCKBACK) ? "&aYou have this equipped."
                         : (Settings.knockbackEnabled ? "&7Cost: &6" + Settings.knockbackCost + " coins"
                         : "&cThis enchantment is disabled.")),
                 "",
@@ -101,7 +101,7 @@ public class KitEnchanter {
         ItemStack sharpness = new ItemBuilder(Material.DIAMOND_SWORD).hideInfo().addGlow().name("&aSharpness").lore(Arrays.asList(
                 "&7Adds the &fSharpness II &7enchantment.",
                 "",
-                (playerData.getEnchants().contains(Enchants.SHARPNESS) ? "&cYou have this equipped."
+                (playerData.getEnchants().contains(Enchants.SHARPNESS) ? "&aYou have this equipped."
                         : (Settings.sharpnessEnabled ? "&7Cost: &6" + Settings.sharpnessCost + " coins"
                         : "&cThis enchantment is disabled.")),
                 "",
@@ -113,7 +113,7 @@ public class KitEnchanter {
         ItemStack punch = new ItemBuilder(Material.BOW).addGlow().name("&aPunch").lore(Arrays.asList(
                 "&7Adds the &fPunch II &7enchantment.",
                 "",
-                (playerData.getEnchants().contains(Enchants.PUNCH) ? "&cYou have this equipped."
+                (playerData.getEnchants().contains(Enchants.PUNCH) ? "&aYou have this equipped."
                         : (Settings.punchEnabled ? "&7Cost: &6" + Settings.punchCost + " coins"
                         : "&cThis enchantment is disabled.")),
                 "",
@@ -125,7 +125,7 @@ public class KitEnchanter {
         ItemStack power = new ItemBuilder(Material.BOW).addGlow().name("&aPower").lore(Arrays.asList(
                 "&7Adds the &fPower II &7enchantment.",
                 "",
-                (playerData.getEnchants().contains(Enchants.POWER) ? "&cYou have this equipped."
+                (playerData.getEnchants().contains(Enchants.POWER) ? "&aYou have this equipped."
                         : (Settings.powerEnabled ? "&7Cost: &6" + Settings.powerCost + " coins"
                         : "&cThis enchantment is disabled.")),
                 "",
