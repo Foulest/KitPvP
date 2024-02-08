@@ -26,13 +26,16 @@ permissions:
   kitpvp.combattag:
     description: Allows players to see their combat tag timer.
     default: true
-  kitpvp.ecogive:
+  kitpvp.eco:
+    description: Allows players to manage the economy.
+    default: false
+  kitpvp.eco.give:
     description: Allows players to give money to other players.
     default: false
-  kitpvp.ecoset:
+  kitpvp.eco.set:
     description: Allows players to set other players' balances.
     default: false
-  kitpvp.ecotake:
+  kitpvp.eco.take:
     description: Allows players to take money from other players.
     default: false
   kitpvp.kitenchanter:
@@ -43,6 +46,9 @@ permissions:
     default: true
   kitpvp.kitshop:
     description: Allows players to use the kit shop.
+    default: true
+  kitpvp.main:
+    description: Allows players to use the main command.
     default: true
   kitpvp.pay:
     description: Allows players to pay other players.
@@ -65,9 +71,6 @@ permissions:
   kitpvp.stats:
     description: Allows players to see their stats.
     default: true
-  kitpvp.bypasslimit:
-    description: Allows players to bypass the kit limit.
-    default: false
   kitpvp.modify:
     description: Allows players to modify the map.
     default: false
