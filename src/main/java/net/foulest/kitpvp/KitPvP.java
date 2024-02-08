@@ -3,7 +3,7 @@ package net.foulest.kitpvp;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
-import net.foulest.kitpvp.combattag.CombatTag;
+import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
@@ -120,11 +120,8 @@ public class KitPvP extends JavaPlugin {
         // Saves online players' data.
         MessageUtil.log(Level.INFO, "Saving Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (CombatTag.isInCombat(player)) {
-                CombatTag.remove(player);
-            }
-
-            PlayerDataManager.removePlayerData(player);
+            PlayerData playerData = PlayerDataManager.getPlayerData(player);
+            playerData.saveAll();
         }
 
         // Closes the DBCP connection.
