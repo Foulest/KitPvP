@@ -181,9 +181,7 @@ public class EventListener implements Listener {
                 }
 
                 // Marks both players for combat.
-                if (Settings.combatTagEnabled) {
-                    CombatTag.markForCombat(damager, receiver);
-                }
+                CombatTag.markForCombat(damager, receiver);
 
                 // Prints the Archer arrow tag message.
                 MessageUtil.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &6"
@@ -259,14 +257,14 @@ public class EventListener implements Listener {
             }
 
             // Combat tags players for Player on Player damage.
-            if (Settings.combatTagEnabled && targetEntity instanceof Player) {
+            if (targetEntity instanceof Player) {
                 CombatTag.markForCombat(damager, (Player) targetEntity);
             }
             return;
         }
 
         // Combat tags players for player-owned entity damage.
-        if (Settings.combatTagEnabled && targetEntity instanceof Player && damagerEntity instanceof Tameable) {
+        if (targetEntity instanceof Player && damagerEntity instanceof Tameable) {
             Tameable tameable = (Tameable) damagerEntity;
             AnimalTamer owner = tameable.getOwner();
 
@@ -276,7 +274,7 @@ public class EventListener implements Listener {
         }
 
         // Combat tags players for Iron Golem damage.
-        if (Settings.combatTagEnabled && damagerEntity instanceof IronGolem && targetEntity instanceof Player) {
+        if (damagerEntity instanceof IronGolem && targetEntity instanceof Player) {
             IronGolem golem = (IronGolem) damagerEntity;
 
             Bukkit.getOnlinePlayers().stream()
@@ -946,6 +944,9 @@ public class EventListener implements Listener {
             case SAND:
             case GRAVEL:
                 event.setCancelled(true);
+                break;
+
+            default:
                 break;
         }
     }
