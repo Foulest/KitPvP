@@ -95,7 +95,6 @@ public class ClearKitCmd {
         }
 
         playerData.giveDefaultItems();
-
         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
     }
 }

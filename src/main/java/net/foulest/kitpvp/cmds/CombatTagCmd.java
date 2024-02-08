@@ -2,6 +2,7 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.entity.Player;
@@ -21,11 +22,17 @@ public class CombatTagCmd {
     public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
 
+        // Checks if the combat tag feature is enabled.
+        if (!Settings.combatTagEnabled) {
+            MessageUtil.messagePlayer(player, "&cThat command is disabled.");
+            return;
+        }
+
         if (CombatTag.isInCombat(player)) {
             int timeLeft = CombatTag.getRemainingTime(player);
 
-            MessageUtil.messagePlayer(player, "&cYou are in combat for " + timeLeft + " more "
-                    + (timeLeft == 1 ? "second" : "seconds") + ".");
+            MessageUtil.messagePlayer(player, "&cYou are in combat for " + timeLeft
+                    + " more " + (timeLeft == 1 ? "second" : "seconds") + ".");
         } else {
             MessageUtil.messagePlayer(player, "&aYou are not in combat.");
         }
