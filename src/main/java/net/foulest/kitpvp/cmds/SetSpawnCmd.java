@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.cmds;
 
+import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -18,6 +19,12 @@ public class SetSpawnCmd {
             permission = "kitpvp.setspawn", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player player = args.getPlayer();
+
+        // Checks if the player is in a safezone.
+        if (!Regions.isInSafezone(player.getLocation())) {
+            MessageUtil.messagePlayer(player, "&cYou cannot set spawn outside of a safezone.");
+            return;
+        }
 
         // Sets the spawn point to the player's location.
         Spawn.setLocation(player.getLocation());
