@@ -64,8 +64,8 @@ public class EventListener implements Listener {
 
         // Adds free kits to player's owned kits list.
         for (Kit kit : KitManager.kits) {
-            if (kit.enabled() && kit.getCost() == 0 && !playerData.getOwnedKits().contains(kit)) {
-                playerData.addOwnedKit(kit);
+            if (kit.enabled() && kit.getCost() == 0) {
+                playerData.getOwnedKits().add(kit);
             }
         }
 
@@ -380,7 +380,7 @@ public class EventListener implements Listener {
                 }
 
                 // Purchases the kit for the player.
-                playerData.addOwnedKit(kit);
+                playerData.getOwnedKits().add(kit);
                 playerData.removeCoins(kitCost);
 
                 // Updates the player's inventory and sends a purchase message.
@@ -467,6 +467,9 @@ public class EventListener implements Listener {
                         if (playerData.getActiveKit() != null) {
                             playerData.getActiveKit().apply(player);
                         }
+
+                        // Re-opens the Kit Enchanter GUI.
+                        new KitEnchanter(player);
                         break;
                     }
                 }
