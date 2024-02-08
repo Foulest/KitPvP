@@ -45,8 +45,6 @@ a variety of custom kits, stats tracking, and exclusive features.
 - [Contribution Guidelines](https://github.com/Foulest/KitPvP/wiki/Contribution-Guidelines)
 - [Disclaimer](https://github.com/Foulest/KitPvP/wiki/Disclaimer)
 - [Installation](https://github.com/Foulest/KitPvP/wiki/Installation)
-- [Permissions](https://github.com/Foulest/KitPvP/wiki/Permissions)
-- [Usage](https://github.com/Foulest/KitPvP/wiki/Usage)
 
 ## Getting Help
 
