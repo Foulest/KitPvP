@@ -32,10 +32,6 @@ dependencies {
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
     compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
 
-    // MariaDB - for database connection
-    // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.3.2'
-
     // HikariCP - for database connection pooling
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
@@ -63,8 +59,8 @@ tasks {
         archiveFileName.set("${project.name}-${project.version}.jar")
 
         minimize()
-        relocate 'org.mariadb', 'net.foulest.kitpvp.shaded.org.mariadb'
         relocate 'com.zaxxer', 'net.foulest.kitpvp.shaded.com.zaxxer'
+        relocate 'org.slf4j', 'net.foulest.kitpvp.shaded.org.slf4j'
     }
 
     compileJava {
