@@ -43,6 +43,11 @@ public class Settings {
     public static boolean combatTagPunishLogout;
     public static boolean combatTagDenyEnteringSpawn;
 
+    // Bounties settings
+    public static boolean bountiesEnabled;
+    public static int bountiesCooldown;
+    public static int bountiesMaxAmount;
+
     // Economy settings
     public static int startingCoins;
     public static int coinsOnKill;
@@ -290,6 +295,11 @@ public class Settings {
         combatTagCancelTeleport = config.getBoolean("kitpvp.combat-tag.cancel-teleport");
         combatTagPunishLogout = config.getBoolean("kitpvp.combat-tag.punish-logout");
         combatTagDenyEnteringSpawn = config.getBoolean("kitpvp.combat-tag.deny-entering-spawn");
+
+        // Bounties settings
+        bountiesEnabled = config.getBoolean("kitpvp.bounties.enabled");
+        bountiesCooldown = config.getInt("kitpvp.bounties.cooldown");
+        bountiesMaxAmount = config.getInt("kitpvp.bounties.max-amount");
 
         // Economy settings
         startingCoins = config.getInt("kitpvp.economy.starting-coins");

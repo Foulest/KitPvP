@@ -3,6 +3,7 @@ package net.foulest.kitpvp.cmds;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +26,12 @@ public class BountyCmd {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
+
+        // Checks if the bounties feature is enabled.
+        if (!Settings.bountiesEnabled) {
+            MessageUtil.messagePlayer(player, "&cThat command is disabled.");
+            return;
+        }
 
         if (args.length() == 0) {
             MessageUtil.messagePlayer(player, "");
@@ -60,6 +67,8 @@ public class BountyCmd {
             return;
         }
 
+        // TODO: Implement cooldown in between placing bounties.
+
         if (targetData.getBounty() != 0 || targetData.getBenefactor() != null) {
             MessageUtil.messagePlayer(player, "&c" + target.getName() + " already has a bounty on their head.");
             return;
@@ -72,9 +81,15 @@ public class BountyCmd {
 
         int amount = Integer.parseInt(args.getArgs(2));
         int minCoins = 50;
+        int maxCoins = Settings.bountiesMaxAmount;
 
         if (amount < minCoins) {
             MessageUtil.messagePlayer(player, "&cThe amount needs to be at least 50 coins.");
+            return;
+        }
+
+        if (amount > maxCoins) {
+            MessageUtil.messagePlayer(player, "&cThe amount cannot exceed " + maxCoins + " coins.");
             return;
         }
 

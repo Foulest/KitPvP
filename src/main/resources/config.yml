@@ -43,6 +43,8 @@ kitpvp:
   # enabled: Whether or not bounties are enabled.
   bounties:
     enabled: true
+    cooldown: 60
+    max-amount: 1000
   # -----------------------------------------------
   # Economy Settings
   # -----------------------------------------------
