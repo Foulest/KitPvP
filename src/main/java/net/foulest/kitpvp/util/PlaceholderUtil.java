@@ -1,9 +1,9 @@
 package net.foulest.kitpvp.util;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.combattag.CombatTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

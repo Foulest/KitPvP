@@ -1,9 +1,9 @@
 package net.foulest.kitpvp.region;
 
 import lombok.Getter;
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Bukkit;

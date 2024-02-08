@@ -1,8 +1,8 @@
 package net.foulest.kitpvp.cmds;
 
+import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
