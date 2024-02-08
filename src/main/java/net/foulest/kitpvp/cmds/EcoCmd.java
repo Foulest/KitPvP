@@ -68,7 +68,7 @@ public class EcoCmd {
                 targetData.setCoins(targetData.getCoins() + amount);
                 totalCoins = targetData.getCoins();
 
-                if ((sender instanceof Player) && target == sender) {
+                if (sender instanceof Player && target.equals(sender)) {
                     MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins. &7(+" + amount + ")");
                     return;
                 }
@@ -86,7 +86,7 @@ public class EcoCmd {
                 targetData.setCoins(amount);
                 totalCoins = targetData.getCoins();
 
-                if ((sender instanceof Player) && target == sender) {
+                if (sender instanceof Player && target.equals(sender)) {
                     MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins.");
                     return;
                 }
@@ -104,7 +104,7 @@ public class EcoCmd {
                 targetData.removeCoins(amount);
                 totalCoins = targetData.getCoins();
 
-                if (sender instanceof Player && target == sender) {
+                if (sender instanceof Player && target.equals(sender)) {
                     MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins. &7(-" + amount + ")");
                     return;
                 }
