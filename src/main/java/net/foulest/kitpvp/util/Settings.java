@@ -211,6 +211,7 @@ public class Settings {
 
     // Database settings
     public static boolean usingFlatFile;
+    public static long autoSaveInterval;
     public static String flatFilePath;
     public static String host;
     public static int port;
@@ -463,6 +464,7 @@ public class Settings {
 
         // Database settings
         usingFlatFile = config.getString("kitpvp.storage.type").trim().equalsIgnoreCase("sqlite");
+        autoSaveInterval = config.getLong("kitpvp.storage.auto-save");
         flatFilePath = config.getString("kitpvp.storage.sqlite.file");
         host = config.getString("kitpvp.storage.mariadb.host");
         port = config.getInt("kitpvp.storage.mariadb.port");

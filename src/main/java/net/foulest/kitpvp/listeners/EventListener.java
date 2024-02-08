@@ -461,7 +461,7 @@ public class EventListener implements Listener {
                         MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                         MessageUtil.messagePlayer(player, "");
                         playerData.removeCoins(enchant.getCost());
-                        playerData.addEnchant(enchant);
+                        playerData.getEnchants().add(enchant);
 
                         // Re-applies the player's active kit.
                         if (playerData.getActiveKit() != null) {

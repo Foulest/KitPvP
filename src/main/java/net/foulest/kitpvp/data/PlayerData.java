@@ -72,6 +72,7 @@ public final class PlayerData {
     private boolean usingSoup;
     private boolean noFall;
     private boolean pendingNoFallRemoval;
+    private long lastSaveToDatabase;
 
     public PlayerData(@NotNull UUID uniqueId, Player player) {
         this.uniqueId = uniqueId;
@@ -216,6 +217,8 @@ public final class PlayerData {
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
         }
+
+        lastSaveToDatabase = System.currentTimeMillis();
         return true;
     }
 
@@ -246,7 +249,6 @@ public final class PlayerData {
 
         this.bounty = bounty;
         this.benefactor = benefactor;
-        updateBountiesTable();
     }
 
     public void removeBounty() {
@@ -265,8 +267,6 @@ public final class PlayerData {
         if (killstreak > topKillstreak) {
             topKillstreak = killstreak;
         }
-
-        updatePlayerStatsTable();
     }
 
     public void addKillstreak() {
@@ -275,8 +275,6 @@ public final class PlayerData {
         if (killstreak > topKillstreak) {
             topKillstreak = killstreak;
         }
-
-        updatePlayerStatsTable();
     }
 
     public double getKDR() {
@@ -292,17 +290,11 @@ public final class PlayerData {
     public void setExperience(int exp) {
         experience = exp;
         calcLevel(false);
-        updatePlayerStatsTable();
     }
 
     public void addExperience(int exp) {
-        if (exp == 0) {
-            return;
-        }
-
         experience += exp;
         calcLevel(true);
-        updatePlayerStatsTable();
     }
 
     public float getExpDecimal() {
@@ -356,56 +348,15 @@ public final class PlayerData {
     }
 
     public void addCoins(int value) {
-        if (value == 0) {
-            return;
-        }
-
-        this.coins += value;
-        updatePlayerStatsTable();
+        this.coins += Math.max(0, this.coins + value);
     }
 
     public void removeCoins(int value) {
-        if (value == 0) {
-            return;
-        }
-
         this.coins = Math.max(0, this.coins - value);
-        updatePlayerStatsTable();
     }
 
     public void setCoins(int value) {
         this.coins = Math.max(0, value);
-        updatePlayerStatsTable();
-    }
-
-    public void setPreviousKit(Kit kit) {
-        previousKit = kit;
-        updatePlayerStatsTable();
-    }
-
-    public void setDeaths(int value) {
-        deaths = value;
-        updatePlayerStatsTable();
-    }
-
-    public void setKills(int value) {
-        kills = value;
-        updatePlayerStatsTable();
-    }
-
-    public void addEnchant(Enchants enchant) {
-        enchants.add(enchant);
-        updateEnchantsTable();
-    }
-
-    public void removeEnchant(Enchants enchant) {
-        enchants.remove(enchant);
-        updateEnchantsTable();
-    }
-
-    public void removeAllEnchants() {
-        enchants.clear();
-        updateEnchantsTable();
     }
 
     public void updatePlayerStatsTable() {
@@ -420,6 +371,8 @@ public final class PlayerData {
             put("usingSoup", (usingSoup ? 1 : 0));
             put("previousKit", previousKit.getName());
         }});
+
+        lastSaveToDatabase = System.currentTimeMillis();
     }
 
     public void updatePlayerKitsTable() {
@@ -437,6 +390,8 @@ public final class PlayerData {
                 }});
             }
         }
+
+        lastSaveToDatabase = System.currentTimeMillis();
     }
 
     public void updateEnchantsTable() {
@@ -450,6 +405,8 @@ public final class PlayerData {
             put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
             put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
         }});
+
+        lastSaveToDatabase = System.currentTimeMillis();
     }
 
     public void updateBountiesTable() {
@@ -458,6 +415,8 @@ public final class PlayerData {
             put("bounty", bounty);
             put("benefactor", (benefactor == null ? "" : benefactor.toString()));
         }});
+
+        lastSaveToDatabase = System.currentTimeMillis();
     }
 
     public void giveDefaultItems() {

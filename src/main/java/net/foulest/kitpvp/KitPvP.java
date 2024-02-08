@@ -12,10 +12,7 @@ import net.foulest.kitpvp.listeners.DeathListener;
 import net.foulest.kitpvp.listeners.EventListener;
 import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
-import net.foulest.kitpvp.util.DatabaseUtil;
-import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.PlaceholderUtil;
-import net.foulest.kitpvp.util.Settings;
+import net.foulest.kitpvp.util.*;
 import net.foulest.kitpvp.util.command.CommandFramework;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -29,6 +26,8 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
 
+import static net.foulest.kitpvp.util.Settings.autoSaveInterval;
+
 /**
  * Main class for KitPvP.
  *
@@ -41,6 +40,7 @@ public class KitPvP extends JavaPlugin {
     @Getter
     public static KitPvP instance;
     private CommandFramework framework;
+    public Runnable databaseUpdateScheduler;
 
     @Override
     public void onLoad() {
@@ -68,9 +68,32 @@ public class KitPvP extends JavaPlugin {
         MessageUtil.log(Level.INFO, "Loading Settings...");
         Settings.loadSettings();
 
-        // Sets up the Hikari instance.
+        // Sets up the database instance.
         MessageUtil.log(Level.INFO, "Loading Database...");
         loadDatabase();
+
+        // Sets up the database update scheduler.
+        // This task runs at a set interval to save player data to the database.
+        TaskUtil.runTaskTimer(databaseUpdateScheduler = () -> {
+            // Ignores the task if no players are online.
+            if (Bukkit.getOnlinePlayers().isEmpty()) {
+                return;
+            }
+
+            // Ignores the task if the database connection is lost.
+            if (!DatabaseUtil.checkDatabaseConnection()) {
+                return;
+            }
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+                // Saves the player's data to the database if the last save was over the set interval.
+                if (System.currentTimeMillis() - playerData.getLastSaveToDatabase() >= autoSaveInterval * 1000L) {
+                    playerData.saveAll();
+                }
+            }
+        }, autoSaveInterval * 20L, autoSaveInterval * 20L);
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");

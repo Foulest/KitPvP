@@ -172,7 +172,7 @@ public class DeathListener implements Listener {
 
         // Removes enchantments from the player.
         if (!receiverData.getEnchants().isEmpty()) {
-            receiverData.removeAllEnchants();
+            receiverData.getEnchants().clear();
             MessageUtil.messagePlayer(receiver, "&cYour enchantments were removed on death.");
         }
 

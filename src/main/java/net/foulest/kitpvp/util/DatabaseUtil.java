@@ -271,4 +271,31 @@ public class DatabaseUtil {
             return null;
         }
     }
+
+    /**
+     * Checks if a valid database connection can be obtained.
+     *
+     * @return true if a valid connection is obtained, false otherwise.
+     */
+    public static boolean checkDatabaseConnection() {
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            if (connection == null) {
+                return false;
+            }
+
+            // Execute a simple query to check if the connection is alive.
+            try (Statement statement = connection.createStatement()) {
+                // This can be any fast-executing query. For SQLite, you might use "SELECT 1".
+                try (ResultSet ignored = statement.executeQuery("SELECT 1")) {
+                    return true; // If the query executed successfully, the connection is valid.
+                }
+            } catch (SQLException ex) {
+                MessageUtil.printException(ex);
+                return false;
+            }
+        } catch (SQLException ex) {
+            MessageUtil.printException(ex);
+            return false;
+        }
+    }
 }

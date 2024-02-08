@@ -35,6 +35,7 @@ public class BlockUtil {
                 || block.getType() == Material.SKULL);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isOnGroundOffset(Player player, double offset) {
         if (isPlayerInUnloadedChunk(player)) {
             return true;
