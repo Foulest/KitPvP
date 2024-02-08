@@ -4,7 +4,7 @@
 [![JitPack Badge](https://jitpack.io/v/Foulest/KitPvP.svg)](https://jitpack.io/#Foulest/KitPvP)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/67e6fb9977c449b6bca1678c193c5f13)](https://app.codacy.com/gh/Foulest/KitPvP/dashboard)
 
-KitPvP is an engaging Spigot plugin designed for the KitPvP game mode, offering a thrilling and polished experience with
+**KitPvP** is an engaging Spigot plugin designed for the KitPvP game mode, offering a thrilling and polished experience with
 a variety of custom kits, stats tracking, and exclusive features.
 
 ## Features
