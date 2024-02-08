@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.logging.Level;
-
 /**
  * Handles the spawn point.
  *
@@ -74,11 +72,6 @@ public class Spawn {
      * Loads the spawn point data.
      */
     public static void load() {
-        if (Settings.config.get("spawn") == null) {
-            MessageUtil.log(Level.WARNING, "Spawn is not defined. Define it using /setspawn.");
-            return;
-        }
-
         location = new Location(Bukkit.getWorld(Settings.spawnWorld), Settings.spawnX,
                 Settings.spawnY, Settings.spawnZ, Settings.spawnYaw, Settings.spawnPitch);
 
