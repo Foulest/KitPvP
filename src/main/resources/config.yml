@@ -1,9 +1,21 @@
+# -----------------------------------------------
 # KitPvP
 # Version: ${project.version}
 #
 # Created by: Foulest (https://github.com/Foulest/KitPvP)
 # License: GPLv3 (https://github.com/Foulest/KitPvP/LICENSE)
+# -----------------------------------------------
 kitpvp:
+  # -----------------------------------------------
+  # Spawn location settings.
+  # These can be set in-game using /setspawn.
+  # -----------------------------------------------
+  # world: The world name of the spawn.
+  # x: The x coordinate of the spawn.
+  # y: The y coordinate of the spawn.
+  # z: The z coordinate of the spawn.
+  # yaw: The yaw of the spawn.
+  # pitch: The pitch of the spawn.
   spawn:
     world: "world"
     x: 0.5
@@ -11,20 +23,53 @@ kitpvp:
     z: 0.5
     yaw: 0.0
     pitch: 0.0
+  # -----------------------------------------------
+  # Combat tag settings.
+  # -----------------------------------------------
+  # enabled: Whether or not combat tag is enabled.
+  # duration: The duration of combat tag in seconds.
+  # cancel-teleport: Whether or not to cancel teleportation when combat tagged.
+  # punish-logout: Whether or not to punish players for logging out while combat tagged.
+  # deny-entering-spawn: Whether or not to deny players from entering spawn while combat tagged.
   combat-tag:
     enabled: true
     duration: 15
     cancel-teleport: true
     punish-logout: true
     deny-entering-spawn: true
+  # -----------------------------------------------
+  # Bounties settings.
+  # -----------------------------------------------
+  # enabled: Whether or not bounties are enabled.
+  bounties:
+    enabled: true
+  # -----------------------------------------------
+  # Economy settings.
+  # -----------------------------------------------
+  # starting-coins: The amount of coins players start with.
+  # coins-on-kill: The amount of coins players receive on kill.
+  # exp-on-kill: The amount of experience players receive on kill.
   economy:
     starting-coins: 500
     coins-on-kill: 10
     exp-on-kill: 15
+  # -----------------------------------------------
+  # Killstreak settings.
+  # Bonus coins and experience scale with the size of the killstreak.
+  # -----------------------------------------------
+  # enabled: Whether or not killstreaks are enabled.
+  # coins-bonus: The amount of bonus coins players receive on a killstreak.
+  # exp-bonus: The amount of bonus experience players receive on a killstreak.
   killstreaks:
     enabled: true
     coins-bonus: 5
     exp-bonus: 10
+  # -----------------------------------------------
+  # Kit Enchanter settings.
+  # -----------------------------------------------
+  # enabled: Whether or not the Kit Enchanter is enabled.
+  # enchant.enabled: Whether or not an Enchant is enabled.
+  # enchant.cost: The cost of the Enchant.
   kit-enchanter:
     enabled: true
     feather-falling:
@@ -48,12 +93,34 @@ kitpvp:
     power:
       enabled: true
       cost: 100
+  # -----------------------------------------------
+  # Storage settings.
+  # MySQL and MariaDB are supported.
+  # -----------------------------------------------
+  # host: The hostname of the database.
+  # port: The port of the database.
+  # database: The name of the database.
+  # username: The username of the database.
+  # password: The password of the database.
   storage:
     host: "hostname"
     port: 3306
     database: "kitpvp"
     username: "username"
     password: "password"
+  # -----------------------------------------------
+  # Kit settings.
+  # Below are all the kits players can choose from.
+  # -----------------------------------------------
+  # enabled: Whether or not the kit is enabled.
+  # cost: The cost of the kit.
+  # cooldown: The cooldown of the kit's ability.
+  # duration: The duration of the effects of the kit's ability.
+  # range: The range of the effects of the kit's ability.
+  # damage: The damage of the effects of the kit's ability.
+  # multiplier: The multiplier of the effects of the kit's ability.
+  # height: The height of the effects of the kit's ability.
+  # amount: The amount of the effects of the kit's ability.
   kits:
     knight:
       enabled: true
