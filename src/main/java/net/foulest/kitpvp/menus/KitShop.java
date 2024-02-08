@@ -21,6 +21,7 @@ import java.util.*;
  * @author Foulest
  * @project KitPvP
  */
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class KitShop {
 
     private static final String inventoryName = MessageUtil.colorize("Kit Shop");
