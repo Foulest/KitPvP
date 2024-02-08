@@ -1,6 +1,5 @@
 package net.foulest.kitpvp;
 
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
@@ -18,6 +17,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.PlaceholderUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.CommandFramework;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
@@ -127,9 +127,9 @@ public class KitPvP extends JavaPlugin {
             PlayerDataManager.removePlayerData(player);
         }
 
-        // Closes the MySQL connection.
+        // Closes the DBCP connection.
         MessageUtil.log(Level.INFO, "Saving Database...");
-        DatabaseUtil.closeHikari();
+        DatabaseUtil.closeDbcp();
 
         MessageUtil.log(Level.INFO, "Shut down successfully.");
     }
@@ -138,11 +138,20 @@ public class KitPvP extends JavaPlugin {
      * Loads the plugin's databases.
      */
     private void loadDatabase() {
-        DatabaseUtil.initialize(new HikariDataSource());
-        DatabaseUtil.setupHikari("MariaDBConnectionPool",
-                "jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
-                "org.mariadb.jdbc.Driver", Settings.user, Settings.password,
-                "utf8", "true", "SELECT 1;");
+        // Initializes the DBCP instance.
+        DatabaseUtil.initialize(new BasicDataSource());
+
+        if (Settings.usingFlatFile) {
+            // Sets up the DBCP instance for SQLite.
+            DatabaseUtil.setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
+                    null, null, null, false, null);
+
+        } else {
+            // Sets up the DBCP instance for MariaDB.
+            DatabaseUtil.setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
+                    "org.mariadb.jdbc.Driver", Settings.user, Settings.password,
+                    "utf8", true, "SELECT 1;");
+        }
 
         // Creates the PlayerStats table if it doesn't exist.
         DatabaseUtil.createTableIfNotExists(
@@ -154,7 +163,7 @@ public class KitPvP extends JavaPlugin {
                         + "deaths INT, "
                         + "killstreak INT, "
                         + "topKillstreak INT, "
-                        + "usingSoup BOOLEAN, "
+                        + "usingSoup INT, "
                         + "previousKit VARCHAR(255), "
                         + "PRIMARY KEY (uuid)"
         );
@@ -179,13 +188,13 @@ public class KitPvP extends JavaPlugin {
         DatabaseUtil.createTableIfNotExists(
                 "Enchants",
                 "uuid VARCHAR(255) NOT NULL, "
-                        + "featherFalling BOOLEAN, "
-                        + "thorns BOOLEAN, "
-                        + "protection BOOLEAN, "
-                        + "knockback BOOLEAN, "
-                        + "sharpness BOOLEAN, "
-                        + "punch BOOLEAN, "
-                        + "power BOOLEAN, "
+                        + "featherFalling INT, "
+                        + "thorns INT, "
+                        + "protection INT, "
+                        + "knockback INT, "
+                        + "sharpness INT, "
+                        + "punch INT, "
+                        + "power INT, "
                         + "PRIMARY KEY (uuid)"
         );
     }

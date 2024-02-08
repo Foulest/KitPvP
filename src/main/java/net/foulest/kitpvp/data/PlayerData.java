@@ -126,7 +126,7 @@ public final class PlayerData {
             put("deaths", 0);
             put("killstreak", 0);
             put("topKillstreak", 0);
-            put("usingSoup", false);
+            put("usingSoup", 0);
             put("previousKit", "Knight");
         }});
 
@@ -136,17 +136,14 @@ public final class PlayerData {
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
-                System.out.println(playerData.toString());
                 coins = (Integer) playerData.get("coins");
                 experience = (Integer) playerData.get("experience");
                 kills = (Integer) playerData.get("kills");
                 deaths = (Integer) playerData.get("deaths");
                 killstreak = (Integer) playerData.get("killstreak");
                 topKillstreak = (Integer) playerData.get("topKillstreak");
-                usingSoup = (Boolean) playerData.get("usingSoup");
+                usingSoup = (Integer) playerData.get("usingSoup") == 1;
                 previousKit = KitManager.getKit((String) playerData.get("previousKit"));
-            } else {
-                System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
@@ -165,8 +162,6 @@ public final class PlayerData {
                 for (HashMap<String, Object> row : data) {
                     ownedKits.add(KitManager.getKit((String) row.get("kitName")));
                 }
-            } else {
-                System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
@@ -190,13 +185,13 @@ public final class PlayerData {
         // Inserts default values into Enchants.
         DatabaseUtil.addDefaultDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put("featherFalling", false);
-            put("thorns", false);
-            put("protection", false);
-            put("knockback", false);
-            put("sharpness", false);
-            put("punch", false);
-            put("power", false);
+            put("featherFalling", 0);
+            put("thorns", 0);
+            put("protection", 0);
+            put("knockback", 0);
+            put("sharpness", 0);
+            put("punch", 0);
+            put("power", 0);
         }});
 
         // Loads values from Enchants.
@@ -208,13 +203,12 @@ public final class PlayerData {
 
                 for (Enchants enchant : Enchants.values()) {
                     String key = enchant.getDatabaseName();
+                    Object value = playerData.get(key);
 
-                    if (playerData.containsKey(key)) {
+                    if (Integer.valueOf(1).equals(value)) {
                         enchants.add(enchant);
                     }
                 }
-            } else {
-                System.out.println("No player found with UUID " + uuid);
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
@@ -252,7 +246,7 @@ public final class PlayerData {
             put("deaths", deaths);
             put("killstreak", killstreak);
             put("topKillstreak", topKillstreak);
-            put("usingSoup", usingSoup);
+            put("usingSoup", (usingSoup ? 1 : 0));
             put("previousKit", previousKit.getName());
         }});
 
@@ -270,7 +264,11 @@ public final class PlayerData {
             put("uuid", uuid);
 
             for (Enchants enchant : Enchants.values()) {
-                put(enchant.getDatabaseName(), enchants.contains(enchant));
+                if (enchants.contains(enchant)) {
+                    put(enchant.getDatabaseName(), 1);
+                } else {
+                    put(enchant.getDatabaseName(), 0);
+                }
             }
         }});
     }
@@ -295,7 +293,8 @@ public final class PlayerData {
             bounty = 0;
             benefactor = null;
 
-            DatabaseUtil.deleteDataFromTable("Bounties", "uuid = ?", Collections.singletonList(player.getUniqueId().toString()));
+            DatabaseUtil.deleteDataFromTable("Bounties", "uuid = ?",
+                    Collections.singletonList(player.getUniqueId().toString()));
         }
     }
 
@@ -490,7 +489,7 @@ public final class PlayerData {
 
         DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put("usingSoup", usingSoup);
+            put("usingSoup", (usingSoup ? 1 : 0));
         }});
     }
 
@@ -517,7 +516,7 @@ public final class PlayerData {
 
         DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put(enchant.getDatabaseName(), true);
+            put(enchant.getDatabaseName(), 1);
         }});
     }
 
@@ -526,8 +525,19 @@ public final class PlayerData {
 
         DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
             put("uuid", uuid);
-            put(enchant.getDatabaseName(), false);
+            put(enchant.getDatabaseName(), 0);
         }});
+    }
+
+    public void removeAllEnchants() {
+        for (Enchants enchant : enchants) {
+            DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+                put("uuid", uuid);
+                put(enchant.getDatabaseName(), 0);
+            }});
+        }
+
+        enchants.clear();
     }
 
     public void addOwnedKit(Kit kit) {

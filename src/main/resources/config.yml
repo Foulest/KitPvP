@@ -1,13 +1,13 @@
-# -----------------------------------------------
+# -------------------------------------------------
 # KitPvP
 # Version: ${project.version}
 #
 # Created by: Foulest (https://github.com/Foulest/KitPvP)
 # License: GPLv3 (https://github.com/Foulest/KitPvP/LICENSE)
-# -----------------------------------------------
+# -------------------------------------------------
 kitpvp:
   # -----------------------------------------------
-  # Spawn location settings.
+  # Spawn Settings
   # These can be set in-game using /setspawn.
   # -----------------------------------------------
   # world: The world name of the spawn.
@@ -17,14 +17,14 @@ kitpvp:
   # yaw: The yaw of the spawn.
   # pitch: The pitch of the spawn.
   spawn:
-    world: "world"
+    world: world
     x: 0.5
     y: 64.0
     z: 0.5
     yaw: 0.0
     pitch: 0.0
   # -----------------------------------------------
-  # Combat tag settings.
+  # Combat Tag Settings
   # -----------------------------------------------
   # enabled: Whether or not combat tag is enabled.
   # duration: The duration of combat tag in seconds.
@@ -38,13 +38,13 @@ kitpvp:
     punish-logout: true
     deny-entering-spawn: true
   # -----------------------------------------------
-  # Bounties settings.
+  # Bounties Settings
   # -----------------------------------------------
   # enabled: Whether or not bounties are enabled.
   bounties:
     enabled: true
   # -----------------------------------------------
-  # Economy settings.
+  # Economy Settings
   # -----------------------------------------------
   # starting-coins: The amount of coins players start with.
   # coins-on-kill: The amount of coins players receive on kill.
@@ -54,7 +54,7 @@ kitpvp:
     coins-on-kill: 10
     exp-on-kill: 15
   # -----------------------------------------------
-  # Killstreak settings.
+  # Killstreak Settings
   # Bonus coins and experience scale with the size of the killstreak.
   # -----------------------------------------------
   # enabled: Whether or not killstreaks are enabled.
@@ -65,7 +65,7 @@ kitpvp:
     coins-bonus: 5
     exp-bonus: 10
   # -----------------------------------------------
-  # Kit Enchanter settings.
+  # Kit Enchanter Settings
   # -----------------------------------------------
   # enabled: Whether or not the Kit Enchanter is enabled.
   # enchant.enabled: Whether or not an Enchant is enabled.
@@ -94,22 +94,28 @@ kitpvp:
       enabled: true
       cost: 100
   # -----------------------------------------------
-  # Storage settings.
-  # MySQL and MariaDB are supported.
+  # Storage Settings
+  # SQLite and MariaDB are supported.
   # -----------------------------------------------
-  # host: The hostname of the database.
-  # port: The port of the database.
-  # database: The name of the database.
-  # username: The username of the database.
-  # password: The password of the database.
+  # type: The type of the database. (sqlite, mariadb)
+  # sqlite.file: The file path of the database.
+  # mariadb.host: The hostname of the database.
+  # mariadb.port: The port of the database.
+  # mariadb.database: The name of the database.
+  # mariadb.username: The username of the database.
+  # mariadb.password: The password of the database.
   storage:
-    host: "hostname"
-    port: 3306
-    database: "kitpvp"
-    username: "username"
-    password: "password"
+    type: sqlite
+    sqlite:
+      file: plugins/KitPvP/database.db
+    mariadb:
+      host: hostname
+      port: 3306
+      database: kitpvp
+      username: username
+      password: password
   # -----------------------------------------------
-  # Kit settings.
+  # Kit Settings
   # Below are all the kits players can choose from.
   # -----------------------------------------------
   # enabled: Whether or not the kit is enabled.

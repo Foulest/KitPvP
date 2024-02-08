@@ -1,13 +1,12 @@
 package net.foulest.kitpvp.util;
 
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.Synchronized;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,51 +19,60 @@ import java.util.stream.IntStream;
 @SuppressWarnings("SqlSourceToSinkFlow")
 public class DatabaseUtil {
 
-    private static HikariDataSource hikari;
+    private static BasicDataSource dataSource;
 
     /**
-     * Initializes the Hikari instance.
+     * Initializes the DBCP instance.
      *
-     * @param source The Hikari data source.
+     * @param source The BasicDataSource instance.
      */
     @Synchronized
-    public static void initialize(HikariDataSource source) {
-        if (hikari == null) {
-            hikari = source;
+    public static void initialize(BasicDataSource source) {
+        if (dataSource == null) {
+            dataSource = source;
         }
     }
 
     /**
-     * Sets up the Hikari instance.
+     * Sets up the DBCP instance.
      *
-     * @param poolName            The pool name.
-     * @param jdbcUrl             The JDBC URL.
-     * @param driverClassName     The driver class name.
-     * @param user                The database user.
-     * @param password            The database password.
-     * @param characterEncoding   The character encoding.
-     * @param useUnicode          The use unicode.
-     * @param connectionTestQuery The connection test query.
+     * @param jdbcUrl           The JDBC URL.
+     * @param driverClassName   The driver class name.
+     * @param user              The database user.
+     * @param password          The database password.
+     * @param characterEncoding The character encoding.
+     * @param useUnicode        Whether to use Unicode.
+     * @param validationQuery   The query to validate connections from the pool.
      */
-    public static void setupHikari(String poolName, String jdbcUrl, String driverClassName,
-                                   String user, String password, String characterEncoding,
-                                   String useUnicode, String connectionTestQuery) {
-        hikari.setPoolName(poolName);
-        hikari.setJdbcUrl(jdbcUrl);
-        hikari.setDriverClassName(driverClassName);
-        hikari.addDataSourceProperty("user", user);
-        hikari.addDataSourceProperty("password", password);
-        hikari.addDataSourceProperty("characterEncoding", characterEncoding);
-        hikari.addDataSourceProperty("useUnicode", useUnicode);
-        hikari.setConnectionTestQuery(connectionTestQuery);
+    public static void setupDbcp(String jdbcUrl, String driverClassName, String user, String password,
+                                 String characterEncoding, boolean useUnicode, String validationQuery) {
+        if (dataSource == null) {
+            dataSource = new BasicDataSource();
+        }
+
+        dataSource.setUrl(jdbcUrl);
+        dataSource.setDriverClassName(driverClassName);
+
+        // SQLite specific adjustments
+        if (!jdbcUrl.startsWith("jdbc:sqlite:")) {
+            dataSource.setUsername(user);
+            dataSource.setPassword(password);
+            dataSource.setValidationQuery(validationQuery);
+            dataSource.addConnectionProperty("characterEncoding", characterEncoding);
+            dataSource.addConnectionProperty("useUnicode", Boolean.toString(useUnicode));
+        }
     }
 
     /**
-     * Closes the Hikari instance.
+     * Closes the DBCP data source.
      */
-    public static void closeHikari() {
-        if (hikari != null) {
-            hikari.close();
+    public static void closeDbcp() {
+        try {
+            if (dataSource != null) {
+                dataSource.close();
+            }
+        } catch (SQLException ex) {
+            MessageUtil.printException(ex);
         }
     }
 
@@ -75,8 +83,8 @@ public class DatabaseUtil {
      * @param tableColumns The table column definition.
      */
     public static void createTableIfNotExists(String tableName, String tableColumns) {
-        try (Connection connection = hikari.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            DatabaseMetaData metaData = Objects.requireNonNull(connection).getMetaData();
             ResultSet tables = metaData.getTables(null, null, tableName, null);
 
             if (!tables.next()) {
@@ -98,8 +106,8 @@ public class DatabaseUtil {
      * @throws SQLException If a database access error occurs.
      */
     public static void deleteTableIfExists(String tableName) throws SQLException {
-        try (Connection connection = hikari.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            DatabaseMetaData metaData = Objects.requireNonNull(connection).getMetaData();
             ResultSet tables = metaData.getTables(null, null, tableName, null);
 
             if (tables.next()) {
@@ -124,15 +132,24 @@ public class DatabaseUtil {
                 .mapToObj(i -> "?")
                 .collect(Collectors.joining(", "));
 
-        String updateStatement = " ON DUPLICATE KEY UPDATE " + tableData.keySet().stream()
-                .map(column -> String.format("%s = VALUES(%s)", column, column))
-                .collect(Collectors.joining(", "));
+        String insertSQL;
 
-        String insertSQL = String.format("INSERT INTO %s (%s) VALUES (%s)%s",
-                tableName, columns, placeholders, updateStatement);
+        if (Settings.usingFlatFile) {
+            // SQLite syntax with INSERT OR REPLACE (assumes table has PRIMARY KEY or UNIQUE constraints)
+            insertSQL = String.format("INSERT OR REPLACE INTO %s (%s) VALUES (%s)",
+                    tableName, columns, placeholders);
+        } else {
+            // MySQL/MariaDB syntax with ON DUPLICATE KEY UPDATE
+            String updateStatement = " ON DUPLICATE KEY UPDATE " + tableData.keySet().stream()
+                    .map(column -> String.format("%s = VALUES(%s)", column, column))
+                    .collect(Collectors.joining(", "));
 
-        try (Connection connection = hikari.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+            insertSQL = String.format("INSERT INTO %s (%s) VALUES (%s)%s",
+                    tableName, columns, placeholders, updateStatement);
+        }
+
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            try (PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(insertSQL)) {
                 int index = 1;
                 for (Object value : tableData.values()) {
                     preparedStatement.setObject(index++, value);
@@ -152,30 +169,28 @@ public class DatabaseUtil {
      * @param tableData The data to be added.
      */
     public static void addDefaultDataToTable(String tableName, @NotNull HashMap<String, Object> tableData) {
-        String columns = String.join(", ", tableData.keySet());
-        String placeholders = IntStream.range(0, tableData.size())
-                .mapToObj(i -> "?")
-                .collect(Collectors.joining(", "));
+        // Check if the table is empty
+        String checkTableEmptySQL = String.format("SELECT COUNT(*) FROM %s", tableName);
 
-        String checkIfExistsSQL = String.format("SELECT 1 FROM %s LIMIT 1", tableName);
-        String insertSQL = String.format("INSERT INTO %s (%s) SELECT %s FROM DUAL WHERE NOT EXISTS (%s)",
-                tableName, columns, placeholders, checkIfExistsSQL);
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
+             PreparedStatement checkTableEmptyStmt = Objects.requireNonNull(connection).prepareStatement(checkTableEmptySQL)) {
 
-        try (Connection connection = hikari.getConnection()) {
-            try (PreparedStatement checkIfExistsStatement = connection.prepareStatement(checkIfExistsSQL);
-                 PreparedStatement insertStatement = connection.prepareStatement(insertSQL)) {
+            ResultSet rs = checkTableEmptyStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return; // Table is not empty, no need to insert default data
+            }
 
-                // Check if any row exists in the table
-                if (checkIfExistsStatement.executeQuery().next()) {
-                    return; // Data already exists, no need to insert
-                }
+            // Proceed with insert since table is empty
+            String columns = String.join(", ", tableData.keySet());
+            String placeholders = String.join(", ", Collections.nCopies(tableData.size(), "?"));
+            String insertSQL = String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
 
-                // Bind values and execute the insert statement
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertSQL)) {
                 int index = 1;
                 for (Object value : tableData.values()) {
-                    insertStatement.setObject(index++, value);
+                    insertStmt.setObject(index++, value);
                 }
-                insertStatement.executeUpdate();
+                insertStmt.executeUpdate();
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
@@ -196,8 +211,8 @@ public class DatabaseUtil {
                                                                            @NotNull List<Object> parameters) throws SQLException {
         String selectSQL = String.format("SELECT * FROM %s WHERE %s", tableName, condition);
 
-        try (Connection connection = hikari.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            try (PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(selectSQL)) {
                 for (int i = 0; i < parameters.size(); i++) {
                     preparedStatement.setObject(i + 1, parameters.get(i));
                 }
@@ -230,14 +245,30 @@ public class DatabaseUtil {
                                            @NotNull List<Object> parameters) {
         String deleteSQL = String.format("DELETE FROM %s WHERE %s", tableName, condition);
 
-        try (Connection connection = hikari.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
+             PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(deleteSQL)) {
             for (int i = 0; i < parameters.size(); i++) {
                 preparedStatement.setObject(i + 1, parameters.get(i));
             }
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
+        }
+    }
+
+    /**
+     * Method to get a SQLite connection directly without DBCP.
+     *
+     * @return The SQLite connection.
+     * @throws SQLException If a database access error occurs.
+     */
+    public static @Nullable Connection getSQLiteConnection() throws SQLException {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            return DriverManager.getConnection("jdbc:sqlite:" + Settings.flatFilePath);
+        } catch (ClassNotFoundException ex) {
+            MessageUtil.printException(ex);
+            return null;
         }
     }
 }
