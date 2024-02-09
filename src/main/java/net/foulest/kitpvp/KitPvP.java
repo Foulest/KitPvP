@@ -1,5 +1,6 @@
 package net.foulest.kitpvp;
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
@@ -14,7 +15,6 @@ import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.*;
 import net.foulest.kitpvp.util.command.CommandFramework;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
@@ -159,7 +159,7 @@ public class KitPvP extends JavaPlugin {
      */
     private void loadDatabase() {
         // Initializes the DBCP instance.
-        DatabaseUtil.initialize(new BasicDataSource());
+        DatabaseUtil.initialize(new HikariDataSource());
 
         if (Settings.usingFlatFile) {
             // Sets up the DBCP instance for SQLite.

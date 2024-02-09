@@ -1,7 +1,7 @@
 package net.foulest.kitpvp.util;
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Synchronized;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,10 +16,10 @@ import java.util.stream.IntStream;
  * @author Foulest
  * @project KitPvP
  */
-@SuppressWarnings("SqlSourceToSinkFlow")
+@SuppressWarnings({"SqlSourceToSinkFlow", "unused"})
 public class DatabaseUtil {
 
-    private static BasicDataSource dataSource;
+    private static HikariDataSource dataSource;
 
     /**
      * Initializes the DBCP instance.
@@ -27,7 +27,7 @@ public class DatabaseUtil {
      * @param source The BasicDataSource instance.
      */
     @Synchronized
-    public static void initialize(BasicDataSource source) {
+    public static void initialize(HikariDataSource source) {
         if (dataSource == null) {
             dataSource = source;
         }
@@ -47,19 +47,19 @@ public class DatabaseUtil {
     public static void setupDbcp(String jdbcUrl, String driverClassName, String user, String password,
                                  String characterEncoding, boolean useUnicode, String validationQuery) {
         if (dataSource == null) {
-            dataSource = new BasicDataSource();
+            dataSource = new HikariDataSource();
         }
 
-        dataSource.setUrl(jdbcUrl);
+        dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(driverClassName);
 
         // SQLite specific adjustments
         if (!jdbcUrl.startsWith("jdbc:sqlite:")) {
             dataSource.setUsername(user);
             dataSource.setPassword(password);
-            dataSource.setValidationQuery(validationQuery);
-            dataSource.addConnectionProperty("characterEncoding", characterEncoding);
-            dataSource.addConnectionProperty("useUnicode", Boolean.toString(useUnicode));
+            dataSource.setConnectionTestQuery(validationQuery);
+            dataSource.addDataSourceProperty("characterEncoding", characterEncoding);
+            dataSource.addDataSourceProperty("useUnicode", Boolean.toString(useUnicode));
         }
     }
 
@@ -67,12 +67,8 @@ public class DatabaseUtil {
      * Closes the DBCP data source.
      */
     public static void closeDbcp() {
-        try {
-            if (dataSource != null) {
-                dataSource.close();
-            }
-        } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+        if (dataSource != null) {
+            dataSource.close();
         }
     }
 

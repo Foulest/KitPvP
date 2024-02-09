@@ -101,7 +101,7 @@ kitpvp:
   # -----------------------------------------------
   # type: The type of the database. (sqlite, mariadb)
   # auto-save: The interval of the database auto-save in seconds.
-  # sqlite.file: The file path of the database.
+  # sqlite.file: The file name of the database.
   # mariadb.host: The hostname of the database.
   # mariadb.port: The port of the database.
   # mariadb.database: The name of the database.
@@ -111,7 +111,7 @@ kitpvp:
     type: sqlite
     auto-save: 300
     sqlite:
-      file: plugins/KitPvP/database.db
+      file: database.db
     mariadb:
       host: hostname
       port: 3306
@@ -143,7 +143,7 @@ kitpvp:
       cost: 250
       ability:
         cooldown: 30
-        duration: 10
+        duration: 5
     cactus:
       enabled: true
       cost: 250
