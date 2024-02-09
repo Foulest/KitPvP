@@ -26,7 +26,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
@@ -34,9 +33,10 @@ import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.logging.Level;
 
 public class EventListener implements Listener {
 
@@ -305,124 +305,97 @@ public class EventListener implements Listener {
         }
     }
 
-    /**
-     * Handles players interacting with their inventory.
-     *
-     * @param event InventoryClickEvent
-     */
     @EventHandler
     public static void onInventoryClick(@NotNull InventoryClickEvent event) {
+        // Nullability checks.
+        if (event.getWhoClicked() == null
+                || event.getClickedInventory() == null) {
+            return;
+        }
+
+        // Player-related variables
         Player player = (Player) event.getWhoClicked();
-        Location playerLocation = player.getLocation();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        ItemStack currentItem = event.getCurrentItem();
+        Location playerLocation = player.getLocation();
+
+        // Event-related variables
+        InventoryType clickedInventoryType = event.getClickedInventory().getType();
         String windowTitle = event.getView().getTitle();
+        ItemStack currentItem = event.getCurrentItem();
 
-        // Ignores items that are null or have no item meta.
-        if (currentItem == null
-                || !currentItem.hasItemMeta()
-                || currentItem.getItemMeta() == null) {
-            event.setCancelled(true);
-            player.updateInventory();
+        // Cancels inventory clicks based on inventory type.
+        switch (clickedInventoryType) {
+            case PLAYER:
+                if (playerData.getActiveKit() == null) {
+                    event.setCancelled(true);
+                    player.updateInventory();
+                    return;
+                }
+                break;
+
+            case CRAFTING:
+            case ANVIL:
+            case BEACON:
+            case HOPPER:
+            case BREWING:
+            case DROPPER:
+            case FURNACE:
+            case CREATIVE:
+            case MERCHANT:
+            case DISPENSER:
+            case WORKBENCH:
+            case ENCHANTING:
+            case ENDER_CHEST:
+                if (player.getGameMode() == GameMode.CREATIVE && player.hasPermission("kitpvp.modify")) {
+                    break;
+                }
+
+                event.setCancelled(true);
+                player.updateInventory();
+                return;
+
+            case CHEST:
+                break;
+        }
+
+        // Cancels inventory clicks based on slot type.
+        switch (event.getSlotType()) {
+            case CRAFTING:
+            case OUTSIDE:
+            case FUEL:
+            case RESULT:
+            case ARMOR:
+                event.setCancelled(true);
+                player.updateInventory();
+                return;
+
+            case CONTAINER:
+            case QUICKBAR:
+                break;
+        }
+
+        // Ignores items without display names.
+        if (currentItem.getItemMeta() == null
+                || currentItem.getItemMeta().getDisplayName() == null) {
             return;
         }
 
-        ItemMeta currentItemMeta = event.getCurrentItem().getItemMeta();
-        String itemName = ChatColor.stripColor(currentItemMeta.getDisplayName());
-
-        // Ignores items that are null or have no item name.
-        if (itemName == null || itemName.trim().isEmpty()) {
-            event.setCancelled(true);
-            player.updateInventory();
-            return;
-        }
-
-        // Fixes a weird hotbar swap bug.
-        if (event.getAction() == InventoryAction.HOTBAR_SWAP
-                && !event.getClickedInventory().getName().equals("container.inventory")) {
-            event.setCancelled(true);
-            player.updateInventory();
-            return;
-        }
-
-        // Prevents players in kits from moving their armor.
-        if (playerData.getActiveKit() != null
-                && event.getSlotType() == InventoryType.SlotType.ARMOR) {
-            event.setCancelled(true);
-            player.updateInventory();
-            return;
-        }
-
+        String itemName = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName().trim());
         Kit kit = KitManager.getKit(itemName);
         int kitCost = (kit == null ? 0 : kit.getCost());
         String kitName = (kit == null ? null : kit.getName());
 
+        // Ignores clicked inventories that are not chests.
+        // Below, we handle the Kit Enchanter, Kit Selector, and Kit Shop.
+        // These are all instances of CHEST inventory types.
+        if (clickedInventoryType != InventoryType.CHEST) {
+            return;
+        }
+
+        // Handles inventory clicks based on window title.
         switch (windowTitle) {
-            case "Kit Shop":
-                event.setCancelled(true);
-                player.updateInventory();
-
-                // Ignores invalid kits from being selected.
-                if (kit == null) {
-                    return;
-                }
-
-                // Ignores players trying to purchase disabled kits.
-                if (!kit.enabled()) {
-                    MessageUtil.messagePlayer(player, "&cThis kit is currently disabled.");
-                    return;
-                }
-
-                // Ignores players trying to purchase kits they cannot afford.
-                if (playerData.getCoins() - kitCost < 0) {
-                    MessageUtil.messagePlayer(player, "&cYou do not have enough coins to purchase " + kitName + ".");
-                    return;
-                }
-
-                // Purchases the kit for the player.
-                playerData.getOwnedKits().add(kit);
-                playerData.removeCoins(kitCost);
-
-                // Updates the player's inventory and sends a purchase message.
-                MessageUtil.messagePlayer(player, "&aYou purchased the " + kitName + " kit for " + kitCost + " coins.");
-                player.playSound(playerLocation, Sound.LEVEL_UP, 1, 1);
-                player.closeInventory();
-                break;
-
-            case "Kit Selector":
-                event.setCancelled(true);
-                player.updateInventory();
-
-                switch (itemName) {
-                    case "-->":
-                        new KitSelector(player, KitSelector.getPage(player) + 1);
-                        break;
-
-                    case "<--":
-                        new KitSelector(player, KitSelector.getPage(player) - 1);
-                        break;
-
-                    case "Kit Shop":
-                        new KitShop(player);
-                        break;
-
-                    default:
-                        // Ignores invalid kits from being selected.
-                        if (kit == null) {
-                            return;
-                        }
-
-                        // Applies the selected kit to the player.
-                        kit.apply(player);
-                        MessageUtil.messagePlayer(player, "&aYou equipped the " + kitName + " kit.");
-                        player.playSound(playerLocation, Sound.SLIME_WALK, 1, 1);
-                        player.updateInventory();
-                        player.closeInventory();
-                        break;
-                }
-                break;
-
             case "Kit Enchanter":
+                MessageUtil.log(Level.INFO, "Kit Enchanter click event for " + player.getName() + ".");
                 event.setCancelled(true);
                 player.updateInventory();
 
@@ -449,7 +422,7 @@ public class EventListener implements Listener {
                         // Checks if the player has enough coins.
                         if (playerData.getCoins() - enchant.getCost() < 0) {
                             player.playSound(playerLocation, Sound.VILLAGER_NO, 1.0F, 1.0F);
-                            MessageUtil.messagePlayer(player, "&cYou do not have enough coins.");
+                            MessageUtil.messagePlayer(player, "&cYou do not have enough coins to purchase this enchant.");
                             event.setCancelled(true);
                             return;
                         }
@@ -475,11 +448,71 @@ public class EventListener implements Listener {
                 }
                 break;
 
-            default:
-                if (playerData.getActiveKit() == null) {
-                    event.setCancelled(true);
-                    player.updateInventory();
+            case "Kit Selector":
+                event.setCancelled(true);
+                player.updateInventory();
+
+                switch (itemName) {
+                    case "-->":
+                        new KitSelector(player, KitSelector.getPage(player) + 1);
+                        break;
+
+                    case "<--":
+                        new KitSelector(player, KitSelector.getPage(player) - 1);
+                        break;
+
+                    case "Kit Shop":
+                        new KitShop(player);
+                        break;
+
+                    default:
+                        // Ignores invalid kits from being selected.
+                        if (kit == null) {
+                            MessageUtil.log(Level.INFO, "Invalid kit in Kit Selector for " + player.getName() + ".");
+                            return;
+                        }
+
+                        // Applies the selected kit to the player.
+                        kit.apply(player);
+                        MessageUtil.messagePlayer(player, "&aYou equipped the " + kitName + " kit.");
+                        player.playSound(playerLocation, Sound.SLIME_WALK, 1, 1);
+                        player.updateInventory();
+                        player.closeInventory();
+                        break;
                 }
+                break;
+
+            case "Kit Shop":
+                MessageUtil.log(Level.INFO, "Kit Shop click event for " + player.getName() + ".");
+                event.setCancelled(true);
+                player.updateInventory();
+
+                // Ignores invalid kits from being selected.
+                if (kit == null) {
+                    MessageUtil.log(Level.INFO, "Invalid kit in Kit Shop for " + player.getName() + ".");
+                    return;
+                }
+
+                // Ignores players trying to purchase disabled kits.
+                if (!kit.enabled()) {
+                    MessageUtil.messagePlayer(player, "&cThis kit is currently disabled.");
+                    return;
+                }
+
+                // Ignores players trying to purchase kits they cannot afford.
+                if (playerData.getCoins() - kitCost < 0) {
+                    MessageUtil.messagePlayer(player, "&cYou do not have enough coins to purchase " + kitName + ".");
+                    return;
+                }
+
+                // Purchases the kit for the player.
+                playerData.getOwnedKits().add(kit);
+                playerData.removeCoins(kitCost);
+
+                // Updates the player's inventory and sends a purchase message.
+                MessageUtil.messagePlayer(player, "&aYou purchased the " + kitName + " kit for " + kitCost + " coins.");
+                player.playSound(playerLocation, Sound.LEVEL_UP, 1, 1);
+                player.closeInventory();
                 break;
         }
     }
