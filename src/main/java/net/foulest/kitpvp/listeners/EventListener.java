@@ -356,6 +356,7 @@ public class EventListener implements Listener {
                 return;
 
             case CHEST:
+            default:
                 break;
         }
 
@@ -372,6 +373,7 @@ public class EventListener implements Listener {
 
             case CONTAINER:
             case QUICKBAR:
+            default:
                 break;
         }
 
@@ -512,6 +514,9 @@ public class EventListener implements Listener {
                 MessageUtil.messagePlayer(player, "&aYou purchased the " + kitName + " kit for " + kitCost + " coins.");
                 player.playSound(playerLocation, Sound.LEVEL_UP, 1, 1);
                 player.closeInventory();
+                break;
+
+            default:
                 break;
         }
     }
