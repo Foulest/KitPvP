@@ -85,15 +85,6 @@ public class KitSelector {
     }
 
     /**
-     * Ensures that we use enough slots to hold all the kit items.
-     *
-     * @param size The size of the inventory.
-     */
-    private static int ensureKits(int size) {
-        return (Math.min(size, 36));
-    }
-
-    /**
      * Creates a kit item.
      *
      * @param kit The kit to create an item for.
@@ -122,6 +113,7 @@ public class KitSelector {
     private void populateInventory(Player player, int page) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
+        int kitsPerPage = 36; // Assuming 36 kits per page
         int rowSize = 9;
 
         // Sets non-present items to glass.
@@ -132,27 +124,23 @@ public class KitSelector {
             inventory.setItem(i, glass);
         }
 
+        // Previous page item
         if (page > 0) {
-            inventory.setItem(inventory.getSize() - 9,
-                    new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
+            inventory.setItem(inventory.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
         }
 
-        List<Kit> checkedKits = KitManager.kits.subList(page * 36,
-                (page * 36) + ensureKits(KitManager.kits.size() - (page * 36)));
+        int start = page * kitsPerPage;
+        int end = Math.min((page + 1) * kitsPerPage, KitManager.kits.size());
 
-        try {
-            List<Kit> futureCheck = KitManager.kits.subList((page + 1) * 36,
-                    ((page + 1) * 36) + ensureKits(KitManager.kits.size() - ((page + 1) * 36)));
-
-            if (!futureCheck.isEmpty()) {
-                inventory.setItem(inventory.getSize() - 1,
-                        new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
-            }
-        } catch (IllegalArgumentException ignored) {
+        // Next page item
+        if (end < KitManager.kits.size()) { // Correct check for the existence of a next page
+            inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
         }
 
-        // Sort kits alphabetically using the kits.getName() function
-        List<Kit> sortedKits = new ArrayList<>(checkedKits);
+        List<Kit> pageKits = KitManager.kits.subList(start, end);
+
+        // Sort kits alphabetically
+        List<Kit> sortedKits = new ArrayList<>(pageKits);
         sortedKits.sort(Comparator.comparing(Kit::getName));
 
         // Add sorted kits in alphabetical order

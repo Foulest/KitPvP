@@ -83,15 +83,6 @@ public class KitShop {
     }
 
     /**
-     * Ensures that we use enough slots to hold all the kit items.
-     *
-     * @param size The size of the inventory.
-     */
-    private static int ensureKits(int size) {
-        return (Math.min(size, 36));
-    }
-
-    /**
      * Creates a kit item.
      *
      * @param kit The kit to create an item for.
@@ -139,12 +130,12 @@ public class KitShop {
         int start = page * kitsPerPage;
         int end = Math.min((page + 1) * kitsPerPage, KitManager.kits.size()); // Correct calculation of the end index
 
-        List<Kit> pageKits = KitManager.kits.subList(start, end);
-
         // Next page item
         if (end < KitManager.kits.size()) { // Correct check for the existence of a next page
             inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
         }
+
+        List<Kit> pageKits = KitManager.kits.subList(start, end);
 
         // Sort kits alphabetically
         List<Kit> sortedKits = new ArrayList<>(pageKits);
