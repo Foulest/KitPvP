@@ -157,7 +157,7 @@ public class KitSelector {
 
         // Add sorted kits in alphabetical order
         for (Kit kit : sortedKits) {
-            if (playerData.getOwnedKits().contains(kit)) {
+            if (kit.getCost() == 0 || playerData.getOwnedKits().contains(kit)) {
                 inventory.addItem(createKitItem(kit));
             }
         }

@@ -120,7 +120,7 @@ public class KitShop {
     private boolean populateInventory(Player player, int page) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack glass = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).name(" ").getItem();
-        int paidKits = 0;
+        int kitsPerPage = 36; // Assuming 36 kits per page
         int rowSize = 9;
 
         // Sets non-present items to glass.
@@ -133,35 +133,28 @@ public class KitShop {
 
         // Previous page item
         if (page > 0) {
-            inventory.setItem(inventory.getSize() - 9,
-                    new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
+            inventory.setItem(inventory.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
         }
 
-        // Future kits check
-        List<Kit> checkedKits = KitManager.kits.subList(page * 36,
-                (page * 36) + ensureKits(KitManager.kits.size() - (page * 36)));
+        int start = page * kitsPerPage;
+        int end = Math.min((page + 1) * kitsPerPage, KitManager.kits.size()); // Correct calculation of the end index
+
+        List<Kit> pageKits = KitManager.kits.subList(start, end);
 
         // Next page item
-        try {
-            List<Kit> futureCheck = KitManager.kits.subList((page + 1) * 36,
-                    ((page + 1) * 36) + ensureKits(KitManager.kits.size() - ((page + 1) * 36)));
-
-            if (!futureCheck.isEmpty()) {
-                inventory.setItem(inventory.getSize() - 1,
-                        new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
-            }
-        } catch (IllegalArgumentException ex) {
-            MessageUtil.printException(ex);
+        if (end < KitManager.kits.size()) { // Correct check for the existence of a next page
+            inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
         }
 
-        // Sort kits alphabetically using the kits.getName() function
-        List<Kit> sortedKits = new ArrayList<>(checkedKits);
+        // Sort kits alphabetically
+        List<Kit> sortedKits = new ArrayList<>(pageKits);
         sortedKits.sort(Comparator.comparing(Kit::getName));
 
-        // Add sorted kits in alphabetical order
-        for (Kit kits : sortedKits) {
-            if (!playerData.getOwnedKits().contains(kits)) {
-                inventory.addItem(createKitItem(kits));
+        int paidKits = 0;
+
+        for (Kit kit : sortedKits) {
+            if (!playerData.getOwnedKits().contains(kit)) {
+                inventory.addItem(createKitItem(kit));
                 paidKits++;
             }
         }
