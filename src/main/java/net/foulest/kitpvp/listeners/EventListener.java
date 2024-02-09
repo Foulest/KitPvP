@@ -346,6 +346,7 @@ public class EventListener implements Listener {
             case WORKBENCH:
             case ENCHANTING:
             case ENDER_CHEST:
+                // Ignores players in creative mode with the modify permission.
                 if (player.getGameMode() == GameMode.CREATIVE && player.hasPermission("kitpvp.modify")) {
                     break;
                 }
@@ -395,7 +396,6 @@ public class EventListener implements Listener {
         // Handles inventory clicks based on window title.
         switch (windowTitle) {
             case "Kit Enchanter":
-                MessageUtil.log(Level.INFO, "Kit Enchanter click event for " + player.getName() + ".");
                 event.setCancelled(true);
                 player.updateInventory();
 
@@ -483,7 +483,6 @@ public class EventListener implements Listener {
                 break;
 
             case "Kit Shop":
-                MessageUtil.log(Level.INFO, "Kit Shop click event for " + player.getName() + ".");
                 event.setCancelled(true);
                 player.updateInventory();
 
