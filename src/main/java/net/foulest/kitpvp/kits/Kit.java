@@ -72,7 +72,7 @@ public interface Kit {
         List<Integer> airSlots = new ArrayList<>();
 
         // Checks if the player owns the kit they're trying to equip.
-        if (!playerData.getOwnedKits().contains(this)) {
+        if (getCost() > 0 && !playerData.getOwnedKits().contains(this)) {
             MessageUtil.messagePlayer(player, "&cYou do not own the " + getName() + " kit.");
             return;
         }
