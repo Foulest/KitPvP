@@ -8,6 +8,7 @@ import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +61,8 @@ public class EcoCmd {
         String subCommand = args.getArgs(0);
         switch (subCommand.toLowerCase()) {
             case "give":
-                if (!sender.hasPermission("kitpvp.eco.give")) {
+                if (!sender.hasPermission("kitpvp.eco.give")
+                        && !(sender instanceof ConsoleCommandSender)) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
                 }
@@ -78,7 +80,8 @@ public class EcoCmd {
                 break;
 
             case "set":
-                if (!sender.hasPermission("kitpvp.eco.set")) {
+                if (!sender.hasPermission("kitpvp.eco.set")
+                        && !(sender instanceof ConsoleCommandSender)) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
                 }
@@ -96,7 +99,8 @@ public class EcoCmd {
                 break;
 
             case "take":
-                if (!sender.hasPermission("kitpvp.eco.take")) {
+                if (!sender.hasPermission("kitpvp.eco.take")
+                        && !(sender instanceof ConsoleCommandSender)) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
                 }

@@ -7,6 +7,7 @@ import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -38,7 +39,8 @@ public class KitPvPCmd {
 
         switch (subCommand.toLowerCase()) {
             case "reload":
-                if (!sender.hasPermission("kitpvp.reload")) {
+                if (!sender.hasPermission("kitpvp.reload")
+                        && !(sender instanceof ConsoleCommandSender)) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
                 }
@@ -65,7 +67,8 @@ public class KitPvPCmd {
      * @param args   The command arguments
      */
     private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
-        if (!sender.hasPermission("kitpvp.main")) {
+        if (!sender.hasPermission("kitpvp.main")
+                && !(sender instanceof ConsoleCommandSender)) {
             MessageUtil.messagePlayer(sender, "&cNo permission.");
             return;
         }

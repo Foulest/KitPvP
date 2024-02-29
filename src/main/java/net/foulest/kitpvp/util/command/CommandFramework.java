@@ -3,10 +3,7 @@ package net.foulest.kitpvp.util.command;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.kitpvp.util.MessageUtil;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
@@ -100,13 +97,15 @@ public class CommandFramework implements CommandExecutor {
                 Object value = commandMap.get(cmdLabel).getValue();
                 Command command = key.getAnnotation(Command.class);
 
-                if (!("").equals(command.permission()) && !sender.hasPermission(command.permission())) {
-                    MessageUtil.messagePlayer(sender, command.noPermission());
+                if (command.inGameOnly() && !(sender instanceof Player)) {
+                    MessageUtil.messagePlayer(sender, "&cOnly players may execute this command.");
                     return;
                 }
 
-                if (command.inGameOnly() && !(sender instanceof Player)) {
-                    MessageUtil.messagePlayer(sender, "&cOnly players may execute this command.");
+                if (!("").equals(command.permission())
+                        && !sender.hasPermission(command.permission())
+                        && !(sender instanceof ConsoleCommandSender)) {
+                    MessageUtil.messagePlayer(sender, command.noPermission());
                     return;
                 }
 
