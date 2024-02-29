@@ -48,6 +48,7 @@ public class SoupCmd {
         if (playerData.getActiveKit() == null) {
             ItemStack healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
             player.getInventory().setItem(6, healingItem);
+            player.updateInventory();
         } else {
             playerData.getActiveKit().apply(player);
         }

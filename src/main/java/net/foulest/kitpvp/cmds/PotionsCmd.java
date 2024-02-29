@@ -47,6 +47,7 @@ public class PotionsCmd {
         if (playerData.getActiveKit() == null) {
             ItemStack healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
             player.getInventory().setItem(6, healingItem);
+            player.updateInventory();
         } else {
             playerData.getActiveKit().apply(player);
         }
