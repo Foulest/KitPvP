@@ -47,4 +47,14 @@ public class PlayerDataManager {
     public static void removePlayerData(@NotNull Player player) {
         playerDataMap.remove(player.getUniqueId());
     }
+
+    /**
+     * Checks if a player has data stored.
+     *
+     * @param player The player to check.
+     * @return True if the player has data stored, otherwise false.
+     */
+    public static boolean hasPlayerData(@NotNull Player player) {
+        return playerDataMap.containsKey(player.getUniqueId());
+    }
 }
