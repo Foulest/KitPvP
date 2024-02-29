@@ -1,5 +1,6 @@
 package net.foulest.kitpvp.util;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
@@ -232,7 +233,7 @@ public class Settings {
      */
     private static void loadConfigFile() {
         // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
-        InputStream defConfigStream = KitPvP.getInstance().getResource(fileName);
+        @Cleanup InputStream defConfigStream = KitPvP.getInstance().getResource(fileName);
 
         if (defConfigStream == null) {
             // Log a warning if the default configuration cannot be found within the JAR
@@ -251,20 +252,13 @@ public class Settings {
         // Now that we've ensured the file exists (either it already did, or we've just created it),
         // we can safely load it into our CustomYamlConfiguration object
         config = CustomYamlConfiguration.loadConfiguration(file);
-        CustomYamlConfiguration defConfig = CustomYamlConfiguration
-                .loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8));
+        @Cleanup InputStreamReader reader = new InputStreamReader(defConfigStream, StandardCharsets.UTF_8);
+        CustomYamlConfiguration defConfig = CustomYamlConfiguration.loadConfiguration(reader);
 
         // Ensure defaults are applied
         config.setDefaults(defConfig);
         config.options().copyDefaults(true);
         saveConfig(); // Save the config with defaults applied
-
-        // Close the defConfigStream properly to avoid resource leaks
-        try {
-            defConfigStream.close();
-        } catch (IOException ex) {
-            MessageUtil.printException(ex);
-        }
     }
 
     /**
@@ -464,8 +458,7 @@ public class Settings {
 
         // Database settings
         usingFlatFile = config.getString("kitpvp.storage.type").trim().equalsIgnoreCase("sqlite");
-        autoSaveInterval = config.getLong("kitpvp.storage.auto-save");
-        flatFilePath = config.getString("kitpvp.storage.sqlite.file");
+        flatFilePath = KitPvP.getInstance().getDataFolder() + "\\" + config.getString("kitpvp.storage.sqlite.file");
         host = config.getString("kitpvp.storage.mariadb.host");
         port = config.getInt("kitpvp.storage.mariadb.port");
         database = config.getString("kitpvp.storage.mariadb.database");
