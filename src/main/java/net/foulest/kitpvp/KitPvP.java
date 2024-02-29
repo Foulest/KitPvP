@@ -1,6 +1,5 @@
 package net.foulest.kitpvp;
 
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
@@ -13,7 +12,10 @@ import net.foulest.kitpvp.listeners.DeathListener;
 import net.foulest.kitpvp.listeners.EventListener;
 import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
-import net.foulest.kitpvp.util.*;
+import net.foulest.kitpvp.util.DatabaseUtil;
+import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.PlaceholderUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.CommandFramework;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
@@ -25,8 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
-
-import static net.foulest.kitpvp.util.Settings.autoSaveInterval;
 
 /**
  * Main class for KitPvP.
@@ -40,7 +40,6 @@ public class KitPvP extends JavaPlugin {
     @Getter
     public static KitPvP instance;
     private CommandFramework framework;
-    public Runnable databaseUpdateScheduler;
 
     @Override
     public void onLoad() {
@@ -70,30 +69,7 @@ public class KitPvP extends JavaPlugin {
 
         // Sets up the database instance.
         MessageUtil.log(Level.INFO, "Loading Database...");
-        loadDatabase();
-
-        // Sets up the database update scheduler.
-        // This task runs at a set interval to save player data to the database.
-        TaskUtil.runTaskTimer(databaseUpdateScheduler = () -> {
-            // Ignores the task if no players are online.
-            if (Bukkit.getOnlinePlayers().isEmpty()) {
-                return;
-            }
-
-            // Ignores the task if the database connection is lost.
-            if (!DatabaseUtil.checkDatabaseConnection()) {
-                return;
-            }
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-                // Saves the player's data to the database if the last save was over the set interval.
-                if (System.currentTimeMillis() - playerData.getLastSaveToDatabase() >= autoSaveInterval * 1000L) {
-                    playerData.saveAll();
-                }
-            }
-        }, autoSaveInterval * 20L, autoSaveInterval * 20L);
+        DatabaseUtil.loadDatabase();
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
@@ -143,8 +119,10 @@ public class KitPvP extends JavaPlugin {
         // Saves online players' data.
         MessageUtil.log(Level.INFO, "Saving Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData playerData = PlayerDataManager.getPlayerData(player);
-            playerData.saveAll();
+            if (PlayerDataManager.hasPlayerData(player)) {
+                PlayerData playerData = PlayerDataManager.getPlayerData(player);
+                playerData.saveAll();
+            }
         }
 
         // Closes the DBCP connection.
@@ -152,71 +130,6 @@ public class KitPvP extends JavaPlugin {
         DatabaseUtil.closeDbcp();
 
         MessageUtil.log(Level.INFO, "Shut down successfully.");
-    }
-
-    /**
-     * Loads the plugin's databases.
-     */
-    private void loadDatabase() {
-        // Initializes the DBCP instance.
-        DatabaseUtil.initialize(new HikariDataSource());
-
-        if (Settings.usingFlatFile) {
-            // Sets up the DBCP instance for SQLite.
-            DatabaseUtil.setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
-                    null, null, null, false, null);
-
-        } else {
-            // Sets up the DBCP instance for MariaDB.
-            DatabaseUtil.setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
-                    "org.mariadb.jdbc.Driver", Settings.user, Settings.password,
-                    "utf8", true, "SELECT 1;");
-        }
-
-        // Creates the PlayerStats table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
-                "PlayerStats",
-                "uuid VARCHAR(255) NOT NULL, "
-                        + "coins INT, "
-                        + "experience INT, "
-                        + "kills INT, "
-                        + "deaths INT, "
-                        + "killstreak INT, "
-                        + "topKillstreak INT, "
-                        + "usingSoup INT, "
-                        + "previousKit VARCHAR(255), "
-                        + "PRIMARY KEY (uuid)"
-        );
-
-        // Creates the PlayerKits table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
-                "PlayerKits",
-                "uuid VARCHAR(255) NOT NULL, "
-                        + "kitName VARCHAR(255)"
-        );
-
-        // Creates the Bounties table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
-                "Bounties",
-                "uuid VARCHAR(255) NOT NULL, "
-                        + "bounty INT, "
-                        + "benefactor VARCHAR(255), "
-                        + "PRIMARY KEY (uuid)"
-        );
-
-        // Creates the Enchants table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
-                "Enchants",
-                "uuid VARCHAR(255) NOT NULL, "
-                        + "featherFalling INT, "
-                        + "thorns INT, "
-                        + "protection INT, "
-                        + "knockback INT, "
-                        + "sharpness INT, "
-                        + "punch INT, "
-                        + "power INT, "
-                        + "PRIMARY KEY (uuid)"
-        );
     }
 
     /**

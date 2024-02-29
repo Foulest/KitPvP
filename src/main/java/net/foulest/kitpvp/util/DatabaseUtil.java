@@ -2,11 +2,18 @@ package net.foulest.kitpvp.util;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Synchronized;
+import net.foulest.kitpvp.data.PlayerData;
+import net.foulest.kitpvp.enchants.Enchants;
+import net.foulest.kitpvp.kits.Kit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,6 +27,176 @@ import java.util.stream.IntStream;
 public class DatabaseUtil {
 
     private static HikariDataSource dataSource;
+
+    /**
+     * Loads the plugin's databases.
+     */
+    public static void loadDatabase() {
+        // Initializes the DBCP instance.
+        DatabaseUtil.initialize(new HikariDataSource());
+
+        if (Settings.usingFlatFile) {
+            try {
+                // Creates the flat file database if missing.
+                if (!Files.exists(Paths.get(Settings.flatFilePath))) {
+                    MessageUtil.log(Level.INFO, "Creating flat file database...");
+                    Files.createFile(Paths.get(Settings.flatFilePath));
+                }
+            } catch (IOException ex) {
+                MessageUtil.printException(ex);
+            }
+
+            // Sets up the DBCP instance for SQLite.
+            DatabaseUtil.setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
+                    null, null, null, false, null);
+
+        } else {
+            // Sets up the DBCP instance for MariaDB.
+            DatabaseUtil.setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
+                    "org.mariadb.jdbc.Driver", Settings.user, Settings.password,
+                    "utf8", true, "SELECT 1;");
+        }
+
+        // Creates the PlayerStats table if it doesn't exist.
+        DatabaseUtil.createTableIfNotExists(
+                "PlayerStats",
+                "uuid VARCHAR(255) NOT NULL, "
+                        + "coins INT, "
+                        + "experience INT, "
+                        + "kills INT, "
+                        + "deaths INT, "
+                        + "killstreak INT, "
+                        + "topKillstreak INT, "
+                        + "usingSoup INT, "
+                        + "previousKit VARCHAR(255), "
+                        + "PRIMARY KEY (uuid)"
+        );
+
+        // Creates the PlayerKits table if it doesn't exist.
+        DatabaseUtil.createTableIfNotExists(
+                "PlayerKits",
+                "uuid VARCHAR(255) NOT NULL, "
+                        + "kitName VARCHAR(255)"
+        );
+
+        // Creates the Bounties table if it doesn't exist.
+        DatabaseUtil.createTableIfNotExists(
+                "Bounties",
+                "uuid VARCHAR(255) NOT NULL, "
+                        + "bounty INT, "
+                        + "benefactor VARCHAR(255), "
+                        + "PRIMARY KEY (uuid)"
+        );
+
+        // Creates the Enchants table if it doesn't exist.
+        DatabaseUtil.createTableIfNotExists(
+                "Enchants",
+                "uuid VARCHAR(255) NOT NULL, "
+                        + "featherFalling INT, "
+                        + "thorns INT, "
+                        + "protection INT, "
+                        + "knockback INT, "
+                        + "sharpness INT, "
+                        + "punch INT, "
+                        + "power INT, "
+                        + "PRIMARY KEY (uuid)"
+        );
+    }
+
+    /**
+     * Updates the PlayerStats table in the database.
+     */
+    public static void updatePlayerStatsTable(@NotNull PlayerData playerData) {
+        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
+            put("uuid", playerData.getUniqueId().toString());
+            put("coins", playerData.getCoins());
+            put("experience", playerData.getExperience());
+            put("kills", playerData.getKills());
+            put("deaths", playerData.getDeaths());
+            put("killstreak", playerData.getKillstreak());
+            put("topKillstreak", playerData.getTopKillstreak());
+            put("usingSoup", (playerData.isUsingSoup() ? 1 : 0));
+            put("previousKit", playerData.getPreviousKit().getName());
+        }});
+    }
+
+    /**
+     * Updates the PlayerKits table in the database.
+     *
+     * @param playerData The player's data.
+     */
+    public static void updatePlayerKitsTable(@NotNull PlayerData playerData) {
+        Set<Kit> ownedKits = playerData.getOwnedKits();
+        String uuid = playerData.getUniqueId().toString();
+
+        if (!ownedKits.isEmpty()) {
+            DatabaseUtil.deleteDataFromTable("PlayerKits",
+                    "uuid = ?", Collections.singletonList(uuid));
+
+            for (Kit kits : ownedKits) {
+                if (kits == null) {
+                    continue;
+                }
+
+                DatabaseUtil.addDataToTable("PlayerKits", new HashMap<String, Object>() {{
+                    put("uuid", uuid);
+                    put("kitName", kits.getName());
+                }});
+            }
+        }
+    }
+
+    /**
+     * Updates the Enchants table in the database.
+     *
+     * @param playerData The player's data.
+     */
+    public static void updateEnchantsTable(@NotNull PlayerData playerData) {
+        Set<Enchants> enchants = playerData.getEnchants();
+        String uuid = playerData.getUniqueId().toString();
+
+        // Removes the player from the table if they have no enchants.
+        // Otherwise, adds the player to the table.
+        if (enchants.isEmpty()) {
+            DatabaseUtil.deleteDataFromTable("Enchants",
+                    "uuid = ?", Collections.singletonList(uuid));
+        } else {
+            DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
+                put("uuid", uuid);
+                put("featherFalling", enchants.contains(Enchants.FEATHER_FALLING) ? 1 : 0);
+                put("thorns", enchants.contains(Enchants.THORNS) ? 1 : 0);
+                put("protection", enchants.contains(Enchants.PROTECTION) ? 1 : 0);
+                put("knockback", enchants.contains(Enchants.KNOCKBACK) ? 1 : 0);
+                put("sharpness", enchants.contains(Enchants.SHARPNESS) ? 1 : 0);
+                put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
+                put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
+            }});
+        }
+    }
+
+    /**
+     * Updates the Bounties table in the database.
+     *
+     * @param playerData The player's data.
+     */
+    public static void updateBountiesTable(@NotNull PlayerData playerData) {
+        int bounty = playerData.getBounty();
+        String uuid = playerData.getUniqueId().toString();
+        UUID benefactor = playerData.getBenefactor();
+
+        // Removes the player from the table if the bounty is 0 or the benefactor is null.
+        // Otherwise, adds the player to the table.
+        if (bounty == 0 || benefactor == null) {
+            DatabaseUtil.deleteDataFromTable("Bounties",
+                    "uuid = ?", Collections.singletonList(uuid));
+        } else {
+            DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
+                put("uuid", uuid);
+                put("bounty", bounty);
+                put("benefactor", benefactor.toString());
+            }});
+        }
+    }
 
     /**
      * Initializes the DBCP instance.
@@ -265,33 +442,6 @@ public class DatabaseUtil {
         } catch (ClassNotFoundException ex) {
             MessageUtil.printException(ex);
             return null;
-        }
-    }
-
-    /**
-     * Checks if a valid database connection can be obtained.
-     *
-     * @return true if a valid connection is obtained, false otherwise.
-     */
-    public static boolean checkDatabaseConnection() {
-        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
-            if (connection == null) {
-                return false;
-            }
-
-            // Execute a simple query to check if the connection is alive.
-            try (Statement statement = connection.createStatement()) {
-                // This can be any fast-executing query. For SQLite, you might use "SELECT 1".
-                try (ResultSet ignored = statement.executeQuery("SELECT 1")) {
-                    return true; // If the query executed successfully, the connection is valid.
-                }
-            } catch (SQLException ex) {
-                MessageUtil.printException(ex);
-                return false;
-            }
-        } catch (SQLException ex) {
-            MessageUtil.printException(ex);
-            return false;
         }
     }
 }

@@ -34,15 +34,15 @@ import static net.foulest.kitpvp.util.Settings.startingCoins;
  */
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public final class PlayerData {
 
     // Player data
-    private UUID uniqueId;
-    private String uuid; // Needed for SQL queries
-    private Player player;
+    private final UUID uniqueId;
+    private final Player player;
 
     // Kit data
-    private Set<Kit> ownedKits = new HashSet<>();
+    private final Set<Kit> ownedKits = new HashSet<>();
     private Kit activeKit;
     private Kit previousKit = KitManager.getKit("Knight");
 
@@ -54,30 +54,27 @@ public final class PlayerData {
     private int deaths;
     private int killstreak;
     private int topKillstreak;
+    private boolean usingSoup;
 
     // Bounty data
     private int bounty;
     private UUID benefactor;
+
+    // Enchant data
+    private final Set<Enchants> enchants = new HashSet<>();
+
+    // No-fall data
+    private boolean noFall;
+    private boolean pendingNoFallRemoval;
 
     // Cooldowns and timers
     private final Map<Kit, Long> cooldowns = new HashMap<>();
     private BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportToSpawnTask;
 
-    // Enchant data
-    private Set<Enchants> enchants = new HashSet<>();
-
-    // Other data
-    @Setter
-    private boolean usingSoup;
-    private boolean noFall;
-    private boolean pendingNoFallRemoval;
-    private long lastSaveToDatabase;
-
     public PlayerData(@NotNull UUID uniqueId, Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
-        uuid = uniqueId.toString();
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -121,7 +118,7 @@ public final class PlayerData {
     public boolean load() {
         // Inserts default values into PlayerStats.
         DatabaseUtil.addDefaultDataToTable("PlayerStats", new HashMap<String, Object>() {{
-            put("uuid", uuid);
+            put("uuid", uniqueId.toString());
             put("coins", 500);
             put("experience", 0);
             put("kills", 0);
@@ -134,7 +131,8 @@ public final class PlayerData {
 
         // Loads values from PlayerStats.
         try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats", "uuid = ?", Collections.singletonList(uuid));
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats",
+                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
@@ -153,13 +151,14 @@ public final class PlayerData {
 
         // Inserts default values into PlayerKits.
         DatabaseUtil.addDefaultDataToTable("PlayerKits", new HashMap<String, Object>() {{
-            put("uuid", uuid);
+            put("uuid", uniqueId.toString());
             put("kitName", "Knight");
         }});
 
         // Loads values from PlayerKits.
         try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(uuid));
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits",
+                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
 
             if (!data.isEmpty()) {
                 for (HashMap<String, Object> row : data) {
@@ -172,7 +171,8 @@ public final class PlayerData {
 
         // Loads values from Bounties.
         try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties", "uuid = ?", Collections.singletonList(uuid));
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties",
+                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
@@ -186,21 +186,10 @@ public final class PlayerData {
             MessageUtil.printException(ex);
         }
 
-        // Inserts default values into Enchants.
-        DatabaseUtil.addDefaultDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("featherFalling", 0);
-            put("thorns", 0);
-            put("protection", 0);
-            put("knockback", 0);
-            put("sharpness", 0);
-            put("punch", 0);
-            put("power", 0);
-        }});
-
         // Loads values from Enchants.
         try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants", "uuid = ?", Collections.singletonList(uuid));
+            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants",
+                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
@@ -217,8 +206,6 @@ public final class PlayerData {
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
         }
-
-        lastSaveToDatabase = System.currentTimeMillis();
         return true;
     }
 
@@ -227,21 +214,31 @@ public final class PlayerData {
             previousKit = KitManager.getKit("Knight");
         }
 
-        // Saves values to PlayerKits.
-        updatePlayerKitsTable();
-
-        // Saves values to PlayerStats.
-        updatePlayerStatsTable();
-
-        // Saves values to Bounties.
-        if (bounty > 0 && benefactor != null) {
-            updateBountiesTable();
-        }
-
-        // Saves values to Enchants.
-        updateEnchantsTable();
+        // Updates values in every table.
+        DatabaseUtil.updatePlayerKitsTable(this);
+        DatabaseUtil.updatePlayerStatsTable(this);
+        DatabaseUtil.updateBountiesTable(this);
+        DatabaseUtil.updateEnchantsTable(this);
     }
 
+    /**
+     * Sets the player's previous kit.
+     *
+     * @param kit The previous kit.
+     */
+    public void setPreviousKit(Kit kit) {
+        previousKit = kit;
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Adds a bounty to the player.
+     *
+     * @param bounty     The amount of the bounty.
+     * @param benefactor The UUID of the benefactor.
+     */
     public void addBounty(int bounty, UUID benefactor) {
         if (bounty > 0) {
             removeBounty();
@@ -249,54 +246,158 @@ public final class PlayerData {
 
         this.bounty = bounty;
         this.benefactor = benefactor;
+
+        // Updates values in the Bounties table.
+        DatabaseUtil.updateBountiesTable(this);
     }
 
+    /**
+     * Removes the player's bounty.
+     */
     public void removeBounty() {
         if (bounty > 0) {
             bounty = 0;
             benefactor = null;
 
-            DatabaseUtil.deleteDataFromTable("Bounties", "uuid = ?",
-                    Collections.singletonList(player.getUniqueId().toString()));
+            // Updates values in the Bounties table.
+            DatabaseUtil.updateBountiesTable(this);
         }
     }
 
+    /**
+     * Sets the player's kills to a specific amount.
+     *
+     * @param kills The amount of kills to set.
+     */
+    public void setKills(int kills) {
+        this.kills = kills;
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Sets the player's deaths to a specific amount.
+     *
+     * @param deaths The amount of deaths to set.
+     */
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Sets the player's killstreak to a specific amount.
+     *
+     * @param streak The killstreak to set.
+     */
     public void setKillstreak(int streak) {
         killstreak = streak;
 
         if (killstreak > topKillstreak) {
             topKillstreak = killstreak;
         }
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
     }
 
+    /**
+     * Adds a kill to the player's current killstreak.
+     */
     public void addKillstreak() {
         killstreak += 1;
 
         if (killstreak > topKillstreak) {
             topKillstreak = killstreak;
         }
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
     }
 
-    public double getKDR() {
-        return (getDeaths() == 0) ? getKills() : getKills() / (double) getDeaths();
-    }
-
-    public String getKDRText() {
-        String decimalFormatStr = "####0.00";
-        DecimalFormat format = new DecimalFormat(decimalFormatStr);
-        return format.format(getKDR());
-    }
-
-    public void setExperience(int exp) {
-        experience = exp;
+    /**
+     * Sets the player's experience to a specific amount.
+     *
+     * @param value The experience to set.
+     */
+    public void setExperience(int value) {
+        experience = value;
         calcLevel(false);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
     }
 
-    public void addExperience(int exp) {
-        experience += exp;
+    /**
+     * Adds experience to the player's current experience.
+     *
+     * @param value The experience to add.
+     */
+    public void addExperience(int value) {
+        experience += value;
         calcLevel(true);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
     }
 
+    /**
+     * Removes experience from the player's current experience.
+     *
+     * @param value The experience to remove.
+     */
+    public void removeExperience(int value) {
+        experience = Math.max(0, experience - value);
+        calcLevel(false);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Adds coins to the player's current amount.
+     *
+     * @param value The amount of coins to add.
+     */
+    public void addCoins(int value) {
+        this.coins += Math.max(0, this.coins + value);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Removes coins from the player's current amount.
+     *
+     * @param value The amount of coins to remove.
+     */
+    public void removeCoins(int value) {
+        this.coins = Math.max(0, this.coins - value);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Sets the player's coins to a specific amount.
+     *
+     * @param value The amount of coins to set.
+     */
+    public void setCoins(int value) {
+        this.coins = Math.max(0, value);
+
+        // Updates values in the PlayerStats table.
+        DatabaseUtil.updatePlayerStatsTable(this);
+    }
+
+    /**
+     * Gets the player's experience as a decimal.
+     *
+     * @return The player's experience as a decimal.
+     */
     public float getExpDecimal() {
         float decimal;
         String decimalFormatStr = "#####.0#";
@@ -312,6 +413,11 @@ public final class PlayerData {
         return Float.parseFloat(format.format(decimal));
     }
 
+    /**
+     * Gets the player's experience as a percent.
+     *
+     * @return The player's experience as a percent.
+     */
     public int getExpPercent() {
         double percent;
         int nextLevelXP = (getLevel() * 25) * 25;
@@ -325,6 +431,29 @@ public final class PlayerData {
         return (int) percent;
     }
 
+    /**
+     * Gets the player's KDR.
+     *
+     * @return The player's KDR.
+     */
+    public double getKDR() {
+        return (getDeaths() == 0) ? getKills() : getKills() / (double) getDeaths();
+    }
+
+    /**
+     * Gets the player's KDR as a string.
+     *
+     * @return The player's KDR as a string.
+     */
+    public String getKDRText() {
+        String decimalFormatStr = "####0.00";
+        DecimalFormat format = new DecimalFormat(decimalFormatStr);
+        return format.format(getKDR());
+    }
+
+    /**
+     * Calculates the player's level and sets it to their experience bar.
+     */
     public void calcLevel(boolean afterKill) {
         if (experience == 0) {
             level = 1;
@@ -347,78 +476,9 @@ public final class PlayerData {
         player.setExp(getExpDecimal());
     }
 
-    public void addCoins(int value) {
-        this.coins += Math.max(0, this.coins + value);
-    }
-
-    public void removeCoins(int value) {
-        this.coins = Math.max(0, this.coins - value);
-    }
-
-    public void setCoins(int value) {
-        this.coins = Math.max(0, value);
-    }
-
-    public void updatePlayerStatsTable() {
-        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("coins", coins);
-            put("experience", experience);
-            put("kills", kills);
-            put("deaths", deaths);
-            put("killstreak", killstreak);
-            put("topKillstreak", topKillstreak);
-            put("usingSoup", (usingSoup ? 1 : 0));
-            put("previousKit", previousKit.getName());
-        }});
-
-        lastSaveToDatabase = System.currentTimeMillis();
-    }
-
-    public void updatePlayerKitsTable() {
-        if (!ownedKits.isEmpty()) {
-            DatabaseUtil.deleteDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(player.getUniqueId().toString()));
-
-            for (Kit kits : ownedKits) {
-                if (kits == null) {
-                    continue;
-                }
-
-                DatabaseUtil.addDataToTable("PlayerKits", new HashMap<String, Object>() {{
-                    put("uuid", uuid);
-                    put("kitName", kits.getName());
-                }});
-            }
-        }
-
-        lastSaveToDatabase = System.currentTimeMillis();
-    }
-
-    public void updateEnchantsTable() {
-        DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("featherFalling", enchants.contains(Enchants.FEATHER_FALLING) ? 1 : 0);
-            put("thorns", enchants.contains(Enchants.THORNS) ? 1 : 0);
-            put("protection", enchants.contains(Enchants.PROTECTION) ? 1 : 0);
-            put("knockback", enchants.contains(Enchants.KNOCKBACK) ? 1 : 0);
-            put("sharpness", enchants.contains(Enchants.SHARPNESS) ? 1 : 0);
-            put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
-            put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
-        }});
-
-        lastSaveToDatabase = System.currentTimeMillis();
-    }
-
-    public void updateBountiesTable() {
-        DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
-            put("uuid", uuid);
-            put("bounty", bounty);
-            put("benefactor", (benefactor == null ? "" : benefactor.toString()));
-        }});
-
-        lastSaveToDatabase = System.currentTimeMillis();
-    }
-
+    /**
+     * Gives the player their default items.
+     */
     public void giveDefaultItems() {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
