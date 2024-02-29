@@ -232,33 +232,37 @@ public class Settings {
      * Initializes the configuration file and loads defaults.
      */
     private static void loadConfigFile() {
-        // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
-        @Cleanup InputStream defConfigStream = KitPvP.getInstance().getResource(fileName);
+        try {
+            // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
+            @Cleanup InputStream defConfigStream = KitPvP.getInstance().getResource(fileName);
 
-        if (defConfigStream == null) {
-            // Log a warning if the default configuration cannot be found within the JAR
-            MessageUtil.log(Level.WARNING, "Could not find " + fileName + " in the plugin JAR.");
-            return;
+            if (defConfigStream == null) {
+                // Log a warning if the default configuration cannot be found within the JAR
+                MessageUtil.log(Level.WARNING, "Could not find " + fileName + " in the plugin JAR.");
+                return;
+            }
+
+            // Proceed to check if the config file exists in the plugin's data folder
+            // and save the default config from the JAR if not
+            File dataFolder = KitPvP.getInstance().getDataFolder();
+            file = new File(dataFolder, fileName);
+            if (!file.exists()) {
+                KitPvP.getInstance().saveResource(fileName, false);
+            }
+
+            // Now that we've ensured the file exists (either it already did, or we've just created it),
+            // we can safely load it into our CustomYamlConfiguration object
+            config = CustomYamlConfiguration.loadConfiguration(file);
+            @Cleanup InputStreamReader reader = new InputStreamReader(defConfigStream, StandardCharsets.UTF_8);
+            CustomYamlConfiguration defConfig = CustomYamlConfiguration.loadConfiguration(reader);
+
+            // Ensure defaults are applied
+            config.setDefaults(defConfig);
+            config.options().copyDefaults(true);
+            saveConfig(); // Save the config with defaults applied
+        } catch (Exception ex) {
+            MessageUtil.printException(ex);
         }
-
-        // Proceed to check if the config file exists in the plugin's data folder
-        // and save the default config from the JAR if not
-        File dataFolder = KitPvP.getInstance().getDataFolder();
-        file = new File(dataFolder, fileName);
-        if (!file.exists()) {
-            KitPvP.getInstance().saveResource(fileName, false);
-        }
-
-        // Now that we've ensured the file exists (either it already did, or we've just created it),
-        // we can safely load it into our CustomYamlConfiguration object
-        config = CustomYamlConfiguration.loadConfiguration(file);
-        @Cleanup InputStreamReader reader = new InputStreamReader(defConfigStream, StandardCharsets.UTF_8);
-        CustomYamlConfiguration defConfig = CustomYamlConfiguration.loadConfiguration(reader);
-
-        // Ensure defaults are applied
-        config.setDefaults(defConfig);
-        config.options().copyDefaults(true);
-        saveConfig(); // Save the config with defaults applied
     }
 
     /**
