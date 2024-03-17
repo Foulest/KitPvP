@@ -39,7 +39,7 @@ dependencies {
 
     // HikariCP - for database pooling
     // https://github.com/Foulest/HikariCP
-    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.0.5'
+    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.0.6'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
@@ -64,6 +64,10 @@ dependencies {
 }
 
 tasks {
+    jar {
+        archiveFileName.set("${project.name}-${project.version}-default.jar")
+    }
+
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
         enableRelocation = true
@@ -89,14 +93,6 @@ tasks {
 
     tasks.register('sourceJar', Jar) {
         from sourceSets.main.allJava
-    }
-
-    jar.configure {
-        archiveClassifier = 'default'
-    }
-
-    shadowJar.configure {
-        archiveClassifier = null
     }
 }
 
