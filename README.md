@@ -4,12 +4,11 @@
 [![CodeQL Badge](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/KitPvP.svg)](https://jitpack.io/#Foulest/KitPvP)
 
-**KitPvP** is an engaging Spigot plugin designed for the KitPvP game mode, offering a thrilling and polished experience with
-a variety of custom kits, stats tracking, and exclusive features.
+**KitPvP** is a fully-featured core plugin for the KitPvP gamemode.
 
 ## Features
 
-### Unique Kits and Customization
+### Kits and Customization
 
 - **22 Unique Kits**: Choose from a diverse range of kits, each with distinct abilities and play styles.
 - **Interactive GUIs**: Seamless interfaces for kit selection, purchasing, and enchantments.
