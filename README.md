@@ -40,12 +40,6 @@ a variety of custom kits, stats tracking, and exclusive features.
 - **[WorldGuard 6.1](https://dev.bukkit.org/projects/worldguard/files/881691)**
 - **[PlaceholderAPI](https://spigotmc.org/resources/placeholderapi.6245)** *(optional)*
 
-## Useful Links
-
-- [Contribution Guidelines](https://github.com/Foulest/KitPvP/wiki/Contribution-Guidelines)
-- [Disclaimer](https://github.com/Foulest/KitPvP/wiki/Disclaimer)
-- [Installation](https://github.com/Foulest/KitPvP/wiki/Installation)
-
 ## Getting Help
 
 For support or queries, please open an issue in the [Issues section](https://github.com/Foulest/KitPvP/issues).
