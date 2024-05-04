@@ -6,6 +6,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command for setting the spawn point.
@@ -17,7 +18,7 @@ public class SetSpawnCmd {
 
     @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
             permission = "kitpvp.setspawn", inGameOnly = true)
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
 
         // Checks if the player is in a safezone.

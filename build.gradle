@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.3.3'
+version = '1.3.4'
 description = 'KitPvP'
 
 compileJava.options.encoding = 'UTF-8'
@@ -39,7 +39,7 @@ dependencies {
 
     // HikariCP - for database pooling
     // https://github.com/Foulest/HikariCP
-    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.0.6'
+    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.0.8'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi

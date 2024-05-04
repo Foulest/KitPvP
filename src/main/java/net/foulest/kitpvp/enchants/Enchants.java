@@ -2,6 +2,7 @@ package net.foulest.kitpvp.enchants;
 
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
+import org.jetbrains.annotations.NotNull;
 
 public enum Enchants {
     FEATHER_FALLING,
@@ -18,7 +19,7 @@ public enum Enchants {
      *
      * @return The formatted name.
      */
-    public String getDatabaseName() {
+    public @NotNull String getDatabaseName() {
         String processedName = MessageUtil.capitalize(this.name().toLowerCase()
                         .replace("_", " "))
                 .replace(" ", "");
@@ -36,13 +37,13 @@ public enum Enchants {
      *
      * @return The formatted name.
      */
-    public String getFormattedName() {
+    public @NotNull String getFormattedName() {
         return MessageUtil.capitalize(this.name().toLowerCase()
                 .replace("_", " "));
     }
 
     /**
-     * Gets the corresponding enchant cost from Settings.
+     * Gets the corresponding enchantment cost from Settings.
      * Example: "FEATHER_FALLING" -> Settings.featherFallingCost
      *
      * @return The enchant cost.

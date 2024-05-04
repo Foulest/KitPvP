@@ -147,6 +147,7 @@ public final class PlayerData {
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
+            return false;
         }
 
         // Inserts default values into PlayerKits.
@@ -167,6 +168,7 @@ public final class PlayerData {
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
+            return false;
         }
 
         // Loads values from Bounties.
@@ -184,6 +186,7 @@ public final class PlayerData {
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
+            return false;
         }
 
         // Loads values from Enchants.
@@ -205,6 +208,7 @@ public final class PlayerData {
             }
         } catch (SQLException ex) {
             MessageUtil.printException(ex);
+            return false;
         }
         return true;
     }

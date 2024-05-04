@@ -10,6 +10,7 @@ import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command for setting your healing item to Soup.
@@ -21,7 +22,7 @@ public class SoupCmd {
 
     @Command(name = "soup", description = "Sets your healing item to Soup.",
             usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 

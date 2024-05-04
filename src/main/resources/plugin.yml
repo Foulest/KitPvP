@@ -7,7 +7,7 @@ loadbefore: [ Essentials ]
 permissions:
   kitpvp.armorcolor:
     description: Allows players to change the color of their armor.
-    default: false
+    default: op
   kitpvp.balance:
     description: Allows players to check their balance.
     default: true
@@ -16,28 +16,28 @@ permissions:
     default: true
   kitpvp.bounties.place:
     description: Allows players to place bounties on other players.
-    default: false
+    default: op
   kitpvp.clearkit:
     description: Allows players to clear their kit.
     default: true
   kitpvp.clearkit.others:
     description: Allows players to clear other players' kits.
-    default: false
+    default: op
   kitpvp.combattag:
     description: Allows players to see their combat tag timer.
     default: true
   kitpvp.eco:
     description: Allows players to manage the economy.
-    default: false
+    default: op
   kitpvp.eco.give:
     description: Allows players to give money to other players.
-    default: false
+    default: op
   kitpvp.eco.set:
     description: Allows players to set other players' balances.
-    default: false
+    default: op
   kitpvp.eco.take:
     description: Allows players to take money from other players.
-    default: false
+    default: op
   kitpvp.kitenchanter:
     description: Allows players to use the kit enchanter.
     default: true
@@ -58,10 +58,10 @@ permissions:
     default: true
   kitpvp.reload:
     description: Allows players to reload the config.
-    default: false
+    default: op
   kitpvp.setspawn:
     description: Allows players to set the spawn.
-    default: false
+    default: op
   kitpvp.soup:
     description: Allows players to use soup.
     default: true
@@ -73,4 +73,4 @@ permissions:
     default: true
   kitpvp.modify:
     description: Allows players to modify the map.
-    default: false
+    default: op

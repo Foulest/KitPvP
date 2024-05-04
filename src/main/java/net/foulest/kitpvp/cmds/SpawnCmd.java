@@ -13,6 +13,7 @@ import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command for teleporting to spawn.
@@ -26,7 +27,7 @@ public class SpawnCmd {
 
     @Command(name = "spawn", description = "Teleports you to spawn.",
             usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 

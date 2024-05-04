@@ -7,6 +7,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command for viewing a player's statistics.
@@ -18,7 +19,7 @@ public class StatsCmd {
 
     @Command(name = "stats", description = "Shows a player's statistics.",
             usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")
-    public void onCommand(CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         Player player;
         Player sender = args.getPlayer();
 
