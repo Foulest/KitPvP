@@ -3,6 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL Badge](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/KitPvP.svg)](https://jitpack.io/#Foulest/KitPvP)
+[![Downloads](https://img.shields.io/github/downloads/Foulest/KitPvP/total.svg)](https://github.com/Foulest/KitPvP/releases)
 
 **KitPvP** is a fully-featured core plugin for the KitPvP gamemode.
 
@@ -38,6 +39,13 @@
 - **[WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2597538)**
 - **[WorldGuard 6.1](https://dev.bukkit.org/projects/worldguard/files/881691)**
 - **[PlaceholderAPI](https://spigotmc.org/resources/placeholderapi.6245)** *(optional)*
+
+## Compiling
+
+1. Clone the repository.
+2. Open a command prompt/terminal to the repository directory.
+3. Run `gradlew shadowJar` on Windows, or `./gradlew shadowJar` on macOS or Linux.
+4. The built `KitPvP-X.X.X.jar` file will be in the `build/libs` folder.
 
 ## Getting Help
 
