@@ -1,3 +1,20 @@
+/*
+ * KitPvP - a fully-featured core plugin for the KitPvP gamemode.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.kitpvp.data;
 
 import lombok.Getter;
@@ -367,7 +384,7 @@ public final class PlayerData {
      * @param value The amount of coins to add.
      */
     public void addCoins(int value) {
-        this.coins += Math.max(0, this.coins + value);
+        coins += Math.max(0, coins + value);
 
         // Updates values in the PlayerStats table.
         DatabaseUtil.updatePlayerStatsTable(this);
@@ -379,7 +396,7 @@ public final class PlayerData {
      * @param value The amount of coins to remove.
      */
     public void removeCoins(int value) {
-        this.coins = Math.max(0, this.coins - value);
+        coins = Math.max(0, coins - value);
 
         // Updates values in the PlayerStats table.
         DatabaseUtil.updatePlayerStatsTable(this);
@@ -391,7 +408,7 @@ public final class PlayerData {
      * @param value The amount of coins to set.
      */
     public void setCoins(int value) {
-        this.coins = Math.max(0, value);
+        coins = Math.max(0, value);
 
         // Updates values in the PlayerStats table.
         DatabaseUtil.updatePlayerStatsTable(this);
