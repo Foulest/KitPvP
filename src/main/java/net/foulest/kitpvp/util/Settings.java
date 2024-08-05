@@ -247,6 +247,7 @@ public final class Settings {
     /**
      * Initializes the configuration file and loads defaults.
      */
+    @SuppressWarnings("OverlyBroadCatchBlock")
     private static void loadConfigFile() {
         try {
             // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
@@ -276,7 +277,7 @@ public final class Settings {
             config.setDefaults(defConfig);
             config.options().copyDefaults(true);
             saveConfig(); // Save the config with defaults applied
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
