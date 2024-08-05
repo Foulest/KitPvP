@@ -39,7 +39,7 @@ dependencies {
 
     // HikariCP - for database pooling
     // https://github.com/Foulest/HikariCP
-    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.0.9'
+    implementation group: 'com.github.Foulest', name: 'HikariCP', version: '4.1.1'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
