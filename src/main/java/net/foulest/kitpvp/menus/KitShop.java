@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.menus;
 
-import lombok.ToString;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
@@ -39,7 +38,6 @@ import java.util.*;
  * @author Foulest
  * @project KitPvP
  */
-@ToString
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class KitShop {
 

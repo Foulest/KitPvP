@@ -19,7 +19,6 @@ package net.foulest.kitpvp.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.command.*;
@@ -43,7 +42,6 @@ import java.util.logging.Level;
  */
 @Getter
 @Setter
-@ToString
 public class CommandFramework implements CommandExecutor {
 
     private final Map<String, Map.Entry<Method, Object>> commandMap = new HashMap<>();

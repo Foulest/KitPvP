@@ -20,7 +20,6 @@ package net.foulest.kitpvp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.ToString;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -54,7 +53,6 @@ import java.util.logging.Level;
  * @project KitPvP
  */
 @Getter
-@ToString
 @NoArgsConstructor
 public class KitPvP extends JavaPlugin {
 

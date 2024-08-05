@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.menus;
 
-import lombok.ToString;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
@@ -40,7 +39,6 @@ import java.util.List;
  * @author Foulest
  * @project KitPvP
  */
-@ToString
 public class KitEnchanter {
 
     private final Inventory inventory;
