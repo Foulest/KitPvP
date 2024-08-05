@@ -17,14 +17,19 @@
  */
 package net.foulest.kitpvp.kits;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KitManager {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class KitManager {
 
-    public static final List<Kit> kits = new ArrayList<>();
+    @Getter
+    private static final List<Kit> kits = new ArrayList<>();
 
     public static @Nullable Kit getKit(String name) {
         for (Kit kit : kits) {

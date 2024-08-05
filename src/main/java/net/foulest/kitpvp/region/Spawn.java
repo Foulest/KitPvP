@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.region;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -35,7 +37,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
-public class Spawn {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Spawn {
 
     @Getter
     public static Location location;

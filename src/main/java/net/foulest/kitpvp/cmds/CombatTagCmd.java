@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
@@ -31,8 +33,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class CombatTagCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
             description = "Displays your current combat tag timer.",
             permission = "kitpvp.combattag", usage = "/combattag", inGameOnly = true)
@@ -47,7 +51,7 @@ public class CombatTagCmd {
 
         // Checks if the combat tag feature is enabled.
         if (!Settings.combatTagEnabled) {
-            MessageUtil.messagePlayer(player, "&cThat command is disabled.");
+            MessageUtil.messagePlayer(player, ConstantUtil.COMMAND_DISABLED);
             return;
         }
 

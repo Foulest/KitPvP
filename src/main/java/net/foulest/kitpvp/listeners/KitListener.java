@@ -17,15 +17,14 @@
  */
 package net.foulest.kitpvp.listeners;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.type.*;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.BlockUtil;
-import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.TaskUtil;
+import net.foulest.kitpvp.util.*;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,17 +48,17 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.foulest.kitpvp.util.Settings.*;
-
+@NoArgsConstructor
 public class KitListener implements Listener {
 
-    public static final Map<UUID, Collection<PotionEffect>> drainedEffects = new HashMap<>();
-    public static final Map<UUID, Location> imprisonedPlayers = new HashMap<>();
-    private static final Random RANDOM = new Random();
+    static final Map<UUID, Collection<PotionEffect>> drainedEffects = new HashMap<>();
+    private static final Map<UUID, Location> imprisonedPlayers = new HashMap<>();
+    private static final Random RANDOM = new SecureRandom();
 
     /**
      * Handles the Burrower ability, which creates a room of bricks above the player.
@@ -78,7 +77,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -97,7 +96,7 @@ public class KitListener implements Listener {
             }
 
             // Adds the room of bricks above the player.
-            ArrayList<BlockState> pendingRollback = new ArrayList<>();
+            Collection<BlockState> pendingRollback = new ArrayList<>();
             for (Location location : roomLocations) {
                 pendingRollback.add(location.getBlock().getState());
                 location.getBlock().setType(Material.BRICK);
@@ -112,14 +111,14 @@ public class KitListener implements Listener {
                 for (BlockState block : pendingRollback) {
                     rollback(block);
                 }
-            }, burrowerKitDuration * 20L);
+            }, Settings.burrowerKitDuration * 20L);
 
             // Gives the player the no-fall status.
             playerData.setNoFall(true);
             playerData.setPendingNoFallRemoval(true);
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), burrowerKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.burrowerKitCooldown, true);
         }
     }
 
@@ -144,7 +143,7 @@ public class KitListener implements Listener {
                     && !Regions.isInSafezone(receiver.getLocation())) {
 
                 receiver.addPotionEffect(new PotionEffect(PotionEffectType.POISON,
-                        cactusKitPassiveDuration * 20, 0, false, false));
+                        Settings.cactusKitPassiveDuration * 20, 0, false, false));
             }
         }
     }
@@ -165,7 +164,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -174,10 +173,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(dragonKitRange, dragonKitRange, dragonKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.dragonKitRange, Settings.dragonKitRange, Settings.dragonKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -209,13 +208,13 @@ public class KitListener implements Listener {
                 if (player.hasLineOfSight(nearbyPlayer)
                         && nearbyPlayerData.getActiveKit() != null
                         && !Regions.isInSafezone(nearbyPlayer.getLocation())) {
-                    nearbyPlayer.damage(dragonKitDamage, player);
-                    nearbyPlayer.setFireTicks(dragonKitDuration * 20);
+                    nearbyPlayer.damage(Settings.dragonKitDamage, player);
+                    nearbyPlayer.setFireTicks(Settings.dragonKitDuration * 20);
                 }
             }
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), dragonKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.dragonKitCooldown, true);
         }
     }
 
@@ -237,11 +236,11 @@ public class KitListener implements Listener {
             CombatTag.markForCombat(player, receiver);
 
             if (playerData.getActiveKit() instanceof Fisherman
-                    && event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY)) {
+                    && event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
 
                 // Ignores the event if the player is in spawn.
                 if (Regions.isInSafezone(player.getLocation())) {
-                    MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                    MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                     return;
                 }
 
@@ -256,7 +255,7 @@ public class KitListener implements Listener {
                     event.getCaught().teleport(player.getLocation());
 
                     MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-                    playerData.setCooldown(playerData.getActiveKit(), fishermanKitCooldown, true);
+                    playerData.setCooldown(playerData.getActiveKit(), Settings.fishermanKitCooldown, true);
                 } else {
                     event.setCancelled(true);
                 }
@@ -278,7 +277,7 @@ public class KitListener implements Listener {
                 && !Regions.isInSafezone(player.getLocation())) {
 
             // Plays a sound when the player moves.
-            for (Entity entity : player.getNearbyEntities(ghostKitRange, ghostKitRange, ghostKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.ghostKitRange, Settings.ghostKitRange, Settings.ghostKitRange)) {
                 if (entity instanceof Player) {
                     ((Player) entity).playSound(player.getLocation(), Sound.CHICKEN_WALK, 0.01F, 0.5F);
                 }
@@ -302,7 +301,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -311,10 +310,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(hulkKitRange, hulkKitRange, hulkKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.hulkKitRange, Settings.hulkKitRange, Settings.hulkKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -345,17 +344,17 @@ public class KitListener implements Listener {
                         && !Regions.isInSafezone(nearbyPlayer.getLocation())) {
                     // Gets the direction to launch the player in.
                     Vector direction = nearbyPlayer.getEyeLocation().getDirection();
-                    direction.multiply(hulkKitMultiplier);
+                    direction.multiply(Settings.hulkKitMultiplier);
                     direction.setY(1.0);
 
                     // Damages and launches the player into the air.
                     nearbyPlayer.setVelocity(direction);
-                    nearbyPlayer.damage(hulkKitDamage, player);
+                    nearbyPlayer.damage(Settings.hulkKitDamage, player);
                 }
             }
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), hulkKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.hulkKitCooldown, true);
         }
     }
 
@@ -375,7 +374,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -389,7 +388,7 @@ public class KitListener implements Listener {
                     new FixedMetadataValue(KitPvP.instance, true));
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), imprisonerKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.imprisonerKitCooldown, true);
         }
     }
 
@@ -418,7 +417,7 @@ public class KitListener implements Listener {
                             && !Regions.isInSafezone(receiver.getLocation())) {
 
                         // Checks if there's enough space above the target to imprison them.
-                        List<Block> cageBlocks = getCageBlocks(receiver.getLocation().add(0.0, imprisonerKitHeight, 0.0));
+                        List<Block> cageBlocks = getCageBlocks(receiver.getLocation().add(0.0, Settings.imprisonerKitHeight, 0.0));
                         for (Block cageBlock : cageBlocks) {
                             if (cageBlock.getType() != Material.AIR) {
                                 MessageUtil.messagePlayer(damager, "&cThere's not enough space above the target.");
@@ -428,7 +427,7 @@ public class KitListener implements Listener {
                         }
 
                         // Adds the cage blocks to a list for rollback.
-                        ArrayList<BlockState> pendingRollback = new ArrayList<>();
+                        Collection<BlockState> pendingRollback = new ArrayList<>();
                         for (Block block : cageBlocks) {
                             pendingRollback.add(block.getState());
                         }
@@ -442,10 +441,10 @@ public class KitListener implements Listener {
                         cageBlocks.get(10).setType(Material.LAVA);
 
                         // Damages the target.
-                        receiver.damage(imprisonerKitDamage, damager);
+                        receiver.damage(Settings.imprisonerKitDamage, damager);
 
                         // Teleports the target into the cage.
-                        Location prisonLoc = receiver.getLocation().add(0.0, imprisonerKitHeight, 0.0);
+                        Location prisonLoc = receiver.getLocation().add(0.0, Settings.imprisonerKitHeight, 0.0);
                         prisonLoc.setX(prisonLoc.getBlockX() + 0.5);
                         prisonLoc.setY(Math.floor(prisonLoc.getY()));
                         prisonLoc.setZ(prisonLoc.getBlockZ() + 0.5);
@@ -461,7 +460,7 @@ public class KitListener implements Listener {
                             for (BlockState block : pendingRollback) {
                                 rollback(block);
                             }
-                        }, imprisonerKitDuration * 20L);
+                        }, Settings.imprisonerKitDuration * 20L);
                     }
                 }
             }
@@ -484,13 +483,13 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is not on the ground.
             if (!BlockUtil.isOnGroundOffset(player, 0.001)) {
-                MessageUtil.messagePlayer(player, "&cYou need to be on the ground.");
+                MessageUtil.messagePlayer(player, ConstantUtil.NOT_ON_GROUND);
                 return;
             }
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -504,7 +503,7 @@ public class KitListener implements Listener {
             player.setVelocity(direction);
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), kangarooKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.kangarooKitCooldown, true);
         }
     }
 
@@ -518,16 +517,16 @@ public class KitListener implements Listener {
         Vector direction = player.getEyeLocation().getDirection();
 
         if (player.isSneaking()) {
-            direction.setY(kangarooKitSneakingHeight);
+            direction.setY(Settings.kangarooKitSneakingHeight);
 
-            if (kangarooKitSneakingMultiplier != 0.0) {
-                direction.multiply(kangarooKitSneakingMultiplier);
+            if (Settings.kangarooKitSneakingMultiplier != 0.0) {
+                direction.multiply(Settings.kangarooKitSneakingMultiplier);
             }
         } else {
-            direction.setY(kangarooKitNormalHeight);
+            direction.setY(Settings.kangarooKitNormalHeight);
 
-            if (kangarooKitNormalMultiplier != 0.0) {
-                direction.multiply(kangarooKitNormalMultiplier);
+            if (Settings.kangarooKitNormalMultiplier != 0.0) {
+                direction.multiply(Settings.kangarooKitNormalMultiplier);
             }
         }
         return direction;
@@ -549,7 +548,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -585,7 +584,7 @@ public class KitListener implements Listener {
             player.addPotionEffect(new PotionEffect(randomEffect, duration, amplifier, false, false));
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), mageKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.mageKitCooldown, true);
         }
     }
 
@@ -610,7 +609,7 @@ public class KitListener implements Listener {
 
                 // Ignores the event if the player is in spawn.
                 if (Regions.isInSafezone(damager.getLocation())) {
-                    MessageUtil.messagePlayer(damager, "&cYou can't use your ability in spawn.");
+                    MessageUtil.messagePlayer(damager, ConstantUtil.ABILITY_IN_SPAWN);
                     return;
                 }
 
@@ -641,7 +640,7 @@ public class KitListener implements Listener {
                 MessageUtil.messagePlayer(receiver, "&cYour items have been swapped by a Monk!");
 
                 MessageUtil.messagePlayer(damager, "&aYour ability has been used.");
-                damagerData.setCooldown(damagerData.getActiveKit(), monkKitCooldown, true);
+                damagerData.setCooldown(damagerData.getActiveKit(), Settings.monkKitCooldown, true);
             }
         }
     }
@@ -662,7 +661,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -676,7 +675,7 @@ public class KitListener implements Listener {
                     new FixedMetadataValue(KitPvP.instance, true));
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), spidermanKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.spidermanKitCooldown, true);
         }
     }
 
@@ -706,7 +705,7 @@ public class KitListener implements Listener {
                     }
 
                     if (snowball.hasMetadata("spiderman")) {
-                        ArrayList<BlockState> blockStates = new ArrayList<>();
+                        Collection<BlockState> blockStates = new ArrayList<>();
                         Block block = receiver.getLocation().getBlock();
 
                         // Ignores water and lava and moves the target to the nearest air block.
@@ -742,7 +741,7 @@ public class KitListener implements Listener {
                             for (BlockState blockState : blockStates) {
                                 rollback(blockState);
                             }
-                        }, spidermanKitDuration * 20L);
+                        }, Settings.spidermanKitDuration * 20L);
                     }
                 }
             }
@@ -765,7 +764,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -774,10 +773,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(summonerKitRange, summonerKitRange, summonerKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.summonerKitRange, Settings.summonerKitRange, Settings.summonerKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -813,10 +812,10 @@ public class KitListener implements Listener {
             }
 
             // Removes the iron golem after the set ability duration.
-            TaskUtil.runTaskLater(ironGolem::remove, summonerKitDuration * 20L);
+            TaskUtil.runTaskLater(ironGolem::remove, Settings.summonerKitDuration * 20L);
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), summonerKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.summonerKitCooldown, true);
         }
     }
 
@@ -836,7 +835,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -845,10 +844,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            ArrayList<Wolf> wolves = new ArrayList<>();
+            Collection<Wolf> wolves = new ArrayList<>();
 
             // Spawns wolves that follow the player.
-            for (int i = 0; i < tamerKitAmount; ++i) {
+            for (int i = 0; i < Settings.tamerKitAmount; ++i) {
                 Wolf wolf = (Wolf) player.getWorld().spawnEntity(player.getLocation(), EntityType.WOLF);
                 wolf.setOwner(player);
                 wolf.isAngry();
@@ -861,10 +860,10 @@ public class KitListener implements Listener {
                 for (Wolf wolf : wolves) {
                     wolf.remove();
                 }
-            }, tamerKitDuration * 20L);
+            }, Settings.tamerKitDuration * 20L);
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), tamerKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.tamerKitCooldown, true);
         }
     }
 
@@ -884,7 +883,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -893,10 +892,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(thorKitRange, thorKitRange, thorKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.thorKitRange, Settings.thorKitRange, Settings.thorKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -923,13 +922,13 @@ public class KitListener implements Listener {
                 if (nearbyPlayerData.getActiveKit() != null
                         && !Regions.isInSafezone(nearbyPlayer.getLocation())) {
                     player.getWorld().strikeLightningEffect(nearbyPlayer.getLocation());
-                    nearbyPlayer.damage(thorKitDamage, player);
-                    nearbyPlayer.setFireTicks(thorKitDuration * 20);
+                    nearbyPlayer.damage(Settings.thorKitDamage, player);
+                    nearbyPlayer.setFireTicks(Settings.thorKitDuration * 20);
                 }
             }
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), thorKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.thorKitCooldown, true);
         }
     }
 
@@ -949,7 +948,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -958,10 +957,10 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(timelordKitRange, timelordKitRange, timelordKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.timelordKitRange, Settings.timelordKitRange, Settings.timelordKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -996,14 +995,14 @@ public class KitListener implements Listener {
                     nearbyPlayer.getWorld().playEffect(nearbyPlayer.getLocation().add(0.0, 1.0, 0.0), Effect.STEP_SOUND, 152);
 
                     // Freezes the player using potion effects.
-                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, timelordKitDuration * 20, 128, false, false));
-                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, timelordKitDuration * 20, 10, false, false));
-                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, timelordKitDuration * 20, 254, false, false));
+                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Settings.timelordKitDuration * 20, 128, false, false));
+                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Settings.timelordKitDuration * 20, 10, false, false));
+                    nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.timelordKitDuration * 20, 254, false, false));
                 }
             }
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), timelordKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.timelordKitCooldown, true);
         }
     }
 
@@ -1023,7 +1022,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -1032,11 +1031,11 @@ public class KitListener implements Listener {
                 return;
             }
 
-            List<Player> nearbyPlayers = new ArrayList<>();
-            List<PotionEffect> playerEffects = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
+            Collection<PotionEffect> playerEffects = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(vampireKitRange, vampireKitRange, vampireKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.vampireKitRange, Settings.vampireKitRange, Settings.vampireKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -1122,11 +1121,11 @@ public class KitListener implements Listener {
                             MessageUtil.messagePlayer(player, "&aYour drained effects were restored.");
                         }
                     }
-                }, vampireKitDuration * 20L);
+                }, Settings.vampireKitDuration * 20L);
             }
 
             MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-            playerData.setCooldown(playerData.getActiveKit(), vampireKitCooldown, true);
+            playerData.setCooldown(playerData.getActiveKit(), Settings.vampireKitCooldown, true);
         }
     }
 
@@ -1150,7 +1149,7 @@ public class KitListener implements Listener {
                     && !Regions.isInSafezone(receiver.getLocation())) {
 
                 damager.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,
-                        vampireKitPassiveDuration, 0, false, false));
+                        Settings.vampireKitPassiveDuration, 0, false, false));
             }
         }
     }
@@ -1171,7 +1170,7 @@ public class KitListener implements Listener {
 
             // Ignores the event if the player is in spawn.
             if (Regions.isInSafezone(player.getLocation())) {
-                MessageUtil.messagePlayer(player, "&cYou can't use your ability in spawn.");
+                MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
                 return;
             }
 
@@ -1182,10 +1181,10 @@ public class KitListener implements Listener {
 
             Player closest = null;
             double closestDistance = 0;
-            List<Player> nearbyPlayers = new ArrayList<>();
+            Collection<Player> nearbyPlayers = new ArrayList<>();
 
             // Adds nearby players to a list.
-            for (Entity entity : player.getNearbyEntities(zenKitRange, zenKitRange, zenKitRange)) {
+            for (Entity entity : player.getNearbyEntities(Settings.zenKitRange, Settings.zenKitRange, Settings.zenKitRange)) {
                 if (entity instanceof Player) {
                     Player nearbyPlayer = (Player) entity;
                     PlayerData nearbyPlayerData = PlayerDataManager.getPlayerData(nearbyPlayer);
@@ -1237,10 +1236,10 @@ public class KitListener implements Listener {
 
                 // Applies blindness to the target.
                 closest.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
-                        zenKitDuration * 20, 0, false, false));
+                        Settings.zenKitDuration * 20, 0, false, false));
 
                 MessageUtil.messagePlayer(player, "&aYou teleported to " + closest.getDisplayName() + ".");
-                playerData.setCooldown(playerData.getActiveKit(), zenKitCooldown, true);
+                playerData.setCooldown(playerData.getActiveKit(), Settings.zenKitCooldown, true);
 
             } else {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
@@ -1256,9 +1255,8 @@ public class KitListener implements Listener {
      * @param location The location of the cage.
      * @return The blocks that make up the cage.
      */
-    public static @NotNull List<Block> getCageBlocks(@NotNull Location location) {
+    private static @NotNull List<Block> getCageBlocks(@NotNull Location location) {
         List<Block> list = new ArrayList<>();
-
         list.add(location.clone().add(0.0, -1.0, 0.0).getBlock());
         list.add(location.clone().add(-1.0, 0.0, 0.0).getBlock());
         list.add(location.clone().add(0.0, 0.0, 1.0).getBlock());
@@ -1280,9 +1278,8 @@ public class KitListener implements Listener {
      * @param location The location of the cage.
      * @return The locations of the blocks that make up the cage.
      */
-    public static @NotNull List<Location> getPlatform(@NotNull Location location) {
+    private static @NotNull List<Location> getPlatform(@NotNull Location location) {
         List<Location> list = new ArrayList<>();
-
         list.add(location.clone());
         list.add(location.clone().add(-1.0, 0.0, 0.0));
         list.add(location.clone().add(0.0, 0.0, -1.0));
@@ -1301,7 +1298,7 @@ public class KitListener implements Listener {
      * @param location The location of the room.
      * @return The locations of the blocks that make up the room.
      */
-    public static @NotNull List<Location> getRoomLocations(@NotNull Location location) {
+    private static @NotNull List<Location> getRoomLocations(@NotNull Location location) {
         location.add(0.0, 9.0, 0.0);
 
         List<Location> list = new ArrayList<>(getPlatform(location));
@@ -1336,9 +1333,8 @@ public class KitListener implements Listener {
      * @param location The location.
      * @return The locations of the blocks surrounding the location.
      */
-    public static @NotNull List<Location> getSurroundingLocations(@NotNull Location location) {
+    private static @NotNull List<Location> getSurroundingLocations(@NotNull Location location) {
         List<Location> list = new ArrayList<>();
-
         list.add(location.clone().add(-1.0, 0.0, 0.0));
         list.add(location.clone().add(0.0, 0.0, 1.0));
         list.add(location.clone().add(0.0, 0.0, -1.0));
@@ -1351,7 +1347,7 @@ public class KitListener implements Listener {
      *
      * @param blockState The block state.
      */
-    public static void rollback(BlockState blockState) {
+    private static void rollback(BlockState blockState) {
         if (blockState instanceof Sign) {
             Sign sign = (Sign) blockState;
             Location location = sign.getLocation();

@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
@@ -33,9 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static net.foulest.kitpvp.util.Settings.cactusKitCost;
-import static net.foulest.kitpvp.util.Settings.cactusKitEnabled;
-
+@NoArgsConstructor
 public class Cactus implements Kit {
 
     @Override
@@ -80,12 +80,12 @@ public class Cactus implements Kit {
 
     @Override
     public boolean enabled() {
-        return cactusKitEnabled;
+        return Settings.cactusKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return cactusKitCost;
+        return Settings.cactusKitCost;
     }
 
     @Override

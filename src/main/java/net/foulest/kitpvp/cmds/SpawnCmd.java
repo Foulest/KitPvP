@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -24,6 +25,7 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.BlockUtil;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -38,10 +40,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class SpawnCmd {
 
-    private static final int secondsToWait = 5;
+    private static final int SECONDS_TO_WAIT = 5;
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "spawn", description = "Teleports you to spawn.",
             usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")
     public void onCommand(@NotNull CommandArgs args) {
@@ -50,13 +54,13 @@ public class SpawnCmd {
 
         // Checks if the player is in combat.
         if (CombatTag.isInCombat(player)) {
-            MessageUtil.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");
+            MessageUtil.messagePlayer(args.getPlayer(), ConstantUtil.COMBAT_TAGGED);
             return;
         }
 
         // Checks if the player is on the ground.
         if (!BlockUtil.isOnGroundOffset(player, 0.001)) {
-            MessageUtil.messagePlayer(args.getPlayer(), "&cYou need to be on the ground.");
+            MessageUtil.messagePlayer(args.getPlayer(), ConstantUtil.NOT_ON_GROUND);
             return;
         }
 
@@ -64,7 +68,7 @@ public class SpawnCmd {
         if (Regions.isInSafezone(player.getLocation())) {
             Spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
-            MessageUtil.messagePlayer(player, MessageUtil.colorize("&aTeleported to spawn."));
+            MessageUtil.messagePlayer(player, MessageUtil.colorize(ConstantUtil.TELEPORTED_TO_SPAWN));
             return;
         }
 
@@ -76,24 +80,27 @@ public class SpawnCmd {
 
         // Teleports the player to spawn.
         playerData.setTeleportToSpawnTask(new BukkitRunnable() {
-            int counter = 0;
-            int remainingSeconds = secondsToWait;
+            int counter;
+            int remainingSeconds = SECONDS_TO_WAIT;
 
             @Override
             public void run() {
-                if (++counter == secondsToWait) {
+                ++counter;
+
+                if (counter == SECONDS_TO_WAIT) {
                     Spawn.teleport(player);
                     player.getInventory().setHeldItemSlot(0);
                     player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
-                    MessageUtil.messagePlayer(player, MessageUtil.colorize("&aTeleported to spawn."));
+                    MessageUtil.messagePlayer(player, MessageUtil.colorize(ConstantUtil.TELEPORTED_TO_SPAWN));
                     playerData.setTeleportToSpawnTask(null);
                     cancel();
                     return;
                 }
 
                 player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                --remainingSeconds;
                 MessageUtil.messagePlayer(player, MessageUtil.colorize("&eTeleporting to spawn in &a"
-                        + --remainingSeconds + " seconds&e..."));
+                        + remainingSeconds + " seconds&e..."));
             }
         }.runTaskTimer(KitPvP.instance, 0L, 20L));
     }

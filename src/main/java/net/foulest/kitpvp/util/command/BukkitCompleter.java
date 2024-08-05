@@ -18,8 +18,9 @@
 package net.foulest.kitpvp.util.command;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.foulest.kitpvp.util.MessageUtil;
+import lombok.ToString;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -28,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Custom Bukkit TabCompleter class that implements the TabCompleter interface.
@@ -39,9 +39,11 @@ import java.util.Map.Entry;
  */
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
 public class BukkitCompleter implements TabCompleter {
 
-    private final Map<String, Entry<Method, Object>> completers = new HashMap<>();
+    private final Map<String, Map.Entry<Method, Object>> completers = new HashMap<>();
 
     /**
      * Adds a TabCompleter method for a specific label.
@@ -50,7 +52,7 @@ public class BukkitCompleter implements TabCompleter {
      * @param method The method to invoke for tab-completion.
      * @param obj    The object that contains the method to be invoked.
      */
-    public void addCompleter(String label, Method method, Object obj) {
+    void addCompleter(String label, Method method, Object obj) {
         completers.put(label, new AbstractMap.SimpleEntry<>(method, obj));
     }
 
@@ -71,24 +73,24 @@ public class BukkitCompleter implements TabCompleter {
                                       String @NotNull [] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
-            buffer.append(label.toLowerCase());
+            buffer.append(label.toLowerCase(Locale.ROOT));
 
             for (int x = 0; x < i; x++) {
                 if (!args[x].isEmpty() && !(" ").equals(args[x])) {
-                    buffer.append(".").append(args[x].toLowerCase());
+                    buffer.append(".").append(args[x].toLowerCase(Locale.ROOT));
                 }
             }
 
             String cmdLabel = buffer.toString();
 
             if (completers.containsKey(cmdLabel)) {
-                Entry<Method, Object> entry = completers.get(cmdLabel);
+                Map.Entry<Method, Object> entry = completers.get(cmdLabel);
 
                 try {
                     return (List<String>) entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
-                    MessageUtil.printException(ex);
+                    ex.printStackTrace();
                 }
             }
         }

@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
@@ -30,9 +32,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-import static net.foulest.kitpvp.util.Settings.ninjaKitCost;
-import static net.foulest.kitpvp.util.Settings.ninjaKitEnabled;
-
+@NoArgsConstructor
 public class Ninja implements Kit {
 
     @Override
@@ -78,12 +78,12 @@ public class Ninja implements Kit {
 
     @Override
     public boolean enabled() {
-        return ninjaKitEnabled;
+        return Settings.ninjaKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return ninjaKitCost;
+        return Settings.ninjaKitCost;
     }
 
     @Override

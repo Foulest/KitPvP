@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.util.command;
 
+import lombok.ToString;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -32,6 +33,7 @@ import java.util.List;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
+@ToString
 public class BukkitCommand extends org.bukkit.command.Command {
 
     private final Plugin owningPlugin;
@@ -45,9 +47,7 @@ public class BukkitCommand extends org.bukkit.command.Command {
      * @param executor The CommandExecutor responsible for handling this command.
      * @param owner    The owning Plugin of this command.
      */
-    protected BukkitCommand(String label,
-                            CommandExecutor executor,
-                            Plugin owner) {
+    BukkitCommand(String label, CommandExecutor executor, Plugin owner) {
         super(label);
         this.executor = executor;
         owningPlugin = owner;

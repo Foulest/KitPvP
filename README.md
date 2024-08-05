@@ -47,6 +47,14 @@
 3. Run `gradlew shadowJar` on Windows, or `./gradlew shadowJar` on macOS or Linux.
 4. The built `KitPvP-X.X.X.jar` file will be in the `build/libs` folder.
 
+## Download and Run
+
+1. Download the latest version from the [releases page](https://github.com/Foulest/KitPvP/releases) or compile it
+   yourself.
+2. Make sure your server is running Spigot 1.8.8 or a public fork of it.
+3. Place the `KitPvP-X.X.X.jar` file in your server's `plugins` folder.
+4. Start or restart your server.
+
 ## Getting Help
 
 For support or queries, please open an issue in the [Issues section](https://github.com/Foulest/KitPvP/issues).

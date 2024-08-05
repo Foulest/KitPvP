@@ -17,8 +17,10 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -35,8 +37,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class EcoCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "eco", description = "Main command for KitPvP's economy.",
             usage = "/eco <give/set/take> <player> <amount>", permission = "kitpvp.eco")
     public void onCommand(@NotNull CommandArgs args) {
@@ -52,7 +56,7 @@ public class EcoCmd {
 
         // Checks if the target is online.
         if (target == null || !target.isOnline()) {
-            MessageUtil.messagePlayer(sender, "Player not found.");
+            MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
             return;
         }
 
@@ -80,7 +84,7 @@ public class EcoCmd {
             case "give":
                 if (!sender.hasPermission("kitpvp.eco.give")
                         && !(sender instanceof ConsoleCommandSender)) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -99,7 +103,7 @@ public class EcoCmd {
             case "set":
                 if (!sender.hasPermission("kitpvp.eco.set")
                         && !(sender instanceof ConsoleCommandSender)) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -118,7 +122,7 @@ public class EcoCmd {
             case "take":
                 if (!sender.hasPermission("kitpvp.eco.take")
                         && !(sender instanceof ConsoleCommandSender)) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 

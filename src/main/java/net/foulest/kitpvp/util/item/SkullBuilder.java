@@ -19,7 +19,8 @@ package net.foulest.kitpvp.util.item;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.foulest.kitpvp.util.MessageUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -32,9 +33,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -44,6 +47,7 @@ import java.util.UUID;
  * @author deanveloper
  * @see <a href="https://github.com/deanveloper/SkullCreator">SkullCreator GitHub</a>
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SkullBuilder {
 
     private static Field blockProfileField;
@@ -56,7 +60,7 @@ public final class SkullBuilder {
      * @return The default skull ItemStack.
      */
     @Contract(" -> new")
-    public static @NotNull ItemStack createSkull() {
+    private static @NotNull ItemStack createSkull() {
         try {
             return new ItemStack(Material.valueOf("PLAYER_HEAD"));
         } catch (IllegalArgumentException var1) {
@@ -131,7 +135,7 @@ public final class SkullBuilder {
      * @return The ItemStack with the owner UUID set.
      */
     @Contract("_, _ -> param1")
-    public static @NotNull ItemStack itemWithUuid(@NotNull ItemStack item, UUID id) {
+    private static @NotNull ItemStack itemWithUuid(@NotNull ItemStack item, UUID id) {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner(Bukkit.getOfflinePlayer(id).getName());
         item.setItemMeta(meta);
@@ -146,7 +150,7 @@ public final class SkullBuilder {
      * @return The ItemStack with the owner URL set.
      */
     @Contract("_, _ -> param1")
-    public static @NotNull ItemStack itemWithUrl(ItemStack item, String url) {
+    private static @NotNull ItemStack itemWithUrl(ItemStack item, String url) {
         return itemWithBase64(item, urlToBase64(url));
     }
 
@@ -158,7 +162,7 @@ public final class SkullBuilder {
      * @return The ItemStack with the owner texture set.
      */
     @Contract("_, _ -> param1")
-    public static @NotNull ItemStack itemWithBase64(@NotNull ItemStack item, String base64) {
+    private static @NotNull ItemStack itemWithBase64(@NotNull ItemStack item, String base64) {
         if (item.getItemMeta() instanceof SkullMeta) {
             SkullMeta meta = (SkullMeta) item.getItemMeta();
             mutateItemMeta(meta, base64);
@@ -189,7 +193,7 @@ public final class SkullBuilder {
      * @param block The skull block to set the owner UUID for.
      * @param id    The UUID of the owner.
      */
-    public static void blockWithUuid(Block block, UUID id) {
+    private static void blockWithUuid(Block block, UUID id) {
         setToSkull(block);
         Skull state = (Skull) block.getState();
         state.setOwner(Bukkit.getOfflinePlayer(id).getName());
@@ -212,7 +216,7 @@ public final class SkullBuilder {
      * @param block  The skull block to set the owner texture for.
      * @param base64 The Base64-encoded texture.
      */
-    public static void blockWithBase64(Block block, String base64) {
+    private static void blockWithBase64(Block block, String base64) {
         setToSkull(block);
         BlockState state = block.getState();
 
@@ -257,7 +261,7 @@ public final class SkullBuilder {
         }
 
         String toEncode = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl + "\"}}}";
-        return Base64.getEncoder().encodeToString(toEncode.getBytes());
+        return Base64.getEncoder().encodeToString(toEncode.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -288,8 +292,8 @@ public final class SkullBuilder {
             }
 
             blockProfileField.set(block, makeProfile(b64));
-        } catch (ReflectiveOperationException ex) {
-            MessageUtil.printException(ex);
+        } catch (IllegalAccessException | NoSuchFieldException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -308,7 +312,7 @@ public final class SkullBuilder {
 
             metaSetProfileMethod.invoke(meta, makeProfile(b64));
 
-        } catch (ReflectiveOperationException ignored) {
+        } catch (IllegalAccessException | InvocationTargetException ignored) {
             try {
                 if (metaProfileField == null) {
                     metaProfileField = meta.getClass().getDeclaredField("profile");
@@ -316,9 +320,11 @@ public final class SkullBuilder {
                 }
 
                 metaProfileField.set(meta, makeProfile(b64));
-            } catch (ReflectiveOperationException ex) {
-                MessageUtil.printException(ex);
+            } catch (IllegalAccessException | NoSuchFieldException ex) {
+                ex.printStackTrace();
             }
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 }

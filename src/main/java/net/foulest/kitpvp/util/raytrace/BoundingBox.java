@@ -20,6 +20,7 @@ package net.foulest.kitpvp.util.raytrace;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IBlockData;
@@ -44,15 +45,16 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @SuppressWarnings("unused")
 public class BoundingBox {
 
-    public Vector min;
-    public Vector max;
+    private Vector min;
+    private Vector max;
 
     // Gets the min and max point of a block.
-    public BoundingBox(@NotNull Block block) {
+    private BoundingBox(@NotNull Block block) {
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
         net.minecraft.server.v1_8_R3.Block blockNative = blockData.getBlock();
 
@@ -64,20 +66,20 @@ public class BoundingBox {
 
     // Gets the min and max point of an entity.
     public BoundingBox(Entity entity) {
-        AxisAlignedBB bb = ((CraftEntity) entity).getHandle().getBoundingBox();
-        min = new Vector(bb.a, bb.b, bb.c);
-        max = new Vector(bb.d, bb.e, bb.f);
+        AxisAlignedBB box = ((CraftEntity) entity).getHandle().getBoundingBox();
+        min = new Vector(box.a, box.b, box.c);
+        max = new Vector(box.d, box.e, box.f);
     }
 
     // Gets the min and max point of an AxisAlignedBB.
-    public BoundingBox(@NotNull AxisAlignedBB bb) {
-        min = new Vector(bb.a, bb.b, bb.c);
-        max = new Vector(bb.d, bb.e, bb.f);
+    public BoundingBox(@NotNull AxisAlignedBB box) {
+        min = new Vector(box.a, box.b, box.c);
+        max = new Vector(box.d, box.e, box.f);
     }
 
     // Gets the min and max point of a custom BoundingBox.
-    public BoundingBox(double minX, double minY, double minZ,
-                       double maxX, double maxY, double maxZ) {
+    private BoundingBox(double minX, double minY, double minZ,
+                        double maxX, double maxY, double maxZ) {
         min = new Vector(minX, minY, minZ);
         max = new Vector(maxX, maxY, maxZ);
     }
@@ -87,7 +89,7 @@ public class BoundingBox {
         return max.clone().add(min).multiply(0.5);
     }
 
-    public boolean collidesWith(@NotNull BoundingBox other) {
+    private boolean collidesWith(@NotNull BoundingBox other) {
         return (min.getX() <= other.max.getX() && max.getX() >= other.min.getX())
                 && (min.getY() <= other.max.getY() && max.getY() >= other.min.getY())
                 && (min.getZ() <= other.max.getZ() && max.getZ() >= other.min.getZ());

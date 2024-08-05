@@ -19,9 +19,11 @@ package net.foulest.kitpvp.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the arguments provided to a command handler method.
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 @Setter
+@ToString
 public class CommandArgs {
 
     private final CommandSender sender;
@@ -76,8 +79,8 @@ public class CommandArgs {
      *
      * @return The formatted command label.
      */
-    public String getLabel() {
-        return label.replaceAll("\\.", " ");
+    String getLabel() {
+        return label.replace(".", " ");
     }
 
     /**
@@ -113,7 +116,7 @@ public class CommandArgs {
      *
      * @return The sender as a Player or null if the sender is not a player.
      */
-    public Player getPlayer() {
+    public @Nullable Player getPlayer() {
         return isPlayer() ? ((Player) sender) : null;
     }
 }

@@ -19,6 +19,7 @@ package net.foulest.kitpvp.util.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 
 @Getter
 @Setter
+@ToString
 @SuppressWarnings("unused")
 public final class ConcurrentStream<T> {
 

@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.menus;
 
+import lombok.ToString;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
@@ -28,8 +29,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents the Kit Enchanter GUI.
@@ -37,9 +40,9 @@ import java.util.Arrays;
  * @author Foulest
  * @project KitPvP
  */
+@ToString
 public class KitEnchanter {
 
-    private static final String inventoryName = MessageUtil.colorize("Kit Enchanter");
     private final Inventory inventory;
 
     /**
@@ -48,6 +51,7 @@ public class KitEnchanter {
      * @param player The player to open the GUI for.
      */
     public KitEnchanter(Player player) {
+        String inventoryName = MessageUtil.colorize("Kit Enchanter");
         inventory = Bukkit.createInventory(player, 27, inventoryName);
 
         populateInventory(player);
@@ -67,89 +71,110 @@ public class KitEnchanter {
             inventory.setItem(i, glass);
         }
 
-        ItemStack featherFalling = new ItemBuilder(Material.DIAMOND_BOOTS).addGlow().name("&aFeather Falling").lore(Arrays.asList(
-                "&7Adds the &fFeather Falling IV &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.FEATHER_FALLING) ? "&aYou have this equipped."
-                        : (Settings.featherFallingEnabled ? "&7Cost: &6" + Settings.featherFallingCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack featherFalling = createEnchantedItem(
+                Material.DIAMOND_BOOTS,
+                "&aFeather Falling",
+                Arrays.asList(
+                        "&7Adds the &fFeather Falling IV &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.FEATHER_FALLING,
+                                Settings.featherFallingEnabled, Settings.featherFallingCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack thorns = new ItemBuilder(Material.DIAMOND_CHESTPLATE).addGlow().name("&aThorns").lore(Arrays.asList(
-                "&7Adds the &fThorns II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.THORNS) ? "&aYou have this equipped."
-                        : (Settings.thornsEnabled ? "&7Cost: &6" + Settings.thornsCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack thorns = createEnchantedItem(
+                Material.DIAMOND_CHESTPLATE,
+                "&aThorns",
+                Arrays.asList(
+                        "&7Adds the &fThorns II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.THORNS,
+                                Settings.thornsEnabled, Settings.thornsCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack protection = new ItemBuilder(Material.DIAMOND_CHESTPLATE).addGlow().name("&aProtection").lore(Arrays.asList(
-                "&7Adds the &fProtection II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.PROTECTION) ? "&aYou have this equipped."
-                        : (Settings.protectionEnabled ? "&7Cost: &6" + Settings.protectionCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack protection = createEnchantedItem(
+                Material.DIAMOND_CHESTPLATE,
+                "&aProtection",
+                Arrays.asList(
+                        "&7Adds the &fProtection II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.PROTECTION,
+                                Settings.protectionEnabled, Settings.protectionCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack knockback = new ItemBuilder(Material.DIAMOND_SWORD).hideInfo().addGlow().name("&aKnockback").lore(Arrays.asList(
-                "&7Adds the &fKnockback II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.KNOCKBACK) ? "&aYou have this equipped."
-                        : (Settings.knockbackEnabled ? "&7Cost: &6" + Settings.knockbackCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack knockback = createEnchantedItem(
+                Material.DIAMOND_SWORD,
+                "&aKnockback",
+                Arrays.asList(
+                        "&7Adds the &fKnockback II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.KNOCKBACK,
+                                Settings.knockbackEnabled, Settings.knockbackCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack sharpness = new ItemBuilder(Material.DIAMOND_SWORD).hideInfo().addGlow().name("&aSharpness").lore(Arrays.asList(
-                "&7Adds the &fSharpness II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.SHARPNESS) ? "&aYou have this equipped."
-                        : (Settings.sharpnessEnabled ? "&7Cost: &6" + Settings.sharpnessCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack sharpness = createEnchantedItem(
+                Material.DIAMOND_SWORD,
+                "&aSharpness",
+                Arrays.asList(
+                        "&7Adds the &fSharpness II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.SHARPNESS,
+                                Settings.sharpnessEnabled, Settings.sharpnessCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack punch = new ItemBuilder(Material.BOW).addGlow().name("&aPunch").lore(Arrays.asList(
-                "&7Adds the &fPunch II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.PUNCH) ? "&aYou have this equipped."
-                        : (Settings.punchEnabled ? "&7Cost: &6" + Settings.punchCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack punch = createEnchantedItem(
+                Material.BOW,
+                "&aPunch",
+                Arrays.asList(
+                        "&7Adds the &fPunch II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.PUNCH,
+                                Settings.punchEnabled, Settings.punchCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
-        ItemStack power = new ItemBuilder(Material.BOW).addGlow().name("&aPower").lore(Arrays.asList(
-                "&7Adds the &fPower II &7enchantment.",
-                "",
-                (playerData.getEnchants().contains(Enchants.POWER) ? "&aYou have this equipped."
-                        : (Settings.powerEnabled ? "&7Cost: &6" + Settings.powerCost + " coins"
-                        : "&cThis enchantment is disabled.")),
-                "",
-                "&cNote: &7This enchantment is temporary.",
-                "&7Kits that already have this enchantment",
-                "&7will be upgraded to a higher level.")
-        ).getItem();
+        ItemStack power = createEnchantedItem(
+                Material.BOW,
+                "&aPower",
+                Arrays.asList(
+                        "&7Adds the &fPower II &7enchantment.",
+                        "",
+                        getEnchantmentStatus(playerData, Enchants.POWER,
+                                Settings.powerEnabled, Settings.powerCost),
+                        "",
+                        "&cNote: &7This enchantment is temporary.",
+                        "&7Kits that already have this enchantment",
+                        "&7will be upgraded to a higher level."
+                )
+        );
 
         inventory.setItem(10, featherFalling);
         inventory.setItem(11, thorns);
@@ -158,5 +183,19 @@ public class KitEnchanter {
         inventory.setItem(14, sharpness);
         inventory.setItem(15, punch);
         inventory.setItem(16, power);
+    }
+
+    private static ItemStack createEnchantedItem(Material material, String name, List<String> lore) {
+        return new ItemBuilder(material).addGlow().name(name).lore(lore).getItem();
+    }
+
+    private static @NotNull String getEnchantmentStatus(@NotNull PlayerData playerData, Enchants enchant, boolean isEnabled, int cost) {
+        if (playerData.getEnchants().contains(enchant)) {
+            return "&aYou have this equipped.";
+        } else if (isEnabled) {
+            return "&7Cost: &6" + cost + " coins";
+        } else {
+            return "&cThis enchantment is disabled.";
+        }
     }
 }

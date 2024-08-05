@@ -17,8 +17,10 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
@@ -34,11 +36,11 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class BountyCmd {
 
-    @Command(name = "bounty", aliases = {"bounties"},
-            description = "Allows players to place bounties on each other.",
-            permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
+    @SuppressWarnings("MethodMayBeStatic")
+    @Command(name = "bounty", aliases = "bounties", description = "Allows players to place bounties on each other.", permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
@@ -46,7 +48,7 @@ public class BountyCmd {
 
         // Checks if the bounties feature is enabled.
         if (!Settings.bountiesEnabled) {
-            MessageUtil.messagePlayer(player, "&cThat command is disabled.");
+            MessageUtil.messagePlayer(player, ConstantUtil.COMMAND_DISABLED);
             return;
         }
 
@@ -111,7 +113,7 @@ public class BountyCmd {
         }
 
         if (playerData.getCoins() - amount < 0) {
-            MessageUtil.messagePlayer(player, "&cYou don't have enough coins.");
+            MessageUtil.messagePlayer(player, ConstantUtil.NOT_ENOUGH_COINS);
             return;
         }
 

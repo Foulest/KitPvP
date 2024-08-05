@@ -17,6 +17,8 @@
  */
 package net.foulest.kitpvp.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -28,6 +30,7 @@ import org.bukkit.entity.Player;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NMSUtil {
 
     /**
@@ -36,7 +39,7 @@ public final class NMSUtil {
      * @param player The Bukkit Player.
      * @return The NMS EntityPlayer.
      */
-    public static EntityPlayer getNmsPlayer(Player player) {
+    private static EntityPlayer getNmsPlayer(Player player) {
         return ((CraftPlayer) player).getHandle();
     }
 

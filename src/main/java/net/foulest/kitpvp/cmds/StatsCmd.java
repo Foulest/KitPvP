@@ -17,8 +17,10 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -32,8 +34,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class StatsCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "stats", description = "Shows a player's statistics.",
             usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")
     public void onCommand(@NotNull CommandArgs args) {
@@ -54,14 +58,14 @@ public class StatsCmd {
         // Displays the stats of another player.
         if (args.length() == 1) {
             if (args.getArgs(0).length() > 16) {
-                MessageUtil.messagePlayer(sender, "&cPlayer not found.");
+                MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
             player = Bukkit.getPlayer(args.getArgs(0));
 
             if (player == null || !player.isOnline()) {
-                MessageUtil.messagePlayer(sender, "&cPlayer not found.");
+                MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 

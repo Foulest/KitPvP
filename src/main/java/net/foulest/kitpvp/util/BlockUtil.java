@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.util;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.foulest.kitpvp.util.data.ConcurrentStream;
 import net.foulest.kitpvp.util.raytrace.BoundingBox;
@@ -29,15 +31,16 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-public class BlockUtil {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class BlockUtil {
 
-    public static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
+    private static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
         return !player.getLocation().getWorld().isChunkLoaded(player.getLocation().getBlockX() >> 4,
                 player.getLocation().getBlockZ() >> 4);
     }
 
     @Contract("_, _ -> new")
-    public static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
+    private static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
         return new ConcurrentStream<>(boundingBox.getCollidingBlocks(player), false);
     }
 

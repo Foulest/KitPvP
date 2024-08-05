@@ -30,7 +30,9 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 public interface Kit {
 
@@ -86,7 +88,7 @@ public interface Kit {
      */
     default void apply(Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        List<Integer> airSlots = new ArrayList<>();
+        Collection<Integer> airSlots = new ArrayList<>();
 
         // Checks if the player owns the kit they're trying to equip.
         if (getCost() > 0 && !playerData.getOwnedKits().contains(this)) {
@@ -132,36 +134,38 @@ public interface Kit {
 
         // Sets the player's kit items.
         for (ItemBuilder item : getItems()) {
-            if (item.getItem().getType().toString().toLowerCase().contains("sword")
-                    || item.getItem().getType().toString().toLowerCase().contains("cactus")
-                    || item.getItem().getType().toString().toLowerCase().contains("axe")) {
+            ItemBuilder itemBuilder = item;
+
+            if (itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("sword")
+                    || itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("cactus")
+                    || itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("axe")) {
                 if (playerData.getEnchants().contains(Enchants.KNOCKBACK)) {
-                    item = item.enchant(Enchantment.KNOCKBACK, 2);
+                    itemBuilder = itemBuilder.enchant(Enchantment.KNOCKBACK, 2);
                 }
 
                 if (playerData.getEnchants().contains(Enchants.SHARPNESS)) {
-                    item = item.enchant(Enchantment.DAMAGE_ALL, 2);
+                    itemBuilder = itemBuilder.enchant(Enchantment.DAMAGE_ALL, 2);
                 }
             }
 
-            if (item.getItem().getType().toString().toLowerCase().contains("bow")) {
+            if (itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("bow")) {
                 if (playerData.getEnchants().contains(Enchants.PUNCH)) {
-                    item = item.enchant(Enchantment.ARROW_KNOCKBACK, 2);
+                    itemBuilder = itemBuilder.enchant(Enchantment.ARROW_KNOCKBACK, 2);
                 }
 
                 if (playerData.getEnchants().contains(Enchants.POWER)) {
-                    item = item.enchant(Enchantment.ARROW_DAMAGE, 2);
+                    itemBuilder = itemBuilder.enchant(Enchantment.ARROW_DAMAGE, 2);
                 }
             }
 
-            if (item.getSlot() != 0) {
-                if (item.getItem().getType() == Material.AIR) {
-                    airSlots.add(item.getSlot());
+            if (itemBuilder.getSlot() == 0) {
+                player.getInventory().addItem(itemBuilder.getItem());
+            } else {
+                if (itemBuilder.getItem().getType() == Material.AIR) {
+                    airSlots.add(itemBuilder.getSlot());
                 }
 
-                player.getInventory().setItem(item.getSlot(), item.getItem());
-            } else {
-                player.getInventory().addItem(item.getItem());
+                player.getInventory().setItem(itemBuilder.getSlot(), itemBuilder.getItem());
             }
         }
 

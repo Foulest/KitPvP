@@ -21,6 +21,8 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 public enum Enchants {
     FEATHER_FALLING,
     THORNS,
@@ -37,13 +39,13 @@ public enum Enchants {
      * @return The formatted name.
      */
     public @NotNull String getDatabaseName() {
-        String processedName = MessageUtil.capitalize(name().toLowerCase()
+        String processedName = MessageUtil.capitalize(name().toLowerCase(Locale.ROOT)
                         .replace("_", " "))
                 .replace(" ", "");
 
         // De-capitalizes the first letter.
         if (!processedName.isEmpty()) {
-            processedName = processedName.substring(0, 1).toLowerCase() + processedName.substring(1);
+            processedName = processedName.substring(0, 1).toLowerCase(Locale.ROOT) + processedName.substring(1);
         }
         return processedName;
     }
@@ -55,7 +57,7 @@ public enum Enchants {
      * @return The formatted name.
      */
     public @NotNull String getFormattedName() {
-        return MessageUtil.capitalize(name().toLowerCase()
+        return MessageUtil.capitalize(name().toLowerCase(Locale.ROOT)
                 .replace("_", " "));
     }
 

@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Material;
@@ -28,9 +30,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
-import static net.foulest.kitpvp.util.Settings.thorKitCost;
-import static net.foulest.kitpvp.util.Settings.thorKitEnabled;
-
+@NoArgsConstructor
 public class Thor implements Kit {
 
     @Override
@@ -75,12 +75,12 @@ public class Thor implements Kit {
 
     @Override
     public boolean enabled() {
-        return thorKitEnabled;
+        return Settings.thorKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return thorKitCost;
+        return Settings.thorKitCost;
     }
 
     @Override

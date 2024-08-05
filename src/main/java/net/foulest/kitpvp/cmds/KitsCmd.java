@@ -17,10 +17,12 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.menus.KitSelector;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -33,8 +35,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class KitsCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
             description = "Selects a kit or opens the Kit Selector.", inGameOnly = true,
             permission = "kitpvp.kitselector")
@@ -43,7 +47,7 @@ public class KitsCmd {
 
         // Checks if the player is in spawn.
         if (!Regions.isInSafezone(player.getLocation())) {
-            MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
+            MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 

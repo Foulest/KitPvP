@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.listeners;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.cmds.StatsCmd;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -35,7 +36,7 @@ import net.foulest.kitpvp.util.TaskUtil;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
+@NoArgsConstructor
 public class EventListener implements Listener {
 
     /**
@@ -63,7 +65,7 @@ public class EventListener implements Listener {
      * @param event PlayerJoinEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+    public static void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -80,7 +82,7 @@ public class EventListener implements Listener {
         playerData.calcLevel(false);
 
         // Adds free kits to player's owned kits list.
-        for (Kit kit : KitManager.kits) {
+        for (Kit kit : KitManager.getKits()) {
             if (kit.enabled() && kit.getCost() == 0) {
                 playerData.getOwnedKits().add(kit);
             }
@@ -205,7 +207,7 @@ public class EventListener implements Listener {
                         + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "❤&e.");
 
                 // Removes arrows from the receiver's body.
-                TaskUtil.runTaskLater(() -> ((CraftPlayer) receiver).getHandle().getDataWatcher().watch(9, (byte) 0), 100L);
+                TaskUtil.runTaskLater(() -> ((CraftEntity) receiver).getHandle().getDataWatcher().watch(9, (byte) 0), 100L);
             }
         }
     }
@@ -267,7 +269,7 @@ public class EventListener implements Listener {
             Player damager = (Player) damagerEntity;
 
             // Prevents players from hitting their own entities.
-            if ((targetEntity instanceof Wolf && ((Wolf) targetEntity).getOwner() == damager)
+            if ((targetEntity instanceof Wolf && ((Tameable) targetEntity).getOwner() == damager)
                     || (targetEntity instanceof IronGolem && targetEntity.hasMetadata(damager.getName()))) {
                 event.setCancelled(true);
                 return;
@@ -292,10 +294,8 @@ public class EventListener implements Listener {
 
         // Combat tags players for Iron Golem damage.
         if (damagerEntity instanceof IronGolem && targetEntity instanceof Player) {
-            IronGolem golem = (IronGolem) damagerEntity;
-
             Bukkit.getOnlinePlayers().stream()
-                    .filter(player -> golem.hasMetadata(player.getName()))
+                    .filter(player -> damagerEntity.hasMetadata(player.getName()))
                     .findFirst()
                     .ifPresent(damager -> CombatTag.markForCombat(damager, (Player) targetEntity));
         }
@@ -730,7 +730,7 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         double deltaY = event.getTo().getY() - event.getFrom().getY();
-        double deltaXZ = Math.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
+        double deltaXZ = StrictMath.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
         boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
 
         // Ignores rotation updates.

@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
@@ -32,9 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static net.foulest.kitpvp.util.Settings.vampireKitCost;
-import static net.foulest.kitpvp.util.Settings.vampireKitEnabled;
-
+@NoArgsConstructor
 public class Vampire implements Kit {
 
     @Override
@@ -80,12 +80,12 @@ public class Vampire implements Kit {
 
     @Override
     public boolean enabled() {
-        return vampireKitEnabled;
+        return Settings.vampireKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return vampireKitCost;
+        return Settings.vampireKitCost;
     }
 
     @Override

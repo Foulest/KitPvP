@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
@@ -34,9 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static net.foulest.kitpvp.util.Settings.kangarooKitCost;
-import static net.foulest.kitpvp.util.Settings.kangarooKitEnabled;
-
+@NoArgsConstructor
 public class Kangaroo implements Kit {
 
     @Override
@@ -84,12 +84,12 @@ public class Kangaroo implements Kit {
 
     @Override
     public boolean enabled() {
-        return kangarooKitEnabled;
+        return Settings.kangarooKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return kangarooKitCost;
+        return Settings.kangarooKitCost;
     }
 
     @Override

@@ -18,7 +18,9 @@
 package net.foulest.kitpvp;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.ToString;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -52,6 +54,8 @@ import java.util.logging.Level;
  * @project KitPvP
  */
 @Getter
+@ToString
+@NoArgsConstructor
 public class KitPvP extends JavaPlugin {
 
     @Getter
@@ -131,7 +135,7 @@ public class KitPvP extends JavaPlugin {
     public void onDisable() {
         // Unloads the kits saved in the Kit Manager.
         MessageUtil.log(Level.INFO, "Unloading Kits...");
-        KitManager.kits.clear();
+        KitManager.getKits().clear();
 
         // Saves online players' data.
         MessageUtil.log(Level.INFO, "Saving Player Data...");
@@ -176,7 +180,7 @@ public class KitPvP extends JavaPlugin {
      *
      * @param kits Kit to load.
      */
-    private void loadKits(Kit... kits) {
-        Collections.addAll(KitManager.kits, kits);
+    private static void loadKits(Kit... kits) {
+        Collections.addAll(KitManager.getKits(), kits);
     }
 }

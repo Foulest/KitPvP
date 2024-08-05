@@ -18,6 +18,7 @@
 package net.foulest.kitpvp.util.item;
 
 import lombok.Getter;
+import lombok.ToString;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -39,6 +40,7 @@ import java.util.List;
  * @see <a href="https://www.spigotmc.org/threads/util-itembuilder-manage-items-easily.48397">Spigot Thread</a>
  */
 @Getter
+@ToString
 public class ItemBuilder {
 
     private final ItemStack item;
@@ -50,10 +52,6 @@ public class ItemBuilder {
 
     public ItemBuilder(ItemStack itemStack) {
         item = new ItemStack(itemStack);
-    }
-
-    public ItemBuilder addTag(String name) {
-        return this;
     }
 
     public ItemBuilder name(String name) {
@@ -104,7 +102,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder lore(@NotNull List<String> lore) {
+    public ItemBuilder lore(@NotNull Iterable<String> lore) {
         ItemMeta meta = item.getItemMeta();
         List<String> loreList = new ArrayList<>();
 

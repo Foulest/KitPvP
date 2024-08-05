@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -31,8 +32,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class SetSpawnCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
             permission = "kitpvp.setspawn", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {

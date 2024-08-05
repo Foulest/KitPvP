@@ -17,8 +17,10 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -34,8 +36,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class PayCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
     public void onCommand(@NotNull CommandArgs args) {
@@ -43,7 +47,7 @@ public class PayCmd {
             Player target = Bukkit.getPlayer(args.getArgs(0));
 
             if (target == null) {
-                MessageUtil.messagePlayer(args.getSender(), args.getArgs(0) + " is not online.");
+                MessageUtil.messagePlayer(args.getSender(), ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
@@ -65,7 +69,7 @@ public class PayCmd {
             PlayerData senderData = PlayerDataManager.getPlayerData(sender);
 
             if (senderData.getCoins() - amount <= 0) {
-                MessageUtil.messagePlayer(sender, "&cYou don't have enough coins.");
+                MessageUtil.messagePlayer(sender, ConstantUtil.NOT_ENOUGH_COINS);
                 return;
             }
 

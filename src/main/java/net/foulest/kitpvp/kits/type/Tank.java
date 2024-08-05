@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Material;
@@ -29,9 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-import static net.foulest.kitpvp.util.Settings.tankKitCost;
-import static net.foulest.kitpvp.util.Settings.tankKitEnabled;
-
+@NoArgsConstructor
 public class Tank implements Kit {
 
     @Override
@@ -77,12 +77,12 @@ public class Tank implements Kit {
 
     @Override
     public boolean enabled() {
-        return tankKitEnabled;
+        return Settings.tankKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return tankKitCost;
+        return Settings.tankKitCost;
     }
 
     @Override

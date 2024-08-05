@@ -18,7 +18,9 @@
 package net.foulest.kitpvp.cmds;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.command.Command;
@@ -38,8 +40,10 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class KitPvPCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitpvp", description = "Main command for KitPvP.",
             permission = "kitpvp.main", usage = "/kitpvp")
     public void onCommand(@NotNull CommandArgs args) {
@@ -54,26 +58,22 @@ public class KitPvPCmd {
         // Handle sub-commands.
         String subCommand = args.getArgs(0);
 
-        switch (subCommand.toLowerCase()) {
-            case "reload":
-                if (!sender.hasPermission("kitpvp.reload")
-                        && !(sender instanceof ConsoleCommandSender)) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
-                    return;
-                }
+        if (subCommand.equalsIgnoreCase("reload")) {
+            if (!sender.hasPermission("kitpvp.reload")
+                    && !(sender instanceof ConsoleCommandSender)) {
+                MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
+                return;
+            }
 
-                if (args.length() != 1) {
-                    MessageUtil.messagePlayer(sender, "&cUsage: /kitpvp reload");
-                    return;
-                }
+            if (args.length() != 1) {
+                MessageUtil.messagePlayer(sender, "&cUsage: /kitpvp reload");
+                return;
+            }
 
-                Settings.loadSettings();
-                MessageUtil.messagePlayer(sender, "&aReloaded the config files successfully.");
-                break;
-
-            default:
-                handleHelp(sender, args);
-                break;
+            Settings.loadSettings();
+            MessageUtil.messagePlayer(sender, "&aReloaded the config files successfully.");
+        } else {
+            handleHelp(sender, args);
         }
     }
 
@@ -83,10 +83,10 @@ public class KitPvPCmd {
      * @param sender The command sender
      * @param args   The command arguments
      */
-    private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
+    private static void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
         if (!sender.hasPermission("kitpvp.main")
                 && !(sender instanceof ConsoleCommandSender)) {
-            MessageUtil.messagePlayer(sender, "&cNo permission.");
+            MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
             return;
         }
 

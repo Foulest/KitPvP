@@ -17,8 +17,10 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -33,8 +35,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class BalanceCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
             permission = "kitpvp.balance", usage = "/balance [player]", inGameOnly = true)
@@ -53,7 +57,7 @@ public class BalanceCmd {
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         if (!target.isOnline()) {
-            MessageUtil.messagePlayer(sender, "&cPlayer not found.");
+            MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
             return;
         }
 

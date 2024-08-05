@@ -17,9 +17,11 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -35,16 +37,18 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class PotionsCmd {
 
-    @Command(name = "potions", aliases = {"pots"}, description = "Sets your healing item to Potions.",
+    @SuppressWarnings("MethodMayBeStatic")
+    @Command(name = "potions", aliases = "pots", description = "Sets your healing item to Potions.",
             usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")
     public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (!Regions.isInSafezone(player.getLocation())) {
-            MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
+            MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 

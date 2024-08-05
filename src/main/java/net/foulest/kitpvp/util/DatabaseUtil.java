@@ -18,6 +18,8 @@
 package net.foulest.kitpvp.util;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.enchants.Enchants;
@@ -41,7 +43,8 @@ import java.util.stream.IntStream;
  * @project KitPvP
  */
 @SuppressWarnings({"SqlSourceToSinkFlow", "unused"})
-public class DatabaseUtil {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class DatabaseUtil {
 
     private static HikariDataSource dataSource;
 
@@ -50,7 +53,7 @@ public class DatabaseUtil {
      */
     public static void loadDatabase() {
         // Initializes the DBCP instance.
-        DatabaseUtil.initialize(new HikariDataSource());
+        initialize(new HikariDataSource());
 
         if (Settings.usingFlatFile) {
             try {
@@ -60,22 +63,22 @@ public class DatabaseUtil {
                     Files.createFile(Paths.get(Settings.flatFilePath));
                 }
             } catch (IOException ex) {
-                MessageUtil.printException(ex);
+                ex.printStackTrace();
             }
 
             // Sets up the DBCP instance for SQLite.
-            DatabaseUtil.setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
+            setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
                     null, null, null, false, null);
 
         } else {
             // Sets up the DBCP instance for MariaDB.
-            DatabaseUtil.setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
+            setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,
                     "org.mariadb.jdbc.Driver", Settings.user, Settings.password,
                     "utf8", true, "SELECT 1;");
         }
 
         // Creates the PlayerStats table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
+        createTableIfNotExists(
                 "PlayerStats",
                 "uuid VARCHAR(255) NOT NULL, "
                         + "coins INT, "
@@ -90,14 +93,14 @@ public class DatabaseUtil {
         );
 
         // Creates the PlayerKits table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
+        createTableIfNotExists(
                 "PlayerKits",
                 "uuid VARCHAR(255) NOT NULL, "
                         + "kitName VARCHAR(255)"
         );
 
         // Creates the Bounties table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
+        createTableIfNotExists(
                 "Bounties",
                 "uuid VARCHAR(255) NOT NULL, "
                         + "bounty INT, "
@@ -106,7 +109,7 @@ public class DatabaseUtil {
         );
 
         // Creates the Enchants table if it doesn't exist.
-        DatabaseUtil.createTableIfNotExists(
+        createTableIfNotExists(
                 "Enchants",
                 "uuid VARCHAR(255) NOT NULL, "
                         + "featherFalling INT, "
@@ -124,17 +127,17 @@ public class DatabaseUtil {
      * Updates the PlayerStats table in the database.
      */
     public static void updatePlayerStatsTable(@NotNull PlayerData playerData) {
-        DatabaseUtil.addDataToTable("PlayerStats", new HashMap<String, Object>() {{
-            put("uuid", playerData.getUniqueId().toString());
-            put("coins", playerData.getCoins());
-            put("experience", playerData.getExperience());
-            put("kills", playerData.getKills());
-            put("deaths", playerData.getDeaths());
-            put("killstreak", playerData.getKillstreak());
-            put("topKillstreak", playerData.getTopKillstreak());
-            put("usingSoup", (playerData.isUsingSoup() ? 1 : 0));
-            put("previousKit", playerData.getPreviousKit().getName());
-        }});
+        Map<String, Object> playerDataMap = new HashMap<>();
+        playerDataMap.put("uuid", playerData.getUniqueId().toString());
+        playerDataMap.put("coins", playerData.getCoins());
+        playerDataMap.put("experience", playerData.getExperience());
+        playerDataMap.put("kills", playerData.getKills());
+        playerDataMap.put("deaths", playerData.getDeaths());
+        playerDataMap.put("killstreak", playerData.getKillstreak());
+        playerDataMap.put("topKillstreak", playerData.getTopKillstreak());
+        playerDataMap.put("usingSoup", playerData.isUsingSoup() ? 1 : 0);
+        playerDataMap.put("previousKit", playerData.getPreviousKit().getName());
+        addDataToTable("PlayerStats", playerDataMap);
     }
 
     /**
@@ -147,7 +150,7 @@ public class DatabaseUtil {
         String uuid = playerData.getUniqueId().toString();
 
         if (!ownedKits.isEmpty()) {
-            DatabaseUtil.deleteDataFromTable("PlayerKits",
+            deleteDataFromTable("PlayerKits",
                     "uuid = ?", Collections.singletonList(uuid));
 
             for (Kit kits : ownedKits) {
@@ -155,10 +158,10 @@ public class DatabaseUtil {
                     continue;
                 }
 
-                DatabaseUtil.addDataToTable("PlayerKits", new HashMap<String, Object>() {{
-                    put("uuid", uuid);
-                    put("kitName", kits.getName());
-                }});
+                Map<String, Object> playerKitsData = new HashMap<>();
+                playerKitsData.put("uuid", uuid);
+                playerKitsData.put("kitName", kits.getName());
+                addDataToTable("PlayerKits", playerKitsData);
             }
         }
     }
@@ -175,19 +178,19 @@ public class DatabaseUtil {
         // Removes the player from the table if they have no enchants.
         // Otherwise, adds the player to the table.
         if (enchants.isEmpty()) {
-            DatabaseUtil.deleteDataFromTable("Enchants",
+            deleteDataFromTable("Enchants",
                     "uuid = ?", Collections.singletonList(uuid));
         } else {
-            DatabaseUtil.addDataToTable("Enchants", new HashMap<String, Object>() {{
-                put("uuid", uuid);
-                put("featherFalling", enchants.contains(Enchants.FEATHER_FALLING) ? 1 : 0);
-                put("thorns", enchants.contains(Enchants.THORNS) ? 1 : 0);
-                put("protection", enchants.contains(Enchants.PROTECTION) ? 1 : 0);
-                put("knockback", enchants.contains(Enchants.KNOCKBACK) ? 1 : 0);
-                put("sharpness", enchants.contains(Enchants.SHARPNESS) ? 1 : 0);
-                put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
-                put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
-            }});
+            Map<String, Object> enchantsData = new HashMap<>();
+            enchantsData.put("uuid", uuid);
+            enchantsData.put("featherFalling", enchants.contains(Enchants.FEATHER_FALLING) ? 1 : 0);
+            enchantsData.put("thorns", enchants.contains(Enchants.THORNS) ? 1 : 0);
+            enchantsData.put("protection", enchants.contains(Enchants.PROTECTION) ? 1 : 0);
+            enchantsData.put("knockback", enchants.contains(Enchants.KNOCKBACK) ? 1 : 0);
+            enchantsData.put("sharpness", enchants.contains(Enchants.SHARPNESS) ? 1 : 0);
+            enchantsData.put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
+            enchantsData.put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
+            addDataToTable("Enchants", enchantsData);
         }
     }
 
@@ -204,14 +207,14 @@ public class DatabaseUtil {
         // Removes the player from the table if the bounty is 0 or the benefactor is null.
         // Otherwise, adds the player to the table.
         if (bounty == 0 || benefactor == null) {
-            DatabaseUtil.deleteDataFromTable("Bounties",
+            deleteDataFromTable("Bounties",
                     "uuid = ?", Collections.singletonList(uuid));
         } else {
-            DatabaseUtil.addDataToTable("Bounties", new HashMap<String, Object>() {{
-                put("uuid", uuid);
-                put("bounty", bounty);
-                put("benefactor", benefactor.toString());
-            }});
+            Map<String, Object> bountiesData = new HashMap<>();
+            bountiesData.put("uuid", uuid);
+            bountiesData.put("bounty", bounty);
+            bountiesData.put("benefactor", benefactor.toString());
+            addDataToTable("Bounties", bountiesData);
         }
     }
 
@@ -221,7 +224,7 @@ public class DatabaseUtil {
      * @param source The BasicDataSource instance.
      */
     @Synchronized
-    public static void initialize(HikariDataSource source) {
+    private static void initialize(HikariDataSource source) {
         if (dataSource == null) {
             dataSource = source;
         }
@@ -238,8 +241,8 @@ public class DatabaseUtil {
      * @param useUnicode        Whether to use Unicode.
      * @param validationQuery   The query to validate connections from the pool.
      */
-    public static void setupDbcp(String jdbcUrl, String driverClassName, String user, String password,
-                                 String characterEncoding, boolean useUnicode, String validationQuery) {
+    private static void setupDbcp(String jdbcUrl, String driverClassName, String user, String password,
+                                  String characterEncoding, boolean useUnicode, String validationQuery) {
         if (dataSource == null) {
             dataSource = new HikariDataSource();
         }
@@ -272,7 +275,7 @@ public class DatabaseUtil {
      * @param tableName    The table name.
      * @param tableColumns The table column definition.
      */
-    public static void createTableIfNotExists(String tableName, String tableColumns) {
+    private static void createTableIfNotExists(String tableName, String tableColumns) {
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
             DatabaseMetaData metaData = Objects.requireNonNull(connection).getMetaData();
             ResultSet tables = metaData.getTables(null, null, tableName, null);
@@ -285,7 +288,7 @@ public class DatabaseUtil {
                 }
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -316,7 +319,7 @@ public class DatabaseUtil {
      * @param tableName The table name.
      * @param tableData The data to be added.
      */
-    public static void addDataToTable(String tableName, @NotNull HashMap<String, Object> tableData) {
+    private static void addDataToTable(String tableName, @NotNull Map<String, Object> tableData) {
         String columns = String.join(", ", tableData.keySet());
         String placeholders = IntStream.range(0, tableData.size())
                 .mapToObj(i -> "?")
@@ -325,11 +328,11 @@ public class DatabaseUtil {
         String insertSQL;
 
         if (Settings.usingFlatFile) {
-            // SQLite syntax with INSERT OR REPLACE (assumes table has PRIMARY KEY or UNIQUE constraints)
+            // SQLite's syntax with INSERT OR REPLACE (assumes table has PRIMARY KEY or UNIQUE constraints)
             insertSQL = String.format("INSERT OR REPLACE INTO %s (%s) VALUES (%s)",
                     tableName, columns, placeholders);
         } else {
-            // MySQL/MariaDB syntax with ON DUPLICATE KEY UPDATE
+            // MySQL/MariaDB's syntax with ON DUPLICATE KEY UPDATE
             String updateStatement = " ON DUPLICATE KEY UPDATE " + tableData.keySet().stream()
                     .map(column -> String.format("%s = VALUES(%s)", column, column))
                     .collect(Collectors.joining(", "));
@@ -342,13 +345,14 @@ public class DatabaseUtil {
             try (PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(insertSQL)) {
                 int index = 1;
                 for (Object value : tableData.values()) {
-                    preparedStatement.setObject(index++, value);
+                    preparedStatement.setObject(index, value);
+                    index++;
                 }
 
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -358,7 +362,7 @@ public class DatabaseUtil {
      * @param tableName The table name.
      * @param tableData The data to be added.
      */
-    public static void addDefaultDataToTable(String tableName, @NotNull HashMap<String, Object> tableData) {
+    public static void addDefaultDataToTable(String tableName, @NotNull Map<String, Object> tableData) {
         // Check if the table is empty
         String checkTableEmptySQL = String.format("SELECT COUNT(*) FROM %s", tableName);
 
@@ -378,12 +382,13 @@ public class DatabaseUtil {
             try (PreparedStatement insertStmt = connection.prepareStatement(insertSQL)) {
                 int index = 1;
                 for (Object value : tableData.values()) {
-                    insertStmt.setObject(index++, value);
+                    insertStmt.setObject(index, value);
+                    index++;
                 }
                 insertStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -430,9 +435,9 @@ public class DatabaseUtil {
      * @param condition  The condition for the SQL query.
      * @param parameters The parameters to replace placeholders in the condition.
      */
-    public static void deleteDataFromTable(String tableName,
-                                           String condition,
-                                           @NotNull List<Object> parameters) {
+    private static void deleteDataFromTable(String tableName,
+                                            String condition,
+                                            @NotNull List<Object> parameters) {
         String deleteSQL = String.format("DELETE FROM %s WHERE %s", tableName, condition);
 
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
@@ -442,7 +447,7 @@ public class DatabaseUtil {
             }
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -452,12 +457,12 @@ public class DatabaseUtil {
      * @return The SQLite connection.
      * @throws SQLException If a database access error occurs.
      */
-    public static @Nullable Connection getSQLiteConnection() throws SQLException {
+    private static @Nullable Connection getSQLiteConnection() throws SQLException {
         try {
             Class.forName("org.sqlite.JDBC");
             return DriverManager.getConnection("jdbc:sqlite:" + Settings.flatFilePath);
         } catch (ClassNotFoundException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return null;
         }
     }

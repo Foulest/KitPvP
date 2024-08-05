@@ -17,10 +17,12 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -36,13 +38,15 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class ClearKitCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
         if (!(args.getSender() instanceof Player)) {
-            MessageUtil.messagePlayer(args.getSender(), "Only players can execute this command.");
+            MessageUtil.messagePlayer(args.getSender(), ConstantUtil.IN_GAME_ONLY);
             return;
         }
 
@@ -52,13 +56,13 @@ public class ClearKitCmd {
         // Handles clearing your own kit.
         if (args.length() == 0) {
             if (CombatTag.isInCombat(args.getPlayer())) {
-                MessageUtil.messagePlayer(args.getPlayer(), "&cYou may not use this command while in combat.");
+                MessageUtil.messagePlayer(args.getPlayer(), ConstantUtil.COMBAT_TAGGED);
                 return;
             }
 
             if (Regions.isInSafezone(player.getLocation())) {
                 if (playerData.getActiveKit() == null) {
-                    MessageUtil.messagePlayer(player, "&cYou do not have a kit selected.");
+                    MessageUtil.messagePlayer(player, ConstantUtil.NO_KIT_SELECTED);
                     return;
                 }
 
@@ -77,12 +81,12 @@ public class ClearKitCmd {
             PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
             if (!target.isOnline()) {
-                MessageUtil.messagePlayer(player, "&cThat player is not online.");
+                MessageUtil.messagePlayer(player, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
             if (targetData.getActiveKit() == null) {
-                MessageUtil.messagePlayer(target, "&cYou do not have a kit selected.");
+                MessageUtil.messagePlayer(target, ConstantUtil.NO_KIT_SELECTED);
                 return;
             }
 
@@ -97,7 +101,7 @@ public class ClearKitCmd {
      *
      * @param playerData The player's data.
      */
-    public static void clearKit(@NotNull PlayerData playerData) {
+    private static void clearKit(@NotNull PlayerData playerData) {
         Player player = playerData.getPlayer();
 
         playerData.setPreviousKit(playerData.getActiveKit());

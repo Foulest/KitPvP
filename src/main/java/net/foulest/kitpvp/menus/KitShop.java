@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.menus;
 
+import lombok.ToString;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
@@ -38,10 +39,10 @@ import java.util.*;
  * @author Foulest
  * @project KitPvP
  */
+@ToString
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class KitShop {
 
-    private static final String inventoryName = MessageUtil.colorize("Kit Shop");
     private static final Map<Player, Integer> pages = new HashMap<>();
     private final Inventory inventory;
 
@@ -61,14 +62,16 @@ public class KitShop {
      * @param page   The page to open the GUI on.
      */
     public KitShop(@NotNull Player player, int page) {
+        String inventoryName = MessageUtil.colorize("Kit Shop");
+
         player.closeInventory();
 
         if (page > 0) {
             inventory = Bukkit.createInventory(player,
-                    ensureSize(KitManager.kits.size()) + 18, inventoryName + " - Page: " + (page + 1));
+                    ensureSize(KitManager.getKits().size()) + 18, inventoryName + " - Page: " + (page + 1));
         } else {
             inventory = Bukkit.createInventory(player,
-                    ensureSize(KitManager.kits.size()) + 18, inventoryName);
+                    ensureSize(KitManager.getKits().size()) + 18, inventoryName);
         }
 
         if (populateInventory(player, page)) {
@@ -96,7 +99,8 @@ public class KitShop {
         if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
-        return ensureSize(++size);
+        ++size;
+        return ensureSize(size);
     }
 
     /**
@@ -145,14 +149,14 @@ public class KitShop {
         }
 
         int start = page * kitsPerPage;
-        int end = Math.min((page + 1) * kitsPerPage, KitManager.kits.size()); // Correct calculation of the end index
+        int end = Math.min((page + 1) * kitsPerPage, KitManager.getKits().size()); // Correct calculation of the end index
 
         // Next page item
-        if (end < KitManager.kits.size()) { // Correct check for the existence of a next page
+        if (end < KitManager.getKits().size()) { // Correct check for the existence of a next page
             inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
         }
 
-        List<Kit> pageKits = KitManager.kits.subList(start, end);
+        List<Kit> pageKits = KitManager.getKits().subList(start, end);
 
         // Sort kits alphabetically
         List<Kit> sortedKits = new ArrayList<>(pageKits);

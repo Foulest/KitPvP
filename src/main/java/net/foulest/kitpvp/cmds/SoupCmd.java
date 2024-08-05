@@ -17,9 +17,11 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -35,8 +37,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class SoupCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "soup", description = "Sets your healing item to Soup.",
             usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")
     public void onCommand(@NotNull CommandArgs args) {
@@ -45,7 +49,7 @@ public class SoupCmd {
 
         // Checks if the player is in spawn.
         if (!Regions.isInSafezone(player.getLocation())) {
-            MessageUtil.messagePlayer(player, "&cYou must be in spawn to use this command.");
+            MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 

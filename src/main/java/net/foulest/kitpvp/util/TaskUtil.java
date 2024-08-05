@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.util;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.foulest.kitpvp.KitPvP;
 import org.bukkit.Bukkit;
@@ -29,7 +31,8 @@ import java.util.List;
 @Getter
 @Setter
 @SuppressWarnings("unused")
-public class TaskUtil {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TaskUtil {
 
     public static void runTask(Runnable runnable) {
         Bukkit.getScheduler().runTask(KitPvP.instance, runnable);

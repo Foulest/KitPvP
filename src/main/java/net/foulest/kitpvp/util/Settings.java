@@ -17,9 +17,7 @@
  */
 package net.foulest.kitpvp.util;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.util.yaml.CustomYamlConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,7 +37,8 @@ import java.util.logging.Level;
  */
 @Getter
 @Setter
-public class Settings {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Settings {
 
     // File settings
     public static File file;
@@ -277,8 +276,8 @@ public class Settings {
             config.setDefaults(defConfig);
             config.options().copyDefaults(true);
             saveConfig(); // Save the config with defaults applied
-        } catch (Exception ex) {
-            MessageUtil.printException(ex);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -289,14 +288,14 @@ public class Settings {
         try {
             config.save(file);
         } catch (IOException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
     /**
      * Loads configuration values into the relevant static fields.
      */
-    public static void loadConfigValues() {
+    private static void loadConfigValues() {
         // Spawn settings
         spawnWorld = config.getString("kitpvp.spawn.world");
         spawnX = config.getDouble("kitpvp.spawn.x");

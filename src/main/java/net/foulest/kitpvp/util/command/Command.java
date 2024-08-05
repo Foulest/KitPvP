@@ -17,6 +17,8 @@
  */
 package net.foulest.kitpvp.util.command;
 
+import net.foulest.kitpvp.util.ConstantUtil;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -48,7 +50,7 @@ public @interface Command {
     /**
      * The message sent to the player when they do not have permission to execute it.
      */
-    String noPermission() default "&cNo permission.";
+    String noPermission() default ConstantUtil.NO_PERMISSION;
 
     /**
      * A list of alternate names that the command is executed under.

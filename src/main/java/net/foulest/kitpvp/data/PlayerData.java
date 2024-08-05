@@ -19,12 +19,14 @@ package net.foulest.kitpvp.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Material;
@@ -34,14 +36,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
-
-import static net.foulest.kitpvp.util.Settings.startingCoins;
 
 /**
  * Main class for storing player data.
@@ -51,6 +52,7 @@ import static net.foulest.kitpvp.util.Settings.startingCoins;
  */
 @Getter
 @Setter
+@ToString
 @SuppressWarnings("unused")
 public final class PlayerData {
 
@@ -64,7 +66,7 @@ public final class PlayerData {
     private Kit previousKit = KitManager.getKit("Knight");
 
     // Player stats
-    private int coins = startingCoins;
+    private int coins = Settings.startingCoins;
     private int kills;
     private int experience;
     private int level;
@@ -75,10 +77,10 @@ public final class PlayerData {
 
     // Bounty data
     private int bounty;
-    private UUID benefactor;
+    private @Nullable UUID benefactor;
 
     // Enchant data
-    private final Set<Enchants> enchants = new HashSet<>();
+    private final Set<Enchants> enchants = EnumSet.noneOf(Enchants.class);
 
     // No-fall data
     private boolean noFall;
@@ -86,7 +88,7 @@ public final class PlayerData {
 
     // Cooldowns and timers
     private final Map<Kit, Long> cooldowns = new HashMap<>();
-    private BukkitTask abilityCooldownNotifier;
+    private @Nullable BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportToSpawnTask;
 
     public PlayerData(@NotNull UUID uniqueId, Player player) {
@@ -134,17 +136,17 @@ public final class PlayerData {
 
     public boolean load() {
         // Inserts default values into PlayerStats.
-        DatabaseUtil.addDefaultDataToTable("PlayerStats", new HashMap<String, Object>() {{
-            put("uuid", uniqueId.toString());
-            put("coins", 500);
-            put("experience", 0);
-            put("kills", 0);
-            put("deaths", 0);
-            put("killstreak", 0);
-            put("topKillstreak", 0);
-            put("usingSoup", 0);
-            put("previousKit", "Knight");
-        }});
+        Map<String, Object> defaultStats = new HashMap<>();
+        defaultStats.put("uuid", uniqueId.toString());
+        defaultStats.put("coins", 500);
+        defaultStats.put("experience", 0);
+        defaultStats.put("kills", 0);
+        defaultStats.put("deaths", 0);
+        defaultStats.put("killstreak", 0);
+        defaultStats.put("topKillstreak", 0);
+        defaultStats.put("usingSoup", 0);
+        defaultStats.put("previousKit", "Knight");
+        DatabaseUtil.addDefaultDataToTable("PlayerStats", defaultStats);
 
         // Loads values from PlayerStats.
         try {
@@ -163,15 +165,15 @@ public final class PlayerData {
                 previousKit = KitManager.getKit((String) playerData.get("previousKit"));
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return false;
         }
 
         // Inserts default values into PlayerKits.
-        DatabaseUtil.addDefaultDataToTable("PlayerKits", new HashMap<String, Object>() {{
-            put("uuid", uniqueId.toString());
-            put("kitName", "Knight");
-        }});
+        Map<String, Object> defaultKits = new HashMap<>();
+        defaultKits.put("uuid", uniqueId.toString());
+        defaultKits.put("kitName", "Knight");
+        DatabaseUtil.addDefaultDataToTable("PlayerKits", defaultKits);
 
         // Loads values from PlayerKits.
         try {
@@ -184,7 +186,7 @@ public final class PlayerData {
                 }
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return false;
         }
 
@@ -202,7 +204,7 @@ public final class PlayerData {
                 }
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return false;
         }
 
@@ -212,7 +214,7 @@ public final class PlayerData {
                     "uuid = ?", Collections.singletonList(uniqueId.toString()));
 
             if (!data.isEmpty()) {
-                HashMap<String, Object> playerData = data.get(0);
+                Map<String, Object> playerData = data.get(0);
 
                 for (Enchants enchant : Enchants.values()) {
                     String key = enchant.getDatabaseName();
@@ -224,7 +226,7 @@ public final class PlayerData {
                 }
             }
         } catch (SQLException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return false;
         }
         return true;
@@ -419,7 +421,7 @@ public final class PlayerData {
      *
      * @return The player's experience as a decimal.
      */
-    public float getExpDecimal() {
+    private float getExpDecimal() {
         float decimal;
         String decimalFormatStr = "#####.0#";
         DecimalFormat format = new DecimalFormat(decimalFormatStr);
@@ -441,13 +443,13 @@ public final class PlayerData {
      */
     public int getExpPercent() {
         double percent;
-        int nextLevelXP = (getLevel() * 25) * 25;
-        int pastLevelXP = (Math.max(1, getLevel() - 1) * 25) * 25;
+        int nextLevelXP = (level * 25) * 25;
+        int pastLevelXP = (Math.max(1, level - 1) * 25) * 25;
 
-        if (getLevel() == 1) {
-            percent = ((double) getExperience() / nextLevelXP) * 100;
+        if (level == 1) {
+            percent = ((double) experience / nextLevelXP) * 100;
         } else {
-            percent = ((double) (getExperience() - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
+            percent = ((double) (experience - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
         }
         return (int) percent;
     }
@@ -457,8 +459,8 @@ public final class PlayerData {
      *
      * @return The player's KDR.
      */
-    public double getKDR() {
-        return (getDeaths() == 0) ? getKills() : getKills() / (double) getDeaths();
+    private double getKDR() {
+        return (deaths == 0) ? kills : kills / (double) deaths;
     }
 
     /**
@@ -488,7 +490,7 @@ public final class PlayerData {
                     MessageUtil.messagePlayer(player, " &b&lLevel Up");
                     MessageUtil.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
                     MessageUtil.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
-                    setCoins(getCoins() + 250);
+                    setCoins(coins + 250);
                 }
             }
         }
@@ -500,6 +502,7 @@ public final class PlayerData {
     /**
      * Gives the player their default items.
      */
+    @SuppressWarnings("LocalVariableHidesMemberVariable")
     public void giveDefaultItems() {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);

@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
@@ -32,9 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static net.foulest.kitpvp.util.Settings.spidermanKitCost;
-import static net.foulest.kitpvp.util.Settings.spidermanKitEnabled;
-
+@NoArgsConstructor
 public class Spiderman implements Kit {
 
     @Override
@@ -80,12 +80,12 @@ public class Spiderman implements Kit {
 
     @Override
     public boolean enabled() {
-        return spidermanKitEnabled;
+        return Settings.spidermanKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return spidermanKitCost;
+        return Settings.spidermanKitCost;
     }
 
     @Override

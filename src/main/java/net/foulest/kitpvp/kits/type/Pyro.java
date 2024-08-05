@@ -17,7 +17,9 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Material;
@@ -32,9 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static net.foulest.kitpvp.util.Settings.pyroKitCost;
-import static net.foulest.kitpvp.util.Settings.pyroKitEnabled;
-
+@NoArgsConstructor
 public class Pyro implements Kit {
 
     @Override
@@ -80,12 +80,12 @@ public class Pyro implements Kit {
 
     @Override
     public boolean enabled() {
-        return pyroKitEnabled;
+        return Settings.pyroKitEnabled;
     }
 
     @Override
     public int getCost() {
-        return pyroKitCost;
+        return Settings.pyroKitCost;
     }
 
     @Override

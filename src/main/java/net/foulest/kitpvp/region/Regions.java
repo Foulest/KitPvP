@@ -24,6 +24,8 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -40,7 +42,8 @@ import java.util.logging.Level;
  * @author Foulest
  * @project KitPvP
  */
-public class Regions {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Regions {
 
     private static final WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
     private static Map<String, ProtectedRegion> regionMap = new HashMap<>();
@@ -48,7 +51,7 @@ public class Regions {
     /**
      * Caches WorldGuard regions for later use.
      */
-    public static void cacheRegions() {
+    static void cacheRegions() {
         RegionContainer container = worldGuard.getRegionContainer();
         RegionManager regionManager = container.get(Spawn.getLocation().getWorld());
 

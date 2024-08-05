@@ -17,15 +17,16 @@
  */
 package net.foulest.kitpvp.util.yaml;
 
-import com.google.common.base.Charsets;
 import lombok.Cleanup;
-import net.foulest.kitpvp.util.MessageUtil;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,6 +39,8 @@ import java.util.regex.Pattern;
  * @author Foulest
  * @project KitPvP
  */
+@ToString
+@NoArgsConstructor
 public class CustomYamlConfiguration extends YamlConfiguration {
 
     // Map to store the path of the YAML keys and their associated comments
@@ -60,7 +63,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         String dataWithoutComments = super.saveToString().trim();
 
         // Use a pattern to match YAML comments and remove them
-        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*?$", "").trim();
+        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*$", "").trim();
 
         StringBuilder dataWithComments = new StringBuilder();
 
@@ -119,7 +122,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     @Override
     public void load(File file) throws IOException, InvalidConfigurationException {
         @Cleanup FileInputStream stream = new FileInputStream(file);
-        @Cleanup InputStreamReader reader = new InputStreamReader(stream, Charsets.UTF_8);
+        @Cleanup InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
         load(reader);
     }
 
@@ -144,7 +147,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             config.load(file);
         } catch (FileNotFoundException ignored) {
         } catch (IOException | InvalidConfigurationException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
         return config;
     }
@@ -155,7 +158,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         try {
             config.load(reader);
         } catch (IOException | InvalidConfigurationException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
         return config;
     }
@@ -166,7 +169,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param line The line of YAML to extract the key from.
      * @return The key if the line contains a key-value pair, otherwise null.
      */
-    private @Nullable String getKeyFromLine(String line) {
+    private static @Nullable String getKeyFromLine(CharSequence line) {
         Matcher matcher = Pattern.compile("^\\s*([\\w\\-]+):").matcher(line);
         return matcher.find() ? matcher.group(1) : null;
     }
@@ -186,7 +189,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
 
         for (String line : lines) {
-            if (line.trim().startsWith("#")) {
+            if (!line.trim().isEmpty() && line.trim().charAt(0) == '#') {
                 if (commentBuilder.length() > 0) {
                     commentBuilder.append("\n");
                 }

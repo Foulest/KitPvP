@@ -17,6 +17,8 @@
  */
 package net.foulest.kitpvp.combattag;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -26,9 +28,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-public class CombatTag {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CombatTag {
 
     private static final Map<Player, BukkitTask> combatScheduler = new HashMap<>();
     private static final Map<Player, Integer> combatHandler = new HashMap<>();
@@ -46,13 +52,15 @@ public class CombatTag {
             return;
         }
 
-        List<Player> players = new ArrayList<>(Arrays.asList(attacker, target));
+        Iterable<Player> players = new ArrayList<>(Arrays.asList(attacker, target));
 
         for (Player player : players) {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             // Handles combat tagging for the player.
-            if (!isInCombat(player)) {
+            if (isInCombat(player)) {
+                combatHandler.replace(player, getRemainingTime(player), Settings.combatTagDuration);
+            } else {
                 combatHandler.put(player, Settings.combatTagDuration);
 
                 combatScheduler.put(player, new BukkitRunnable() {
@@ -67,8 +75,6 @@ public class CombatTag {
                         }
                     }
                 }.runTaskTimer(KitPvP.instance, 0L, 20L));
-            } else {
-                combatHandler.replace(player, getRemainingTime(player), Settings.combatTagDuration);
             }
 
             // Cancels the player's pending teleportation when taking damage for.
@@ -100,7 +106,7 @@ public class CombatTag {
      * @return The remaining time in combat.
      */
     public static int getRemainingTime(Player player) {
-        return !isInCombat(player) ? -1 : combatHandler.get(player);
+        return isInCombat(player) ? combatHandler.get(player) : -1;
     }
 
     /**

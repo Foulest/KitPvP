@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.listeners;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -41,6 +42,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+@NoArgsConstructor
 public class DeathListener implements Listener {
 
     /**
@@ -49,7 +51,7 @@ public class DeathListener implements Listener {
      * @param receiver     The player that died.
      * @param onPlayerQuit Whether the player died from quitting.
      */
-    public static void handleDeath(Player receiver, boolean onPlayerQuit) {
+    static void handleDeath(Player receiver, boolean onPlayerQuit) {
         PlayerData receiverData = PlayerDataManager.getPlayerData(receiver);
         Kit currentKit = receiverData.getActiveKit();
         Vector vec = new Vector();
@@ -64,7 +66,7 @@ public class DeathListener implements Listener {
             if (currentKit instanceof Tamer) {
                 Bukkit.getWorld(receiver.getWorld().getUID()).getEntities().stream()
                         .filter(entity -> entity.getType() == EntityType.WOLF)
-                        .map(entity -> (Wolf) entity)
+                        .map(Wolf.class::cast)
                         .filter(wolf -> wolf.getOwner() == receiver)
                         .forEach(Wolf::remove);
             }
@@ -73,7 +75,7 @@ public class DeathListener implements Listener {
             if (currentKit instanceof Summoner) {
                 Bukkit.getWorld(receiver.getWorld().getUID()).getEntities().stream()
                         .filter(entity -> entity.getType() == EntityType.IRON_GOLEM)
-                        .map(entity -> (IronGolem) entity)
+                        .map(IronGolem.class::cast)
                         .filter(golem -> golem.hasMetadata(receiver.getName()))
                         .forEach(IronGolem::remove);
             }

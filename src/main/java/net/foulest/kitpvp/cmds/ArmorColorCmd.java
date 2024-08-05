@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -35,8 +36,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project KitPvP
  */
+@NoArgsConstructor
 public class ArmorColorCmd {
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
