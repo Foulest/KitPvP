@@ -4,6 +4,7 @@
 [![CodeQL Badge](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/KitPvP.svg)](https://jitpack.io/#Foulest/KitPvP)
 [![Downloads](https://img.shields.io/github/downloads/Foulest/KitPvP/total.svg)](https://github.com/Foulest/KitPvP/releases)
+[![Lines of Code](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/Foulest/KitPvP/badge?filter=.java$&style=flat&logoColor=white&label=Lines%20of%20Code)](https://ghloc.vercel.app/Foulest/KitPvP?branch=main)
 
 **KitPvP** is a fully-featured core plugin for the KitPvP gamemode.
 
