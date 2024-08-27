@@ -4,7 +4,6 @@
 [![CodeQL Badge](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/KitPvP/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/KitPvP.svg)](https://jitpack.io/#Foulest/KitPvP)
 [![Downloads](https://img.shields.io/github/downloads/Foulest/KitPvP/total.svg)](https://github.com/Foulest/KitPvP/releases)
-[![Lines of Code](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/Foulest/KitPvP/badge?filter=.java$&style=flat&logoColor=white&label=Lines%20of%20Code)](https://ghloc.vercel.app/Foulest/KitPvP?branch=main)
 
 **KitPvP** is a fully-featured core plugin for the KitPvP gamemode.
 
@@ -12,7 +11,7 @@
 
 ### Kits and Customization
 
-- **22 Unique Kits**: Choose from a diverse range of kits, each with distinct abilities and play styles.
+- **22 Unique Kits**: Choose from a diverse range of kits with distinct abilities and play styles.
 - **Interactive GUIs**: Seamless interfaces for kit selection, purchasing, and enchantments.
 - **Flexible Kit Management**: Customize kit prices, abilities, cooldowns, and toggle kits on/off as needed.
 
