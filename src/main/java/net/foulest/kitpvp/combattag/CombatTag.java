@@ -33,11 +33,27 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manages combat tagging for players.
+ *
+ * @author Foulest
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CombatTag {
 
+    /**
+     * The combat scheduler and handler for each player.
+     */
     private static final Map<Player, BukkitTask> combatScheduler = new HashMap<>();
+
+    /**
+     * The remaining time in combat for each player.
+     */
     private static final Map<Player, Integer> combatHandler = new HashMap<>();
+
+    /**
+     * The last attacker of each player.
+     */
     private static final Map<Player, Player> lastAttacker = new HashMap<>();
 
     /**

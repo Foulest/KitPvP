@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -38,13 +37,16 @@ import org.jetbrains.annotations.NotNull;
  * Command for teleporting to spawn.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class SpawnCmd {
 
     private static final int SECONDS_TO_WAIT = 5;
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "spawn", description = "Teleports you to spawn.",
             usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")

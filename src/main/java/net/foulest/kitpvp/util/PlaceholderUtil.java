@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.util;
 
-import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -29,9 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * Sets up placeholders with PlaceholderAPI.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override

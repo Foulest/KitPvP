@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -36,11 +35,14 @@ import org.jetbrains.annotations.NotNull;
  * Command for clearing your kit.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class ClearKitCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)

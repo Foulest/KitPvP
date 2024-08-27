@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.listeners;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.cmds.StatsCmd;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -56,7 +55,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-@NoArgsConstructor
+/**
+ * Handles all non-kit-related events in the plugin.
+ *
+ * @author Foulest
+ */
 public class EventListener implements Listener {
 
     /**
@@ -322,6 +325,11 @@ public class EventListener implements Listener {
         }
     }
 
+    /**
+     * Handles players clicking inside of inventories.
+     *
+     * @param event InventoryClickEvent
+     */
     @EventHandler
     public static void onInventoryClick(@NotNull InventoryClickEvent event) {
         // Nullability checks.
@@ -576,7 +584,7 @@ public class EventListener implements Listener {
     }
 
     /**
-     * Handles right-clicking blocks & items.
+     * Handles right-clicking blocks and items.
      *
      * @param event PlayerInteractEvent
      */

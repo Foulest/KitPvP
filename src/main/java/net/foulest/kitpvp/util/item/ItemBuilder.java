@@ -41,19 +41,36 @@ import java.util.List;
  */
 @Getter
 @ToString
+@SuppressWarnings("unused")
 public class ItemBuilder {
 
     private final ItemStack item;
     private int slot;
 
+    /**
+     * Creates a new ItemBuilder with the given Material.
+     *
+     * @param material The Material to create the ItemBuilder with.
+     */
     public ItemBuilder(Material material) {
         item = new ItemStack(material);
     }
 
+    /**
+     * Creates a new ItemBuilder with the given ItemStack.
+     *
+     * @param itemStack The ItemStack to create the ItemBuilder with.
+     */
     public ItemBuilder(ItemStack itemStack) {
         item = new ItemStack(itemStack);
     }
 
+    /**
+     * Sets the name of the item.
+     *
+     * @param name The name to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder name(String name) {
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(MessageUtil.colorize(name));
@@ -61,11 +78,23 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Sets the slot of the item.
+     *
+     * @param slot The slot to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder slot(int slot) {
         this.slot = slot;
         return this;
     }
 
+    /**
+     * Sets the unbreakable status of the item.
+     *
+     * @param status The status to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder unbreakable(boolean status) {
         ItemMeta meta = item.getItemMeta();
 
@@ -78,6 +107,11 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Adds a glow effect to the item.
+     *
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder addGlow() {
         enchant(Enchantment.WATER_WORKER, 1);
         ItemMeta meta = item.getItemMeta();
@@ -86,6 +120,11 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Hides the item's information.
+     *
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder hideInfo() {
         ItemMeta meta = item.getItemMeta();
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -95,6 +134,12 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Sets the lore of the item.
+     *
+     * @param lore The lore to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder lore(String lore) {
         List<String> itemLore = item.getItemMeta().hasLore() ? item.getItemMeta().getLore() : new ArrayList<>();
         itemLore.add(MessageUtil.colorize(lore));
@@ -102,6 +147,12 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Sets the lore of the item.
+     *
+     * @param lore The lore to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder lore(@NotNull Iterable<String> lore) {
         ItemMeta meta = item.getItemMeta();
         List<String> loreList = new ArrayList<>();
@@ -115,11 +166,21 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Clears the lore of the item.
+     *
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder clearLore() {
         lore(Collections.emptyList());
         return this;
     }
 
+    /**
+     * Clears the enchantments of the item.
+     *
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder clearEnchantments() {
         if (item.getItemMeta().hasEnchants()) {
             for (Enchantment enchantments : item.getEnchantments().keySet()) {
@@ -129,6 +190,12 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Clears the specified enchantment of the item.
+     *
+     * @param enchantment The enchantment to clear.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder clearEnchantment(Enchantment enchantment) {
         ItemMeta meta;
 
@@ -140,6 +207,13 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Adds an enchantment to the item.
+     *
+     * @param enchantment The enchantment to add.
+     * @param level       The level of the enchantment.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder enchant(Enchantment enchantment, int level) {
         if (item.containsEnchantment(enchantment)) {
             item.addUnsafeEnchantment(enchantment, level + item.getEnchantmentLevel(enchantment));
@@ -149,16 +223,34 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Sets the amount of the item.
+     *
+     * @param amount The amount to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder amount(int amount) {
         item.setAmount(amount > 0 ? amount : 1);
         return this;
     }
 
+    /**
+     * Sets the durability of the item.
+     *
+     * @param durability The durability to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder durability(int durability) {
         item.setDurability((short) durability);
         return this;
     }
 
+    /**
+     * Sets the color of the item.
+     *
+     * @param color The color to set.
+     * @return The ItemBuilder instance.
+     */
     public ItemBuilder color(Color color) {
         LeatherArmorMeta meta;
 

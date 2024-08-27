@@ -17,13 +17,13 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.menus.KitShop;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,15 +31,25 @@ import org.jetbrains.annotations.NotNull;
  * Command for opening the Kit Shop.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class KitShopCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
-    @Command(name = "kitshop", aliases = "shop", description = "Opens the Kit Shop.", usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")
+    @Command(name = "kitshop", aliases = "shop", description = "Opens the Kit Shop.",
+            usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         if (!Regions.isInSafezone(player.getLocation())) {
             MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);

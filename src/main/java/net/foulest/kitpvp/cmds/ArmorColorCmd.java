@@ -17,7 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -34,17 +34,25 @@ import org.jetbrains.annotations.NotNull;
  * Useful for testing armor colors for new kits.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class ArmorColorCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
         Player player = args.getPlayer();
         CommandSender sender = args.getSender();
+
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         // Prints the usage message.
         if (args.length() != 1) {

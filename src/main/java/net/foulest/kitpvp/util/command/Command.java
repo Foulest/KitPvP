@@ -17,8 +17,6 @@
  */
 package net.foulest.kitpvp.util.command;
 
-import net.foulest.kitpvp.util.ConstantUtil;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,37 +37,51 @@ public @interface Command {
     /**
      * The name of the command. If it is a sub command then its values would be separated by periods.
      * i.e. a command that would be a sub command of test would be 'test.subcommandname'.
+     *
+     * @return The name of the command.
      */
     String name();
 
     /**
      * Gets the required permission of the command.
+     *
+     * @return The required permission of the command.
      */
     String permission() default "";
 
     /**
      * The message sent to the player when they do not have permission to execute it.
+     *
+     * @return The message sent to the player when they do not have permission to execute it.
      */
-    String noPermission() default ConstantUtil.NO_PERMISSION;
+    String noPermission() default "&cNo permission.";
 
     /**
      * A list of alternate names that the command is executed under.
      * See name() for details on how names work.
+     *
+     * @return A list of alternate names that the command is executed under.
      */
     String[] aliases() default {};
 
     /**
      * The description that will appear in the /help of the command.
+     *
+     * @return The description that will appear in the /help of the command.
      */
     String description();
 
     /**
      * The usage that will appear in the /help of the command.
+     *
+     * @return The usage that will appear in the /help of the command.
      */
     String usage();
 
     /**
      * If the command is available to players only.
+     *
+     * @return If the command is available to players only.
      */
     boolean inGameOnly() default false;
 }

@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -34,11 +33,14 @@ import org.jetbrains.annotations.NotNull;
  * Command for placing bounties on other players.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class BountyCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "bounty", aliases = "bounties", description = "Allows players to place bounties on each other.", permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {

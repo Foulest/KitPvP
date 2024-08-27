@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -31,7 +30,11 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-@NoArgsConstructor
+/**
+ * Represents the Tank kit.
+ *
+ * @author Foulest
+ */
 public class Tank implements Kit {
 
     @Override

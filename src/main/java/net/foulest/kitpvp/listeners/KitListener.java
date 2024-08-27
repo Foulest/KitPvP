@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.listeners;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -53,7 +52,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@NoArgsConstructor
+/**
+ * Handles all kit-related events in the plugin.
+ *
+ * @author Foulest
+ */
 public class KitListener implements Listener {
 
     static final Map<UUID, Collection<PotionEffect>> drainedEffects = new HashMap<>();

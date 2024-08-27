@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
  * Utility class for accessing NMS ({@link net.minecraft.server}) components.
  *
  * @author Foulest
- * @project KitPvP
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NMSUtil {

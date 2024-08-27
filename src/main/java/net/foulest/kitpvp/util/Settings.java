@@ -33,11 +33,11 @@ import java.util.logging.Level;
  * Utility class for settings.
  *
  * @author Foulest
- * @project KitPvP
  */
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("WeakerAccess")
 public final class Settings {
 
     // File settings
@@ -248,7 +248,7 @@ public final class Settings {
      * Initializes the configuration file and loads defaults.
      */
     @SuppressWarnings("OverlyBroadCatchBlock")
-    private static void loadConfigFile() {
+    public static void loadConfigFile() {
         try {
             // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
             @Cleanup InputStream defConfigStream = KitPvP.getInstance().getResource(fileName);
@@ -296,7 +296,7 @@ public final class Settings {
     /**
      * Loads configuration values into the relevant static fields.
      */
-    private static void loadConfigValues() {
+    public static void loadConfigValues() {
         // Spawn settings
         spawnWorld = config.getString("kitpvp.spawn.world");
         spawnX = config.getDouble("kitpvp.spawn.x");

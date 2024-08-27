@@ -40,7 +40,6 @@ import java.util.stream.IntStream;
  * Utility class for database operations.
  *
  * @author Foulest
- * @project KitPvP
  */
 @SuppressWarnings({"SqlSourceToSinkFlow", "unused"})
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -125,6 +124,8 @@ public final class DatabaseUtil {
 
     /**
      * Updates the PlayerStats table in the database.
+     *
+     * @param playerData The player's data.
      */
     public static void updatePlayerStatsTable(@NotNull PlayerData playerData) {
         Map<String, Object> playerDataMap = new HashMap<>();

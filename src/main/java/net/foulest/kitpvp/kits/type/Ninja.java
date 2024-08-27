@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -32,7 +31,11 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-@NoArgsConstructor
+/**
+ * Represents the Ninja kit.
+ *
+ * @author Foulest
+ */
 public class Ninja implements Kit {
 
     @Override

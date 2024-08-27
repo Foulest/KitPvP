@@ -18,7 +18,6 @@
 package net.foulest.kitpvp.cmds;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -36,13 +35,16 @@ import java.util.List;
  * Main command for KitPvP.
  *
  * @author Foulest
- * @project KitPvP
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class KitPvPCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitpvp", description = "Main command for KitPvP.",
             permission = "kitpvp.main", usage = "/kitpvp")

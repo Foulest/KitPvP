@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -32,7 +31,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@NoArgsConstructor
+/**
+ * Represents the Burrower kit.
+ *
+ * @author Foulest
+ */
 public class Burrower implements Kit {
 
     @Override

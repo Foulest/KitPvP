@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.menus.KitSelector;
@@ -26,6 +25,7 @@ import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,17 +33,27 @@ import org.jetbrains.annotations.NotNull;
  * Command for selecting a kit or opening the Kit Selector.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class KitsCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
             description = "Selects a kit or opens the Kit Selector.", inGameOnly = true,
             permission = "kitpvp.kitselector")
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         // Checks if the player is in spawn.
         if (!Regions.isInSafezone(player.getLocation())) {

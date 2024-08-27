@@ -29,21 +29,45 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Utility class for block-related methods.
+ *
+ * @author Foulest
+ */
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BlockUtil {
 
+    /**
+     * Checks if a player is in an unloaded chunk.
+     *
+     * @param player The player to check.
+     * @return Whether the player is in an unloaded chunk.
+     */
     private static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
         return !player.getLocation().getWorld().isChunkLoaded(player.getLocation().getBlockX() >> 4,
                 player.getLocation().getBlockZ() >> 4);
     }
 
+    /**
+     * Gets the blocks that a player is colliding with.
+     *
+     * @param player The player to check.
+     * @param boundingBox The bounding box to check.
+     * @return The blocks that the player is colliding with.
+     */
     @Contract("_, _ -> new")
     private static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
         return new ConcurrentStream<>(boundingBox.getCollidingBlocks(player), false);
     }
 
+    /**
+     * Checks if a player is colliding with a solid block.
+     *
+     * @param player The player to check.
+     * @return Whether the player is colliding with a solid block.
+     */
     private static boolean collidesWithSolid(Player player, BoundingBox boundingBox) {
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
@@ -55,6 +79,13 @@ public final class BlockUtil {
                 || block.getType() == Material.SKULL);
     }
 
+    /**
+     * Checks if a player is on the ground.
+     *
+     * @param player The player to check.
+     * @param offset The offset to check.
+     * @return Whether the player is on the ground.
+     */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isOnGroundOffset(Player player, double offset) {
         if (isPlayerInUnloadedChunk(player)) {

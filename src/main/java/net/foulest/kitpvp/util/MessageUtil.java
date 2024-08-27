@@ -37,7 +37,6 @@ import java.util.stream.IntStream;
  * Utility class for sending messages.
  *
  * @author Foulest
- * @project KitPvP
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -121,6 +120,7 @@ public final class MessageUtil {
      * Colorizes the specified message.
      *
      * @param message The message to colorize.
+     * @return The colorized message.
      */
     @Contract("_ -> new")
     public static @NotNull String colorize(String message) {
@@ -131,6 +131,7 @@ public final class MessageUtil {
      * Strips the color from the specified message.
      *
      * @param message The message to strip the color from.
+     * @return The message without color.
      */
     public static String stripColor(String message) {
         return ChatColor.stripColor(message);

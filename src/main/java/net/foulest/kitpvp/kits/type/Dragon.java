@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -35,7 +34,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@NoArgsConstructor
+/**
+ * Represents the Dragon kit.
+ *
+ * @author Foulest
+ */
 public class Dragon implements Kit {
 
     @Override

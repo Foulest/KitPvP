@@ -26,10 +26,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Utility class for managing player data.
+ *
+ * @author Foulest
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PlayerDataManager {
 
-    // Map of player UUIDs to their stored data.
+    /**
+     * Map of player UUIDs to their stored data.
+     */
     private static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     /**

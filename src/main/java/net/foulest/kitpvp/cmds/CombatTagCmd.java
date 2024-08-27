@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -31,11 +30,14 @@ import org.jetbrains.annotations.NotNull;
  * Command for checking your combat tag timer.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class CombatTagCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
             description = "Displays your current combat tag timer.",

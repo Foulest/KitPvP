@@ -31,7 +31,6 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -53,7 +52,9 @@ public class BoundingBox {
     private Vector min;
     private Vector max;
 
-    // Gets the min and max point of a block.
+    /**
+     * Gets the min and max point of a block.
+     */
     private BoundingBox(@NotNull Block block) {
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
         net.minecraft.server.v1_8_R3.Block blockNative = blockData.getBlock();
@@ -64,37 +65,69 @@ public class BoundingBox {
         max = new Vector(block.getX() + blockNative.C(), block.getY() + blockNative.E(), block.getZ() + blockNative.G());
     }
 
-    // Gets the min and max point of an entity.
+    /**
+     * Gets the min and max point of an Entity.
+     *
+     * @param entity The entity to get the BoundingBox of.
+     */
     public BoundingBox(Entity entity) {
         AxisAlignedBB box = ((CraftEntity) entity).getHandle().getBoundingBox();
         min = new Vector(box.a, box.b, box.c);
         max = new Vector(box.d, box.e, box.f);
     }
 
-    // Gets the min and max point of an AxisAlignedBB.
+    /**
+     * Gets the min and max point of an AxisAlignedBB.
+     *
+     * @param box The AxisAlignedBB to get the BoundingBox of.
+     */
     public BoundingBox(@NotNull AxisAlignedBB box) {
         min = new Vector(box.a, box.b, box.c);
         max = new Vector(box.d, box.e, box.f);
     }
 
-    // Gets the min and max point of a custom BoundingBox.
+    /**
+     * Gets the min and max point of a custom BoundingBox.
+     *
+     * @param minX The minimum x value.
+     * @param minY The minimum y value.
+     * @param minZ The minimum z value.
+     * @param maxX The maximum x value.
+     * @param maxY The maximum y value.
+     * @param maxZ The maximum z value.
+     */
     private BoundingBox(double minX, double minY, double minZ,
                         double maxX, double maxY, double maxZ) {
         min = new Vector(minX, minY, minZ);
         max = new Vector(maxX, maxY, maxZ);
     }
 
-    // Gets the mid-point of the bounding box.
+    /**
+     * Gets the mid-point of the BoundingBox.
+     *
+     * @return The mid-point of the BoundingBox.
+     */
     public Vector midPoint() {
         return max.clone().add(min).multiply(0.5);
     }
 
+    /**
+     * Checks if the BoundingBox collides with another BoundingBox.
+     *
+     * @param other The BoundingBox to check for collisions.
+     */
     private boolean collidesWith(@NotNull BoundingBox other) {
         return (min.getX() <= other.max.getX() && max.getX() >= other.min.getX())
                 && (min.getY() <= other.max.getY() && max.getY() >= other.min.getY())
                 && (min.getZ() <= other.max.getZ() && max.getZ() >= other.min.getZ());
     }
 
+    /**
+     * Expands the BoundingBox by a value.
+     *
+     * @param value The value to expand the BoundingBox by.
+     * @return The expanded BoundingBox.
+     */
     public BoundingBox expand(double value) {
         double minX = min.getX() - value;
         double minY = min.getY() - value;
@@ -105,6 +138,14 @@ public class BoundingBox {
         return new BoundingBox(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
     }
 
+    /**
+     * Expands the BoundingBox by a value.
+     *
+     * @param x The value to expand the BoundingBox by on the x-axis.
+     * @param y The value to expand the BoundingBox by on the y-axis.
+     * @param z The value to expand the BoundingBox by on the z-axis.
+     * @return The expanded BoundingBox.
+     */
     public BoundingBox expand(double x, double y, double z) {
         double minX = min.getX() - x;
         double minY = min.getY() - y;
@@ -115,6 +156,14 @@ public class BoundingBox {
         return new BoundingBox(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
     }
 
+    /**
+     * Expands the BoundingBox's minimum values by a value.
+     *
+     * @param x The value to expand the BoundingBox by on the x-axis.
+     * @param y The value to expand the BoundingBox by on the y-axis.
+     * @param z The value to expand the BoundingBox by on the z-axis.
+     * @return The expanded BoundingBox.
+     */
     public BoundingBox expandMin(double x, double y, double z) {
         double minX = min.getX() - x;
         double minY = min.getY() - y;
@@ -122,6 +171,14 @@ public class BoundingBox {
         return new BoundingBox(new Vector(minX, minY, minZ), max);
     }
 
+    /**
+     * Expands the BoundingBox's maximum values by a value.
+     *
+     * @param x The value to expand the BoundingBox by on the x-axis.
+     * @param y The value to expand the BoundingBox by on the y-axis.
+     * @param z The value to expand the BoundingBox by on the z-axis.
+     * @return The expanded BoundingBox.
+     */
     public BoundingBox expandMax(double x, double y, double z) {
         double maxX = max.getX() + x;
         double maxY = max.getY() + y;
@@ -129,6 +186,12 @@ public class BoundingBox {
         return new BoundingBox(min, new Vector(maxX, maxY, maxZ));
     }
 
+    /**
+     * Gets the blocks that the BoundingBox collides with.
+     *
+     * @param player The player to check for block collisions.
+     * @return The blocks that the BoundingBox collides with.
+     */
     public List<Block> getCollidingBlocks(Player player) {
         List<Block> blocks = new ArrayList<>();
 
@@ -148,20 +211,5 @@ public class BoundingBox {
             }
         }
         return blocks;
-    }
-
-    @Contract("_ -> new")
-    public static @NotNull BoundingBox getEntityBoundingBox(@NotNull Location location) {
-        double f = 0.6 / 2.0;
-        double f1 = 1.8;
-        return (new BoundingBox(location.getX() - f, location.getY(), location.getZ() - f,
-                location.getX() + f, location.getY() + f1, location.getZ() + f));
-    }
-
-    @Contract("_, _, _ -> new")
-    public static @NotNull BoundingBox getEntityBoundingBox(double x, double y, double z) {
-        double f = 0.6 / 2.0;
-        double f1 = 1.8;
-        return (new BoundingBox(x - f, y, z - f, x + f, y + f1, z + f));
     }
 }

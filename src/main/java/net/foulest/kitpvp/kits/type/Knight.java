@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -30,7 +29,11 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
-@NoArgsConstructor
+/**
+ * Represents the Knight kit.
+ *
+ * @author Foulest
+ */
 public class Knight implements Kit {
 
     @Override

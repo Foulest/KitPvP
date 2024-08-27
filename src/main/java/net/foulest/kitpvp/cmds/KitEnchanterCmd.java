@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -28,11 +27,14 @@ import org.jetbrains.annotations.NotNull;
  * Command for opening the Kit Enchanter.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class KitEnchanterCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "enchanter", aliases = "kitenchanter", description = "Opens the Kit Enchanter.", usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
     public void onCommand(@NotNull CommandArgs args) {

@@ -18,7 +18,6 @@
 package net.foulest.kitpvp.util.yaml;
 
 import lombok.Cleanup;
-import lombok.NoArgsConstructor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -36,14 +35,20 @@ import java.util.regex.Pattern;
  * that allows for comments to be stored and loaded.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class CustomYamlConfiguration extends YamlConfiguration {
 
-    // Map to store the path of the YAML keys and their associated comments
+    /**
+     * Map to store the path of the YAML keys and their associated comments
+     */
     private final Map<String, String> commentsMap = new LinkedHashMap<>();
 
+    /**
+     * Loads the CustomYamlConfiguration from a String.
+     *
+     * @param contents The YAML data to load.
+     * @throws InvalidConfigurationException If the configuration is invalid.
+     */
     @Override
     public void loadFromString(String contents) throws InvalidConfigurationException {
         super.loadFromString(contents); // Call the original method to load the data
@@ -55,6 +60,11 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         parseAndStoreComments(contents);
     }
 
+    /**
+     * Saves the CustomYamlConfiguration to a String.
+     *
+     * @return The YAML data as a String.
+     */
     @Override
     public String saveToString() {
         // Strip all comments from the original data
@@ -117,6 +127,13 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         return dataWithComments.toString();
     }
 
+    /**
+     * Loads a CustomYamlConfiguration from a file.
+     *
+     * @param file The file to load the configuration from.
+     * @throws IOException If an I/O error occurs.
+     * @throws InvalidConfigurationException If the configuration is invalid.
+     */
     @Override
     public void load(File file) throws IOException, InvalidConfigurationException {
         @Cleanup FileInputStream stream = new FileInputStream(file);
@@ -124,6 +141,13 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         load(reader);
     }
 
+    /**
+     * Loads a CustomYamlConfiguration from a reader.
+     *
+     * @param reader The reader to load the configuration from.
+     * @throws IOException If an I/O error occurs.
+     * @throws InvalidConfigurationException If the configuration is invalid.
+     */
     @Override
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
         @Cleanup BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
@@ -138,6 +162,12 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         loadFromString(builder.toString());
     }
 
+    /**
+     * Loads a CustomYamlConfiguration from a file.
+     *
+     * @param file The file to load the configuration from.
+     * @return The loaded CustomYamlConfiguration.
+     */
     public static @NotNull CustomYamlConfiguration loadConfiguration(File file) {
         CustomYamlConfiguration config = new CustomYamlConfiguration();
 
@@ -150,6 +180,12 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         return config;
     }
 
+    /**
+     * Loads a CustomYamlConfiguration from a reader.
+     *
+     * @param reader The reader to load the configuration from.
+     * @return The loaded CustomYamlConfiguration.
+     */
     public static @NotNull CustomYamlConfiguration loadConfiguration(Reader reader) {
         CustomYamlConfiguration config = new CustomYamlConfiguration();
 

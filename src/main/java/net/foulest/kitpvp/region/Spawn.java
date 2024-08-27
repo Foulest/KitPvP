@@ -35,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
  * Handles the spawn point.
  *
  * @author Foulest
- * @project KitPvP
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Spawn {

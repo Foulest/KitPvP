@@ -28,15 +28,39 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * A utility class for handling concurrent streams.
+ *
+ * @param <T> The type of the stream.
+ * @see Stream
+ * @author Foulest
+ */
 @Getter
 @Setter
 @SuppressWarnings("unused")
 public final class ConcurrentStream<T> {
 
+    /**
+     * The supplier of the stream.
+     */
     private final Supplier<Stream<T>> supplier;
+
+    /**
+     * The collection of the stream.
+     */
     private final Collection<T> collection;
+
+    /**
+     * Whether the stream is parallel.
+     */
     private final boolean parallel;
 
+    /**
+     * Constructs a new concurrent stream.
+     *
+     * @param list The list to create the stream from.
+     * @param parallel Whether the stream is parallel.
+     */
     @Contract(pure = true)
     public ConcurrentStream(@NotNull List<T> list, boolean parallel) {
         supplier = list::stream;
@@ -44,10 +68,22 @@ public final class ConcurrentStream<T> {
         this.parallel = parallel;
     }
 
+    /**
+     * Finds any element in the stream that matches the predicate.
+     *
+     * @param t The predicate to match.
+     * @return Whether any element in the stream matches the predicate.
+     */
     public boolean any(Predicate<T> t) {
         return parallel ? supplier.get().parallel().anyMatch(t) : supplier.get().anyMatch(t);
     }
 
+    /**
+     * Finds all elements in the stream that match the predicate.
+     *
+     * @param t The predicate to match.
+     * @return Whether all elements in the stream match the predicate.
+     */
     public boolean all(Predicate<T> t) {
         return parallel ? supplier.get().parallel().allMatch(t) : supplier.get().allMatch(t);
     }

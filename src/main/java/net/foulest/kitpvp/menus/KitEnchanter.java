@@ -37,7 +37,6 @@ import java.util.List;
  * Represents the Kit Enchanter GUI.
  *
  * @author Foulest
- * @project KitPvP
  */
 public class KitEnchanter {
 

@@ -34,50 +34,73 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Represents a kit.
+ *
+ * @author Foulest
+ */
 public interface Kit {
 
     /**
-     * The name of the kit.
+     * Gets the name of the kit.
+     *
+     * @return The name of the kit.
      */
     String getName();
 
     /**
-     * The display item of the kit.
+     * Gets the display item of the kit.
+     *
+     * @return The display item of the kit.
      */
     ItemStack getDisplayItem();
 
     /**
-     * The items of the kit.
+     * Gets the items of the kit.
+     *
+     * @return The items of the kit.
      */
     List<ItemBuilder> getItems();
 
     /**
-     * The armor of the kit.
+     * Gets the armor of the kit.
+     *
+     * @return The armor of the kit.
      */
     ItemBuilder[] getArmor();
 
     /**
-     * The potion effects of the kit.
+     * Gets the potion effects of the kit.
+     *
+     * @return The potion effects of the kit.
      */
     PotionEffect[] getPotionEffects();
 
     /**
-     * The lore of the kit.
+     * Gets the lore of the kit.
+     *
+     * @return The lore of the kit.
      */
     List<String> getLore();
 
     /**
-     * The enabled status of the kit.
+     * Gets the enabled status of the kit.
+     *
+     * @return The enabled status of the kit.
      */
     boolean enabled();
 
     /**
-     * The cost of the kit in coins.
+     * Gets the cost of the kit.
+     *
+     * @return The cost of the kit.
      */
     int getCost();
 
     /**
-     * The permission of the kit.
+     * Gets the permission of the kit.
+     *
+     * @return The permission of the kit.
      */
     Permission permission();
 

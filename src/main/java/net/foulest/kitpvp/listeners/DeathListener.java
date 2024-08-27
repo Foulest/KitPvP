@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.listeners;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -42,7 +41,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-@NoArgsConstructor
+/**
+ * Handles all player deaths.
+ *
+ * @author Foulest
+ */
 public class DeathListener implements Listener {
 
     /**

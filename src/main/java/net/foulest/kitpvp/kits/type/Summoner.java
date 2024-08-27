@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -33,7 +32,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@NoArgsConstructor
+/**
+ * Represents the Summoner kit.
+ *
+ * @author Foulest
+ */
 public class Summoner implements Kit {
 
     @Override

@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -35,11 +34,14 @@ import org.jetbrains.annotations.NotNull;
  * Command for managing a player's balance.
  *
  * @author Foulest
- * @project KitPvP
  */
-@NoArgsConstructor
 public class EcoCmd {
 
+    /**
+     * Handles the command logic.
+     *
+     * @param args The command arguments.
+     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "eco", description = "Main command for KitPvP's economy.",
             usage = "/eco <give/set/take> <player> <amount>", permission = "kitpvp.eco")

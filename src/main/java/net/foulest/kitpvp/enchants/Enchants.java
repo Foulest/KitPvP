@@ -23,13 +23,43 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
+/**
+ * Represents the enchantments available for purchase.
+ */
 public enum Enchants {
+    /**
+     * Represents the Feather Falling enchantment.
+     */
     FEATHER_FALLING,
+
+    /**
+     * Represents the Thorns enchantment.
+     */
     THORNS,
+
+    /**
+     * Represents the Protection enchantment.
+     */
     PROTECTION,
+
+    /**
+     * Represents the Knockback enchantment.
+     */
     KNOCKBACK,
+
+    /**
+     * Represents the Sharpness enchantment.
+     */
     SHARPNESS,
+
+    /**
+     * Represents the Punch enchantment.
+     */
     PUNCH,
+
+    /**
+     * Represents the Power enchantment.
+     */
     POWER;
 
     /**

@@ -36,7 +36,6 @@ import java.util.*;
  * Represents the Kit Selector GUI.
  *
  * @author Foulest
- * @project KitPvP
  */
 public class KitSelector {
 
@@ -75,7 +74,10 @@ public class KitSelector {
     }
 
     /**
-     * Populates the GUI's inventory.
+     * Gets the page the GUI was opened on.
+     *
+     * @param player The player to open the GUI for.
+     * @return The page the GUI was opened on.
      */
     public static int getPage(Player player) {
         return pages.get(player);

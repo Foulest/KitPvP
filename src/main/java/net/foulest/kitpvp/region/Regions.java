@@ -40,7 +40,6 @@ import java.util.logging.Level;
  * Utility class for handling WorldGuard regions.
  *
  * @author Foulest
- * @project KitPvP
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Regions {

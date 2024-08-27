@@ -36,7 +36,6 @@ import java.util.*;
  * Represents the Kit Shop GUI.
  *
  * @author Foulest
- * @project KitPvP
  */
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class KitShop {

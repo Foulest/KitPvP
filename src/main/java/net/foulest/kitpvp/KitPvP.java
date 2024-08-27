@@ -18,7 +18,6 @@
 package net.foulest.kitpvp;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import net.foulest.kitpvp.cmds.*;
 import net.foulest.kitpvp.data.PlayerData;
@@ -50,14 +49,19 @@ import java.util.logging.Level;
  * Main class for KitPvP.
  *
  * @author Foulest
- * @project KitPvP
  */
 @Getter
-@NoArgsConstructor
 public class KitPvP extends JavaPlugin {
 
+    /**
+     * The instance of the plugin.
+     */
     @Getter
     public static KitPvP instance;
+
+    /**
+     * The Command Framework instance.
+     */
     private CommandFramework framework;
 
     @Override

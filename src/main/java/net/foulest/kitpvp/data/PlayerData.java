@@ -48,7 +48,6 @@ import java.util.*;
  * Main class for storing player data.
  *
  * @author Foulest
- * @project KitPvP
  */
 @Getter
 @Setter
@@ -91,11 +90,23 @@ public final class PlayerData {
     private @Nullable BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportToSpawnTask;
 
+    /**
+     * Creates a new player data object.
+     *
+     * @param uniqueId The player's UUID.
+     * @param player  The player object.
+     */
     public PlayerData(@NotNull UUID uniqueId, Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
     }
 
+    /**
+     * Checks if the player has a cooldown for their active kit.
+     *
+     * @param sendMessage Whether to send a message to the player.
+     * @return Whether the player has a cooldown.
+     */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasCooldown(boolean sendMessage) {
         long cooldown = cooldowns.containsKey(activeKit) ? (cooldowns.get(activeKit) - System.currentTimeMillis()) : 0L;
@@ -111,6 +122,9 @@ public final class PlayerData {
         return false;
     }
 
+    /**
+     * Clears all cooldowns.
+     */
     public void clearCooldowns() {
         cooldowns.clear();
 
@@ -120,6 +134,13 @@ public final class PlayerData {
         }
     }
 
+    /**
+     * Sets a cooldown for a specific kit.
+     *
+     * @param kit          The kit to set the cooldown for.
+     * @param cooldownTime The time in seconds for the cooldown.
+     * @param notify       Whether to notify the player when the cooldown expires.
+     */
     public void setCooldown(Kit kit, int cooldownTime, boolean notify) {
         cooldowns.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
 
@@ -134,6 +155,11 @@ public final class PlayerData {
         }
     }
 
+    /**
+     * Loads the player's data from the database.
+     *
+     * @return Whether the data was loaded successfully.
+     */
     public boolean load() {
         // Inserts default values into PlayerStats.
         Map<String, Object> defaultStats = new HashMap<>();
@@ -232,6 +258,9 @@ public final class PlayerData {
         return true;
     }
 
+    /**
+     * Saves the player's data to the database.
+     */
     public void saveAll() {
         if (previousKit == null) {
             previousKit = KitManager.getKit("Knight");
@@ -476,6 +505,8 @@ public final class PlayerData {
 
     /**
      * Calculates the player's level and sets it to their experience bar.
+     *
+     * @param afterKill Whether the level up is after a kill.
      */
     public void calcLevel(boolean afterKill) {
         if (experience == 0) {

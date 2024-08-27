@@ -25,12 +25,26 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages all the loaded kits.
+ *
+ * @author Foulest
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class KitManager {
 
+    /**
+     * The list of loaded kits.
+     */
     @Getter
     private static final List<Kit> kits = new ArrayList<>();
 
+    /**
+     * Gets a kit by its name.
+     *
+     * @param name The name of the kit.
+     * @return The kit with the given name, or null if no kit with that name exists.
+     */
     public static @Nullable Kit getKit(String name) {
         for (Kit kit : kits) {
             if (kit.getName().equalsIgnoreCase(name)) {
