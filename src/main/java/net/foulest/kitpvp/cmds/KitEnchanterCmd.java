@@ -30,11 +30,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class KitEnchanterCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "enchanter", aliases = "kitenchanter", description = "Opens the Kit Enchanter.", usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
     public void onCommand(@NotNull CommandArgs args) {

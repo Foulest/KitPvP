@@ -34,11 +34,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class StatsCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "stats", description = "Shows a player's statistics.",
             usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")

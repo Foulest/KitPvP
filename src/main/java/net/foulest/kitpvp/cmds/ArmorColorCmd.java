@@ -37,11 +37,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ArmorColorCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)

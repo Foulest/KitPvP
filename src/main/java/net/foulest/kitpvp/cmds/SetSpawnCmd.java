@@ -34,11 +34,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SetSpawnCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
             permission = "kitpvp.setspawn", inGameOnly = true)

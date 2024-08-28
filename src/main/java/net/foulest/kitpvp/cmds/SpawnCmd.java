@@ -43,11 +43,6 @@ public class SpawnCmd {
 
     private static final int SECONDS_TO_WAIT = 5;
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "spawn", description = "Teleports you to spawn.",
             usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")

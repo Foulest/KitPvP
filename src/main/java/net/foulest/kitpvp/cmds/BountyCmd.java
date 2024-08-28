@@ -37,11 +37,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BountyCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "bounty", aliases = "bounties", description = "Allows players to place bounties on each other.", permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {

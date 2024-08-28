@@ -39,11 +39,6 @@ import java.util.Locale;
  */
 public class EcoCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "eco", description = "Main command for KitPvP's economy.",
             usage = "/eco <give/set/take> <player> <amount>", permission = "kitpvp.eco")

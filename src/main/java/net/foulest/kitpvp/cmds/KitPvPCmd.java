@@ -40,11 +40,6 @@ import java.util.List;
 @Setter
 public class KitPvPCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitpvp", description = "Main command for KitPvP.",
             permission = "kitpvp.main", usage = "/kitpvp")

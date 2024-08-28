@@ -33,11 +33,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CombatTagCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "combattag", aliases = {"combatlog", "ct", "combat", "combattime", "combattimer"},
             description = "Displays your current combat tag timer.",

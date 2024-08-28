@@ -36,11 +36,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class KitsCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kit", aliases = {"kits", "kitselector"}, usage = "/kit [name]",
             description = "Selects a kit or opens the Kit Selector.", inGameOnly = true,

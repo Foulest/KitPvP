@@ -38,11 +38,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PotionsCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "potions", aliases = "pots", description = "Sets your healing item to Potions.",
             usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")

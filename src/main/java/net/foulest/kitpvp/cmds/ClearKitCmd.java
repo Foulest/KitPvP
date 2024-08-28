@@ -39,11 +39,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ClearKitCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)

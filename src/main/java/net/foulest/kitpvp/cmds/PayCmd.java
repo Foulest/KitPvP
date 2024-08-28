@@ -37,11 +37,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PayCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")

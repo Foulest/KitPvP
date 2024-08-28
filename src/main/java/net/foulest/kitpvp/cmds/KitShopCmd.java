@@ -34,11 +34,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class KitShopCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitshop", aliases = "shop", description = "Opens the Kit Shop.",
             usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")

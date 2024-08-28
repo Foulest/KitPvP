@@ -38,11 +38,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SoupCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "soup", description = "Sets your healing item to Soup.",
             usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")

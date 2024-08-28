@@ -35,11 +35,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BalanceCmd {
 
-    /**
-     * Handles the command logic.
-     *
-     * @param args The command arguments.
-     */
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
