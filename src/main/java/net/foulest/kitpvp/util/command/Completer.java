@@ -34,19 +34,15 @@ import java.lang.annotation.Target;
 public @interface Completer {
 
     /**
-     * The command that this completer completes.
+     * @return The command that this completer completes.
      * If it is a sub command, then its values would be separated by periods.
      * i.e. a command that would be a sub command of test would be 'test.subcommandname'
-     *
-     * @return The name of the command.
      */
     String name();
 
     /**
-     * A list of alternate names that the completer is executed under.
-     * See name() for details on how names work.
-     *
      * @return A list of alternate names that the completer is executed under.
+     * See name() for details on how names work.
      */
     String[] aliases() default {};
 }
