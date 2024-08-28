@@ -19,6 +19,7 @@ package net.foulest.kitpvp.util;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.AccessLevel;
+import lombok.Cleanup;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import net.foulest.kitpvp.data.PlayerData;
@@ -363,15 +364,16 @@ public final class DatabaseUtil {
      * @param tableName The table name.
      * @param tableData The data to be added.
      */
+    @SuppressWarnings("JDBCResourceOpenedButNotSafelyClosed")
     public static void addDefaultDataToTable(String tableName, @NotNull Map<String, Object> tableData) {
         // Check if the table is empty
         String checkTableEmptySQL = String.format("SELECT COUNT(*) FROM %s", tableName);
 
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
              PreparedStatement checkTableEmptyStmt = Objects.requireNonNull(connection).prepareStatement(checkTableEmptySQL)) {
+            @Cleanup ResultSet resultSet = checkTableEmptyStmt.executeQuery();
 
-            ResultSet rs = checkTableEmptyStmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
                 return; // Table is not empty, no need to insert default data
             }
 
@@ -436,8 +438,7 @@ public final class DatabaseUtil {
      * @param condition  The condition for the SQL query.
      * @param parameters The parameters to replace placeholders in the condition.
      */
-    private static void deleteDataFromTable(String tableName,
-                                            String condition,
+    private static void deleteDataFromTable(String tableName, String condition,
                                             @NotNull List<Object> parameters) {
         String deleteSQL = String.format("DELETE FROM %s WHERE %s", tableName, condition);
 

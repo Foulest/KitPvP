@@ -26,6 +26,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,15 @@ public class SoupCmd {
     @Command(name = "soup", description = "Sets your healing item to Soup.",
             usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
+
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Checks if the player is in spawn.
@@ -55,6 +64,7 @@ public class SoupCmd {
             return;
         }
 
+        // Checks if the command arguments are invalid.
         if (args.length() != 0) {
             MessageUtil.messagePlayer(args.getSender(), "&cUsage: /soup");
             return;
@@ -69,6 +79,7 @@ public class SoupCmd {
         playerData.setUsingSoup(true);
         MessageUtil.messagePlayer(player, "&aYou are now using Soup.");
 
+        // Sets the player's healing item to soup.
         if (playerData.getActiveKit() == null) {
             ItemStack healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
             player.getInventory().setItem(6, healingItem);

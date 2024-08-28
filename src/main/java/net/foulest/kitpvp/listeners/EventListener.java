@@ -318,7 +318,7 @@ public class EventListener implements Listener {
 
             // Cancels pending teleportation when taking damage.
             if (teleportToSpawnTask != null) {
-                MessageUtil.messagePlayer(player, MessageUtil.colorize("&cTeleportation cancelled, you took damage."));
+                MessageUtil.messagePlayer(player, "&cTeleportation cancelled, you took damage.");
                 teleportToSpawnTask.cancel();
                 playerData.setTeleportToSpawnTask(null);
             }
@@ -748,7 +748,7 @@ public class EventListener implements Listener {
 
         // Cancels pending teleportation when moving.
         if (playerData.getTeleportToSpawnTask() != null) {
-            MessageUtil.messagePlayer(player, MessageUtil.colorize("&cTeleportation cancelled, you moved."));
+            MessageUtil.messagePlayer(player, "&cTeleportation cancelled, you moved.");
             playerData.getTeleportToSpawnTask().cancel();
             playerData.setTeleportToSpawnTask(null);
         }

@@ -129,13 +129,7 @@ public class BoundingBox {
      * @return The expanded BoundingBox.
      */
     public BoundingBox expand(double value) {
-        double minX = min.getX() - value;
-        double minY = min.getY() - value;
-        double minZ = min.getZ() - value;
-        double maxX = max.getX() + value;
-        double maxY = max.getY() + value;
-        double maxZ = max.getZ() + value;
-        return new BoundingBox(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
+        return expand(value, value, value);
     }
 
     /**

@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
+@SuppressWarnings("WeakerAccess")
 @Getter
 @Setter
 public class CommandArgs {
@@ -50,8 +51,8 @@ public class CommandArgs {
      * @param args       The arguments provided to the command.
      * @param subCommand The number of sub-commands in the command.
      */
-    protected CommandArgs(CommandSender sender, org.bukkit.command.Command command,
-                          String label, String @NotNull [] args, int subCommand) {
+    CommandArgs(CommandSender sender, org.bukkit.command.Command command,
+                String label, String @NotNull [] args, int subCommand) {
         String[] modArgs = new String[args.length - subCommand];
 
         if (args.length - subCommand >= 0) {

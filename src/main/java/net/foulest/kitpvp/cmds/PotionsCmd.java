@@ -26,6 +26,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,15 @@ public class PotionsCmd {
     @Command(name = "potions", aliases = "pots", description = "Sets your healing item to Potions.",
             usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
+
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (!Regions.isInSafezone(player.getLocation())) {

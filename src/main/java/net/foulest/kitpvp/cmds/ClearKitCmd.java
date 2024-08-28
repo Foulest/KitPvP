@@ -27,6 +27,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
@@ -47,12 +48,22 @@ public class ClearKitCmd {
     @Command(name = "clearkit", description = "Clears your kit.",
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
-        if (!(args.getSender() instanceof Player)) {
+        CommandSender sender = args.getSender();
+
+        // Checks if the sender is a player.
+        if (!(sender instanceof Player)) {
             MessageUtil.messagePlayer(args.getSender(), ConstantUtil.IN_GAME_ONLY);
             return;
         }
 
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
+
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Handles clearing your own kit.

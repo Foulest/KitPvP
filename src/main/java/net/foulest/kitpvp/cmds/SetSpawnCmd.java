@@ -19,9 +19,11 @@ package net.foulest.kitpvp.cmds;
 
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +43,14 @@ public class SetSpawnCmd {
     @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
             permission = "kitpvp.setspawn", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         // Checks if the player is in a safezone.
         if (!Regions.isInSafezone(player.getLocation())) {

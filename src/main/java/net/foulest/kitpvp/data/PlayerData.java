@@ -148,7 +148,7 @@ public final class PlayerData {
             abilityCooldownNotifier = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    MessageUtil.messagePlayer(player, MessageUtil.colorize("&aYour ability cooldown has expired."));
+                    MessageUtil.messagePlayer(player, "&aYour ability cooldown has expired.");
                     cooldowns.remove(kit);
                 }
             }.runTaskLater(KitPvP.instance, cooldownTime * 20L);

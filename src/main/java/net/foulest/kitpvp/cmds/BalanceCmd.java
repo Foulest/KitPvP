@@ -45,9 +45,16 @@ public class BalanceCmd {
             description = "Shows your current balance.",
             permission = "kitpvp.balance", usage = "/balance [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
-        Player player = args.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         CommandSender sender = args.getSender();
+        Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
+
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Prints the usage message.
         if (args.length() != 1) {

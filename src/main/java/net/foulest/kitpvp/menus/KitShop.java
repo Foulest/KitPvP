@@ -60,7 +60,6 @@ public class KitShop {
      */
     public KitShop(@NotNull Player player, int page) {
         String inventoryName = MessageUtil.colorize("Kit Shop");
-
         player.closeInventory();
 
         if (page > 0) {

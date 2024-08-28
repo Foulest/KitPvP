@@ -26,6 +26,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,15 @@ public class BountyCmd {
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "bounty", aliases = "bounties", description = "Allows players to place bounties on each other.", permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
         Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
+
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
 

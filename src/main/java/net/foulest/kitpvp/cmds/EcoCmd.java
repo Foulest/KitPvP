@@ -30,6 +30,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * Command for managing a player's balance.
  *
@@ -82,7 +84,7 @@ public class EcoCmd {
 
         // Handles sub-commands.
         String subCommand = args.getArgs(0);
-        switch (subCommand.toLowerCase()) {
+        switch (subCommand.toLowerCase(Locale.ROOT)) {
             case "give":
                 if (!sender.hasPermission("kitpvp.eco.give")
                         && !(sender instanceof ConsoleCommandSender)) {
