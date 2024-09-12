@@ -5,11 +5,9 @@ name: 'DevSkim'
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: '0 8 * * 1'
+    branches: [ 'main' ]
 
 jobs:
   devskim:
@@ -27,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 'Run DevSkim Analysis'
-        uses: microsoft/DevSkim-Action@v1.0.11
+        uses: microsoft/DevSkim-Action@v1
 
       - name: 'Upload DevSkim Results'
         uses: github/codeql-action/upload-sarif@v3
