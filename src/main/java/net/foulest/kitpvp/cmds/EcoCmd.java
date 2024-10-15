@@ -63,7 +63,7 @@ public class EcoCmd {
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         // Checks if the amount is a number.
-        if (!StringUtils.isNumeric(args.getArgs(1))) {
+        if (!StringUtils.isNumeric(args.getArgs(2))) {
             MessageUtil.messagePlayer(args.getSender(), "&c'" + args.getArgs(1) + "' is not a valid amount.");
             return;
         }

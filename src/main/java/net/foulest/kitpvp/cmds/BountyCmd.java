@@ -105,7 +105,7 @@ public class BountyCmd {
         }
 
         int amount = Integer.parseInt(args.getArgs(2));
-        int minCoins = 50;
+        int minCoins = Settings.bountiesMinAmount;
         int maxCoins = Settings.bountiesMaxAmount;
 
         if (amount < minCoins) {

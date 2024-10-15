@@ -415,7 +415,7 @@ public final class PlayerData {
      * @param value The amount of coins to add.
      */
     public void addCoins(int value) {
-        coins += Math.max(0, coins + value);
+        coins = Math.max(0, coins + value);
 
         // Updates values in the PlayerStats table.
         DatabaseUtil.updatePlayerStatsTable(this);

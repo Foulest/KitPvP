@@ -63,6 +63,7 @@ public final class Settings {
     // Bounties settings
     public static boolean bountiesEnabled;
     public static int bountiesCooldown;
+    public static int bountiesMinAmount;
     public static int bountiesMaxAmount;
 
     // Economy settings
@@ -315,6 +316,7 @@ public final class Settings {
         // Bounties settings
         bountiesEnabled = config.getBoolean("kitpvp.bounties.enabled");
         bountiesCooldown = config.getInt("kitpvp.bounties.cooldown");
+        bountiesMinAmount = config.getInt("kitpvp.bounties.min-amount");
         bountiesMaxAmount = config.getInt("kitpvp.bounties.max-amount");
 
         // Economy settings
