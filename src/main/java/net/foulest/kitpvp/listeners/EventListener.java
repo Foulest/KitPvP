@@ -207,7 +207,7 @@ public class EventListener implements Listener {
 
                 // Prints the Archer arrow tag message.
                 MessageUtil.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &6"
-                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "❤&e.");
+                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "\u2764&e.");
 
                 // Removes arrows from the receiver's body.
                 TaskUtil.runTaskLater(() -> ((CraftEntity) receiver).getHandle().getDataWatcher().watch(9, (byte) 0), 100L);

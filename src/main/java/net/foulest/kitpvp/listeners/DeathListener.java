@@ -145,7 +145,7 @@ public class DeathListener implements Listener {
 
             // Prints kill messages to both the damager and receiver.
             MessageUtil.messagePlayer(receiver.getPlayer(), "&eYou were killed by &c" + damager.getName()
-                    + " &eon &6" + String.format("%.01f", damager.getHealth()) + "❤&e.");
+                    + " &eon &6" + String.format("%.01f", damager.getHealth()) + "\u2764&e.");
             MessageUtil.messagePlayer(damager, "&eYou killed &a" + receiver.getPlayer().getName()
                     + "&e for &a" + coinsGiven + " coins &eand &a" + experienceGiven + " exp&e.");
         } else {

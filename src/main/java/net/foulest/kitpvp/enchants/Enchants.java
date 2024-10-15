@@ -64,7 +64,7 @@ public enum Enchants {
 
     /**
      * Gets the name of the enchantment in a MySQL-friendly format.
-     * Example: "FEATHER_FALLING" -> "featherFalling"
+     * Example: "FEATHER_FALLING" is converted to "featherFalling"
      *
      * @return The formatted name.
      */
@@ -82,7 +82,7 @@ public enum Enchants {
 
     /**
      * Gets the name of the enchantment in a human-friendly format.
-     * Example: "FEATHER_FALLING" -> "Feather Falling"
+     * Example: "FEATHER_FALLING" is converted to  "Feather Falling"
      *
      * @return The formatted name.
      */
@@ -93,7 +93,7 @@ public enum Enchants {
 
     /**
      * Gets the corresponding enchantment cost from Settings.
-     * Example: "FEATHER_FALLING" -> Settings.featherFallingCost
+     * Example: "FEATHER_FALLING" is converted to  Settings.featherFallingCost
      *
      * @return The enchant cost.
      */
