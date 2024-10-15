@@ -23,10 +23,12 @@ import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -126,7 +128,9 @@ public interface Kit {
         }
 
         // Checks if the player has permission to use the kit.
-        if (permission() != null && !player.hasPermission(permission())) {
+        if (permission() != null
+                && permission().getDefault() != PermissionDefault.TRUE
+                && !player.hasPermission(permission())) {
             MessageUtil.messagePlayer(player, "&cYou do not have permission to use this kit.");
             return;
         }
@@ -259,5 +263,11 @@ public interface Kit {
         player.getInventory().setChestplate(chestplate.getItem());
         player.getInventory().setLeggings(leggings.getItem());
         player.getInventory().setBoots(boots.getItem());
+
+        // Sends the player a message and plays a sound.
+        MessageUtil.messagePlayer(player, "&aYou equipped the " + getName() + " kit.");
+        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
+        player.updateInventory();
+        player.closeInventory();
     }
 }

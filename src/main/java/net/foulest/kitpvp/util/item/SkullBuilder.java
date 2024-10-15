@@ -33,7 +33,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -305,25 +304,13 @@ public final class SkullBuilder {
      */
     private static void mutateItemMeta(SkullMeta meta, String b64) {
         try {
-            if (metaSetProfileMethod == null) {
-                metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-                metaSetProfileMethod.setAccessible(true);
+            if (metaProfileField == null) {
+                metaProfileField = meta.getClass().getDeclaredField("profile");
+                metaProfileField.setAccessible(true);
             }
 
-            metaSetProfileMethod.invoke(meta, makeProfile(b64));
-
-        } catch (IllegalAccessException | InvocationTargetException ignored) {
-            try {
-                if (metaProfileField == null) {
-                    metaProfileField = meta.getClass().getDeclaredField("profile");
-                    metaProfileField.setAccessible(true);
-                }
-
-                metaProfileField.set(meta, makeProfile(b64));
-            } catch (IllegalAccessException | NoSuchFieldException ex) {
-                ex.printStackTrace();
-            }
-        } catch (NoSuchMethodException ex) {
+            metaProfileField.set(meta, makeProfile(b64));
+        } catch (IllegalAccessException | NoSuchFieldException ex) {
             ex.printStackTrace();
         }
     }

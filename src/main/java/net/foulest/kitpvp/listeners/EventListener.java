@@ -501,10 +501,6 @@ public class EventListener implements Listener {
 
                         // Applies the selected kit to the player.
                         kit.apply(player);
-                        MessageUtil.messagePlayer(player, "&aYou equipped the " + kitName + " kit.");
-                        player.playSound(playerLocation, Sound.SLIME_WALK, 1, 1);
-                        player.updateInventory();
-                        player.closeInventory();
                         break;
                 }
                 break;
