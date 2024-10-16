@@ -38,7 +38,7 @@ dependencies {
 
     // HikariCP - for database pooling
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    implementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '6.0.0'
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
