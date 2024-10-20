@@ -19,6 +19,7 @@ package net.foulest.kitpvp.cmds;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
@@ -68,6 +69,7 @@ public class KitPvPCmd {
             }
 
             Settings.loadSettings();
+            Spawn.load();
             MessageUtil.messagePlayer(sender, "&aReloaded the config files successfully.");
         } else {
             handleHelp(sender, args);
