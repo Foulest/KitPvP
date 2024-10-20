@@ -59,7 +59,7 @@ public class Imprisoner implements Kit {
     public List<ItemBuilder> getItems() {
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
         ItemBuilder special = new ItemBuilder(Material.DISPENSER).name("&aLava Prison &7(Right Click)")
-                .lore("&7Sends players to jail.");
+                .lore("&7Sends enemy players to jail.");
         return Arrays.asList(sword, special);
     }
 
@@ -78,7 +78,7 @@ public class Imprisoner implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Sends players to lava jail."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Sends enemy players to jail."));
     }
 
     @Override

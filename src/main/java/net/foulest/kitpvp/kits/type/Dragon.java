@@ -62,7 +62,7 @@ public class Dragon implements Kit {
     public List<ItemBuilder> getItems() {
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
         ItemBuilder special = new ItemBuilder(Material.FIREBALL).name("&aDragon's Breath &7(Right Click)")
-                .lore("&7Emits a powerful fiery breath.");
+                .lore("&7Emits a powerful, fiery breath.");
         return Arrays.asList(sword, special);
     }
 
@@ -81,7 +81,7 @@ public class Dragon implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Emits a powerful fiery breath."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Emits a powerful, fiery breath."));
     }
 
     @Override

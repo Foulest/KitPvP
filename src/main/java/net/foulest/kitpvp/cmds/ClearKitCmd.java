@@ -41,6 +41,7 @@ public class ClearKitCmd {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "clearkit", description = "Clears your kit.",
+            aliases = {"ck", "ckit"},
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();

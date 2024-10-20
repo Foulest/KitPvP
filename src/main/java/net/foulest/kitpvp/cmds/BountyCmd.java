@@ -38,7 +38,9 @@ import org.jetbrains.annotations.NotNull;
 public class BountyCmd {
 
     @SuppressWarnings("MethodMayBeStatic")
-    @Command(name = "bounty", aliases = "bounties", description = "Allows players to place bounties on each other.", permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
+    @Command(name = "bounty", aliases = "bounties",
+            description = "Allows players to place bounties on each other.",
+            permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
     public void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
@@ -94,11 +96,6 @@ public class BountyCmd {
 
         // TODO: Implement cooldown in between placing bounties.
 
-        if (targetData.getBounty() != 0 || targetData.getBenefactor() != null) {
-            MessageUtil.messagePlayer(player, "&c" + target.getName() + " already has a bounty on their head.");
-            return;
-        }
-
         if (!StringUtils.isNumeric(args.getArgs(2))) {
             MessageUtil.messagePlayer(player, "&c'" + args.getArgs(3) + "' is not a valid amount.");
             return;
@@ -123,6 +120,11 @@ public class BountyCmd {
             return;
         }
 
+        if (targetData.getBounty() > amount) {
+            MessageUtil.messagePlayer(player, "&c" + target.getName() + " already has a higher bounty.");
+            return;
+        }
+
         MessageUtil.messagePlayer(player, "&aYou set a $" + amount + " bounty on " + target.getName() + "'s head.");
 
         MessageUtil.messagePlayer(target, "");
@@ -137,5 +139,19 @@ public class BountyCmd {
 
         targetData.addBounty(amount, player.getUniqueId());
         playerData.removeCoins(amount);
+
+        // Refund the original benefactor if they set a new bounty on the same player.
+        if (targetData.getBenefactor() != null) {
+            Player targetBenefactor = Bukkit.getPlayer(targetData.getBenefactor());
+            PlayerData targetBenefactorData = PlayerDataManager.getPlayerData(targetBenefactor);
+
+            if (targetBenefactor.isOnline()) {
+                MessageUtil.messagePlayer(targetBenefactor, "&aYour bounty on " + target.getName() + "'s head has been refunded.");
+            } else {
+                targetBenefactorData.load();
+            }
+
+            targetBenefactorData.addCoins(targetData.getBounty());
+        }
     }
 }

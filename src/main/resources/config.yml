@@ -179,7 +179,7 @@ kitpvp:
       enabled: true
       cost: 250
       ability:
-        cooldown: 15
+        cooldown: 20
         duration: 5
     summoner:
       enabled: true

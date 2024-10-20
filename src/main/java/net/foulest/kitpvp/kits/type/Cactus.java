@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +54,9 @@ public class Cactus implements Kit {
 
     @Override
     public PotionEffect[] getPotionEffects() {
-        return new PotionEffect[0];
+        return new PotionEffect[]{
+                new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false)
+        };
     }
 
     @Override

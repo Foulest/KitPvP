@@ -58,7 +58,7 @@ public class Summoner implements Kit {
     public List<ItemBuilder> getItems() {
         ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
         ItemBuilder special = new ItemBuilder(Material.IRON_BLOCK).name("&aSummon Golem &7(Right Click)")
-                .lore("&7Summon your very own Iron Golem.");
+                .lore("&7Summons an Iron Golem.");
         return Arrays.asList(sword, special);
     }
 
@@ -77,7 +77,7 @@ public class Summoner implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Summon your very own Iron Golem."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Summons an Iron Golem."));
     }
 
     @Override

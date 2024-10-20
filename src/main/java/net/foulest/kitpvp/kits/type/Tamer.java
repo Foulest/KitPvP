@@ -58,8 +58,8 @@ public class Tamer implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
-        ItemBuilder special = new ItemBuilder(Material.BONE).name("&aSummon Dogs &7(Right Click)")
-                .lore("&7Summon the hounds.");
+        ItemBuilder special = new ItemBuilder(Material.BONE).name("&aSummon Wolves &7(Right Click)")
+                .lore("&7Summons a pack of wolves.");
         return Arrays.asList(sword, special);
     }
 
@@ -78,7 +78,7 @@ public class Tamer implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Summon the hounds."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Summons a pack of wolves."));
     }
 
     @Override

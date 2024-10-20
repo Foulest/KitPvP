@@ -54,7 +54,7 @@ public class Thor implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         ItemBuilder sword = new ItemBuilder(Material.IRON_AXE).name("&aMjolnir &7(Right Click)")
-                .lore("&7Strike your opponents with lightning.").unbreakable(true).hideInfo();
+                .lore("&7Strike enemies with lightning.").unbreakable(true).hideInfo();
         return Collections.singletonList(sword);
     }
 
@@ -73,7 +73,7 @@ public class Thor implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Strike your opponents with lightning."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Strike enemies with lightning."));
     }
 
     @Override
