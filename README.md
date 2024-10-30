@@ -11,7 +11,7 @@
 
 ### Kits and Customization
 
-- **22 Unique Kits**: Choose from a diverse range of kits with distinct abilities and play styles.
+- **Unique Kits**: Choose from a diverse range of kits with distinct abilities and play styles.
 - **Interactive GUIs**: Seamless interfaces for kit selection, purchasing, and enchantments.
 - **Flexible Kit Management**: Customize kit prices, abilities, cooldowns, and toggle kits on/off as needed.
 
