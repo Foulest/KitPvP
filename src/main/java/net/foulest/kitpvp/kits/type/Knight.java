@@ -43,7 +43,7 @@ public class Knight implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.IRON_CHESTPLATE));
+        return new ItemBuilder(Material.IRON_CHESTPLATE).hideInfo().getItem();
     }
 
     @Override
@@ -53,6 +53,7 @@ public class Knight implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Attack value: 5.0
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
         return Collections.singletonList(sword);
     }
@@ -63,6 +64,7 @@ public class Knight implements Kit {
                 + "A1Mzk3M2U3YzUyMzcyYzNiMTExMzk0ZGZmOTUxOWNiYWMxZmJhM2Y2NTliMjE4NmJlZjhlZWY5ZTEwZmEyIn19fQ==";
 
         return new ItemBuilder[]{
+                // Armor value: 6.5
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fKnight's Head"),
                 new ItemBuilder(Material.IRON_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),

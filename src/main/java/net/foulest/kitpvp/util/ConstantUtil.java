@@ -38,7 +38,7 @@ public class ConstantUtil {
     /**
      * Constant for when a player needs to be in the game to use a command.
      */
-    public final String IN_GAME_ONLY = "&cOnly players can execute this command.";
+    public final String IN_GAME_ONLY = "&cOnly players may execute this command.";
 
     /**
      * Constant for when a tab completer is unable to be registered.

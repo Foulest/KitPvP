@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
@@ -25,6 +26,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import net.foulest.kitpvp.util.item.ItemBuilder;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,12 +38,12 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class SoupCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "soup", description = "Sets your healing item to Soup.",
             usage = "/soup", inGameOnly = true, permission = "kitpvp.soup")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
@@ -51,23 +53,24 @@ public class SoupCmd {
             return;
         }
 
+        Location location = player.getLocation();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Checks if the player is in spawn.
-        if (!Regions.isInSafezone(player.getLocation())) {
+        if (!Regions.isInSafezone(location)) {
             MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 
         // Checks if the command arguments are invalid.
         if (args.length() != 0) {
-            MessageUtil.messagePlayer(args.getSender(), "&cUsage: /soup");
+            MessageUtil.messagePlayer(sender, "&cUsage: /soup");
             return;
         }
 
         // Checks if the player is already using soup.
         if (playerData.isUsingSoup()) {
-            MessageUtil.messagePlayer(args.getSender(), "&cYou are already using Soup.");
+            MessageUtil.messagePlayer(sender, "&cYou are already using Soup.");
             return;
         }
 

@@ -47,23 +47,29 @@ public class Archer implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Material.BOW);
+        return new ItemBuilder(Material.BOW).hideInfo().getItem();
     }
 
     @Override
     public PotionEffect[] getPotionEffects() {
         return new PotionEffect[]{
-                new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false),
-                new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false)
+                new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false)
         };
     }
 
     @Override
     public List<ItemBuilder> getItems() {
-        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo().enchant(Enchantment.KNOCKBACK, 1);
+        // Damage value: 4.0
+        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
+
+        // Damage value: 4.5
         ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo().enchant(Enchantment.ARROW_DAMAGE, 1);
-        ItemBuilder arrow = new ItemBuilder(Material.ARROW).unbreakable(true).hideInfo().amount(32).slot(9);
-        return Arrays.asList(sword, bow, arrow);
+
+        ItemBuilder special = new ItemBuilder(Material.FEATHER).unbreakable(true).hideInfo().name("&aSpeed Boost &7(Right Click)")
+                .lore("&7Gain a temporary speed boost.");
+
+        ItemBuilder arrow = new ItemBuilder(Material.ARROW).unbreakable(true).hideInfo().amount(32).slot(8);
+        return Arrays.asList(sword, bow, special, arrow);
     }
 
     @Override
@@ -72,6 +78,7 @@ public class Archer implements Kit {
                 + "MwMzIyZDM1NjgzMjI4ZjMwZmJjYThjZDFjMmE2MDIwODczMDE1MTZmNmI0MzhiNDhkNjc2ZWU1NTIwNzU3MCJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 3.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fArcher's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).hideInfo(),

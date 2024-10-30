@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -24,6 +25,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +34,20 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class StatsCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "stats", description = "Shows a player's statistics.",
             usage = "/stats", inGameOnly = true, permission = "kitpvp.stats")
-    public void onCommand(@NotNull CommandArgs args) {
-        Player player;
-        Player sender = args.getPlayer();
+    public static void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
+        Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         // Prints the usage message.
         if (args.length() > 1) {
@@ -49,24 +57,26 @@ public class StatsCmd {
 
         // Display the sender's stats.
         if (args.length() == 0) {
-            displayStats(sender, true);
+            displayStats(player, true);
         }
 
         // Displays the stats of another player.
         if (args.length() == 1) {
-            if (args.getArgs(0).length() > 16) {
+            String targetName = args.getArgs(0);
+
+            if (targetName.length() > 16) {
                 MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
-            player = Bukkit.getPlayer(args.getArgs(0));
+            Player targetPlayer = Bukkit.getPlayer(targetName);
 
-            if (player == null || !player.isOnline()) {
+            if (targetPlayer == null || !targetPlayer.isOnline()) {
                 MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
-            displayStats(sender, false);
+            displayStats(targetPlayer, false);
         }
     }
 
@@ -78,16 +88,26 @@ public class StatsCmd {
      */
     public static void displayStats(Player player, boolean samePlayer) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        String playerName = player.getName();
+        int kills = playerData.getKills();
+        int deaths = playerData.getDeaths();
+        String kdrText = playerData.getKDRText();
+        int killstreak = playerData.getKillstreak();
+        int topKillstreak = playerData.getTopKillstreak();
+        int level = playerData.getLevel();
+        int expPercent = playerData.getExpPercent();
+        int coins = playerData.getCoins();
+        int bounty = playerData.getBounty();
 
         MessageUtil.messagePlayer(player, "");
-        MessageUtil.messagePlayer(player, " &a&l" + (samePlayer ? "Your" : player.getName() + "'s") + " Stats");
-        MessageUtil.messagePlayer(player, " &fKills: &e" + playerData.getKills());
-        MessageUtil.messagePlayer(player, " &fDeaths: &e" + playerData.getDeaths());
-        MessageUtil.messagePlayer(player, " &fK/D Ratio: &e" + playerData.getKDRText());
-        MessageUtil.messagePlayer(player, " &fStreak: &e" + playerData.getKillstreak() + " &7(" + playerData.getTopKillstreak() + ")");
-        MessageUtil.messagePlayer(player, " &fLevel: &e" + playerData.getLevel() + " &7(" + playerData.getExpPercent() + "%)");
-        MessageUtil.messagePlayer(player, " &fCoins: &6" + playerData.getCoins());
-        MessageUtil.messagePlayer(player, " &fBounty: &6" + playerData.getBounty());
+        MessageUtil.messagePlayer(player, " &a&l" + (samePlayer ? "Your" : playerName + "'s") + " Stats");
+        MessageUtil.messagePlayer(player, " &fKills: &e" + kills);
+        MessageUtil.messagePlayer(player, " &fDeaths: &e" + deaths);
+        MessageUtil.messagePlayer(player, " &fK/D Ratio: &e" + kdrText);
+        MessageUtil.messagePlayer(player, " &fStreak: &e" + killstreak + " &7(" + topKillstreak + ")");
+        MessageUtil.messagePlayer(player, " &fLevel: &e" + level + " &7(" + expPercent + "%)");
+        MessageUtil.messagePlayer(player, " &fCoins: &6" + coins);
+        MessageUtil.messagePlayer(player, " &fBounty: &6" + bounty);
         MessageUtil.messagePlayer(player, "");
     }
 }

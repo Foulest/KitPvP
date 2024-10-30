@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * CustomYamlConfiguration is an extension of YamlConfiguration
@@ -151,15 +152,8 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     @Override
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
         @Cleanup BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
-        StringBuilder builder = new StringBuilder();
-        String line;
-
-        while ((line = input.readLine()) != null) {
-            builder.append(line);
-            builder.append('\n');
-        }
-
-        loadFromString(builder.toString());
+        String builder = input.lines().map(line -> line + '\n').collect(Collectors.joining());
+        loadFromString(builder);
     }
 
     /**
@@ -217,22 +211,30 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     private void parseAndStoreComments(@NotNull String contents) {
         String[] lines = contents.split("\n");
         StringBuilder commentBuilder = new StringBuilder();
+        String lastComment = commentBuilder.toString();
         boolean isHeader = true; // Assume the first comments are header comments
 
         // Define the pattern within this method
         Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
 
-        for (String line : lines) {
+        for (String entry : lines) {
+            String line = entry;
+
             if (!line.trim().isEmpty() && line.trim().charAt(0) == '#') {
                 if (commentBuilder.length() > 0) {
                     commentBuilder.append("\n");
                 }
-                commentBuilder.append(line.trim().substring(1).trim()); // Remove '#' and trim
+
+                // Remove '#' and trim
+                line = line.trim();
+                line = line.replaceFirst("^#", "");
+                line = line.trim();
+
+                commentBuilder.append(line);
 
             } else {
                 if (!line.trim().isEmpty() && isHeader) {
                     // Store header comments and mark that we've found a non-comment line
-                    String lastComment = commentBuilder.toString();
                     commentsMap.put("__header__", lastComment);
                     commentBuilder.setLength(0);
                     isHeader = false; // No longer reading header comments
@@ -244,7 +246,6 @@ public class CustomYamlConfiguration extends YamlConfiguration {
                     // Found a key, store the accumulated comments if any
                     String key = matcher.group(1);
                     if (commentBuilder.length() > 0) {
-                        String lastComment = commentBuilder.toString();
                         commentsMap.put(key, lastComment);
                         commentBuilder.setLength(0); // Reset comment builder
                     }
@@ -254,7 +255,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
 
         // In case the file ends with comments not associated with a key
         if (commentBuilder.length() > 0 && !isHeader) {
-            commentsMap.put("__footer__", commentBuilder.toString());
+            commentsMap.put("__footer__", lastComment);
         }
     }
 }

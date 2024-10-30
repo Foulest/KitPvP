@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -25,6 +26,7 @@ import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,12 +37,12 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class PayCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
 
         if (args.length() == 2) {
@@ -52,13 +54,11 @@ public class PayCmd {
                 return;
             }
 
-            // Checks if the sender is a player.
-            if (!(sender instanceof Player)) {
-                MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
-                return;
-            }
+            Location location = player.getLocation();
+            String playerName = player.getName();
 
-            Player target = Bukkit.getPlayer(args.getArgs(0));
+            String desiredTarget = args.getArgs(0);
+            Player target = Bukkit.getPlayer(desiredTarget);
 
             // Checks if the target is online.
             if (target == null) {
@@ -66,13 +66,15 @@ public class PayCmd {
                 return;
             }
 
+            String desiredAmount = args.getArgs(1);
+
             // Checks if the amount is a number.
-            if (!StringUtils.isNumeric(args.getArgs(1))) {
-                MessageUtil.messagePlayer(player, "&c'" + args.getArgs(1) + "' is not a valid amount.");
+            if (!StringUtils.isNumeric(desiredAmount)) {
+                MessageUtil.messagePlayer(player, "&c'" + desiredAmount + "' is not a valid amount.");
                 return;
             }
 
-            int amount = Integer.parseInt(args.getArgs(1));
+            int amount = Integer.parseInt(desiredAmount);
 
             // Checks if the amount is negative.
             if (amount < 0) {
@@ -82,7 +84,7 @@ public class PayCmd {
 
             // Checks if the sender is the target.
             if (sender == target) {
-                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+                player.playSound(location, Sound.VILLAGER_NO, 1.0F, 1.0F);
                 MessageUtil.messagePlayer(player, "&cYou can't pay yourself.");
                 return;
             }
@@ -96,11 +98,13 @@ public class PayCmd {
                 return;
             }
 
-            targetData.setCoins(targetData.getCoins() + amount);
+            int targetCoins = targetData.getCoins();
+
+            targetData.setCoins(targetCoins + amount);
             senderData.removeCoins(amount);
 
-            MessageUtil.messagePlayer(player, "&a" + player.getName() + " sent you " + amount + " coins!");
-            MessageUtil.messagePlayer(sender, "&aYou sent " + player.getName() + " " + amount + " coins!");
+            MessageUtil.messagePlayer(player, "&a" + playerName + " sent you " + amount + " coins!");
+            MessageUtil.messagePlayer(sender, "&aYou sent " + playerName + " " + amount + " coins!");
             return;
         }
 

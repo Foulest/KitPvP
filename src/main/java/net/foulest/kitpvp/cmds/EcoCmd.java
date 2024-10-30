@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -37,12 +38,12 @@ import java.util.Locale;
  *
  * @author Foulest
  */
+@Data
 public class EcoCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "eco", description = "Main command for KitPvP's economy.",
             usage = "/eco <give/set/take> <player> <amount>", permission = "kitpvp.eco")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
 
         // No additional arguments, display usage message.
@@ -51,29 +52,33 @@ public class EcoCmd {
             return;
         }
 
-        Player target = Bukkit.getPlayer(args.getArgs(1));
+        String target = args.getArgs(1);
+        Player targetPlayer = Bukkit.getPlayer(target);
 
         // Checks if the target is online.
-        if (target == null || !target.isOnline()) {
+        if (targetPlayer == null || !targetPlayer.isOnline()) {
             MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
             return;
         }
 
-        String targetName = target.getName();
-        PlayerData targetData = PlayerDataManager.getPlayerData(target);
+        String targetName = targetPlayer.getName();
+        PlayerData targetData = PlayerDataManager.getPlayerData(targetPlayer);
+        int targetCoins = targetData.getCoins();
+
+        String desiredAmount = args.getArgs(2);
 
         // Checks if the amount is a number.
-        if (!StringUtils.isNumeric(args.getArgs(2))) {
-            MessageUtil.messagePlayer(args.getSender(), "&c'" + args.getArgs(1) + "' is not a valid amount.");
+        if (!StringUtils.isNumeric(desiredAmount)) {
+            MessageUtil.messagePlayer(sender, "&c'" + target + "' is not a valid amount.");
             return;
         }
 
         int totalCoins;
-        int amount = Integer.parseInt(args.getArgs(2));
+        int amount = Integer.parseInt(desiredAmount);
 
         // Checks if the amount is negative.
         if (amount < 0) {
-            MessageUtil.messagePlayer(args.getSender(), "&cYou cannot use negative numbers.");
+            MessageUtil.messagePlayer(sender, "&cYou cannot use negative numbers.");
             return;
         }
 
@@ -87,15 +92,15 @@ public class EcoCmd {
                     return;
                 }
 
-                targetData.setCoins(targetData.getCoins() + amount);
+                targetData.setCoins(targetCoins + amount);
                 totalCoins = targetData.getCoins();
 
-                if (sender instanceof Player && target.equals(sender)) {
-                    MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins. &7(+" + amount + ")");
+                if (sender instanceof Player && targetPlayer.equals(sender)) {
+                    MessageUtil.messagePlayer(targetPlayer, "&aYou set your balance to " + totalCoins + " coins. &7(+" + amount + ")");
                     return;
                 }
 
-                MessageUtil.messagePlayer(target, "&aYou were given " + amount + " coins! &7(Total: " + totalCoins + ")");
+                MessageUtil.messagePlayer(targetPlayer, "&aYou were given " + amount + " coins! &7(Total: " + totalCoins + ")");
                 MessageUtil.messagePlayer(sender, "&aYou set " + targetName + "'s balance to " + totalCoins + " coins. &7(+" + amount + ")");
                 break;
 
@@ -109,12 +114,12 @@ public class EcoCmd {
                 targetData.setCoins(amount);
                 totalCoins = targetData.getCoins();
 
-                if (sender instanceof Player && target.equals(sender)) {
-                    MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins.");
+                if (sender instanceof Player && targetPlayer.equals(sender)) {
+                    MessageUtil.messagePlayer(targetPlayer, "&aYou set your balance to " + totalCoins + " coins.");
                     return;
                 }
 
-                MessageUtil.messagePlayer(target, "&aYour balance was set to " + totalCoins + " coins.");
+                MessageUtil.messagePlayer(targetPlayer, "&aYour balance was set to " + totalCoins + " coins.");
                 MessageUtil.messagePlayer(sender, "&aYou set " + targetName + "'s balance to " + totalCoins + " coins.");
                 break;
 
@@ -128,12 +133,12 @@ public class EcoCmd {
                 targetData.removeCoins(amount);
                 totalCoins = targetData.getCoins();
 
-                if (sender instanceof Player && target.equals(sender)) {
-                    MessageUtil.messagePlayer(target, "&aYou set your balance to " + totalCoins + " coins. &7(-" + amount + ")");
+                if (sender instanceof Player && targetPlayer.equals(sender)) {
+                    MessageUtil.messagePlayer(targetPlayer, "&aYou set your balance to " + totalCoins + " coins. &7(-" + amount + ")");
                     return;
                 }
 
-                MessageUtil.messagePlayer(target, "&aYour balance was set to " + totalCoins + " coins. &7(-" + amount + ")");
+                MessageUtil.messagePlayer(targetPlayer, "&aYour balance was set to " + totalCoins + " coins. &7(-" + amount + ")");
                 MessageUtil.messagePlayer(sender, "&aYou set " + targetName + "'s balance to " + totalCoins + " coins. &7(-" + amount + ")");
                 break;
 

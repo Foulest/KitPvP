@@ -18,9 +18,7 @@
 package net.foulest.kitpvp.util;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.AccessLevel;
-import lombok.Cleanup;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import lombok.Synchronized;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.enchants.Enchants;
@@ -42,9 +40,8 @@ import java.util.stream.IntStream;
  *
  * @author Foulest
  */
-@SuppressWarnings({"SqlSourceToSinkFlow", "unused"})
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DatabaseUtil {
+@Data
+public class DatabaseUtil {
 
     private static HikariDataSource dataSource;
 
@@ -130,15 +127,29 @@ public final class DatabaseUtil {
      */
     public static void updatePlayerStatsTable(@NotNull PlayerData playerData) {
         Map<String, Object> playerDataMap = new HashMap<>();
-        playerDataMap.put("uuid", playerData.getUniqueId().toString());
-        playerDataMap.put("coins", playerData.getCoins());
-        playerDataMap.put("experience", playerData.getExperience());
-        playerDataMap.put("kills", playerData.getKills());
-        playerDataMap.put("deaths", playerData.getDeaths());
-        playerDataMap.put("killstreak", playerData.getKillstreak());
-        playerDataMap.put("topKillstreak", playerData.getTopKillstreak());
-        playerDataMap.put("usingSoup", playerData.isUsingSoup() ? 1 : 0);
-        playerDataMap.put("previousKit", playerData.getPreviousKit().getName());
+
+        UUID playerUUID = playerData.getUniqueId();
+        String playerUUIDString = playerUUID.toString();
+        int coins = playerData.getCoins();
+        int experience = playerData.getExperience();
+        int kills = playerData.getKills();
+        int deaths = playerData.getDeaths();
+        int killstreak = playerData.getKillstreak();
+        int topKillstreak = playerData.getTopKillstreak();
+        boolean usingSoup = playerData.isUsingSoup();
+        Kit previousKit = playerData.getPreviousKit();
+        String previousKitName = previousKit.getName();
+
+        playerDataMap.put("uuid", playerUUIDString);
+        playerDataMap.put("coins", coins);
+        playerDataMap.put("experience", experience);
+        playerDataMap.put("kills", kills);
+        playerDataMap.put("deaths", deaths);
+        playerDataMap.put("killstreak", killstreak);
+        playerDataMap.put("topKillstreak", topKillstreak);
+        playerDataMap.put("usingSoup", usingSoup ? 1 : 0);
+        playerDataMap.put("previousKit", previousKitName);
+
         addDataToTable("PlayerStats", playerDataMap);
     }
 
@@ -152,17 +163,19 @@ public final class DatabaseUtil {
         String uuid = playerData.getUniqueId().toString();
 
         if (!ownedKits.isEmpty()) {
-            deleteDataFromTable("PlayerKits",
-                    "uuid = ?", Collections.singletonList(uuid));
+            deleteDataFromTable("PlayerKits", "uuid = ?", Collections.singletonList(uuid));
 
-            for (Kit kits : ownedKits) {
-                if (kits == null) {
+            for (Kit kit : ownedKits) {
+                if (kit == null) {
                     continue;
                 }
 
                 Map<String, Object> playerKitsData = new HashMap<>();
+                String kitName = kit.getName();
+
                 playerKitsData.put("uuid", uuid);
-                playerKitsData.put("kitName", kits.getName());
+                playerKitsData.put("kitName", kitName);
+
                 addDataToTable("PlayerKits", playerKitsData);
             }
         }
@@ -184,14 +197,23 @@ public final class DatabaseUtil {
                     "uuid = ?", Collections.singletonList(uuid));
         } else {
             Map<String, Object> enchantsData = new HashMap<>();
+            boolean featherFalling = enchants.contains(Enchants.FEATHER_FALLING);
+            boolean thorns = enchants.contains(Enchants.THORNS);
+            boolean protection = enchants.contains(Enchants.PROTECTION);
+            boolean knockback = enchants.contains(Enchants.KNOCKBACK);
+            boolean sharpness = enchants.contains(Enchants.SHARPNESS);
+            boolean punch = enchants.contains(Enchants.PUNCH);
+            boolean power = enchants.contains(Enchants.POWER);
+
             enchantsData.put("uuid", uuid);
-            enchantsData.put("featherFalling", enchants.contains(Enchants.FEATHER_FALLING) ? 1 : 0);
-            enchantsData.put("thorns", enchants.contains(Enchants.THORNS) ? 1 : 0);
-            enchantsData.put("protection", enchants.contains(Enchants.PROTECTION) ? 1 : 0);
-            enchantsData.put("knockback", enchants.contains(Enchants.KNOCKBACK) ? 1 : 0);
-            enchantsData.put("sharpness", enchants.contains(Enchants.SHARPNESS) ? 1 : 0);
-            enchantsData.put("punch", enchants.contains(Enchants.PUNCH) ? 1 : 0);
-            enchantsData.put("power", enchants.contains(Enchants.POWER) ? 1 : 0);
+            enchantsData.put("featherFalling", featherFalling ? 1 : 0);
+            enchantsData.put("thorns", thorns ? 1 : 0);
+            enchantsData.put("protection", protection ? 1 : 0);
+            enchantsData.put("knockback", knockback ? 1 : 0);
+            enchantsData.put("sharpness", sharpness ? 1 : 0);
+            enchantsData.put("punch", punch ? 1 : 0);
+            enchantsData.put("power", power ? 1 : 0);
+
             addDataToTable("Enchants", enchantsData);
         }
     }
@@ -213,9 +235,11 @@ public final class DatabaseUtil {
                     "uuid = ?", Collections.singletonList(uuid));
         } else {
             Map<String, Object> bountiesData = new HashMap<>();
+            String benefactorString = benefactor.toString();
+
             bountiesData.put("uuid", uuid);
             bountiesData.put("bounty", bounty);
-            bountiesData.put("benefactor", benefactor.toString());
+            bountiesData.put("benefactor", benefactorString);
             addDataToTable("Bounties", bountiesData);
         }
     }
@@ -279,14 +303,20 @@ public final class DatabaseUtil {
      */
     private static void createTableIfNotExists(String tableName, String tableColumns) {
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
-            DatabaseMetaData metaData = Objects.requireNonNull(connection).getMetaData();
-            ResultSet tables = metaData.getTables(null, null, tableName, null);
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return;
+            }
 
-            if (!tables.next()) {
-                String createTableSQL = String.format("CREATE TABLE %s (%s)", tableName, tableColumns);
+            DatabaseMetaData metaData = connection.getMetaData();
 
-                try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSQL)) {
-                    preparedStatement.execute();
+            try (ResultSet tables = metaData.getTables(null, null, tableName, null)) {
+                if (!tables.next()) {
+                    String createTableSQL = String.format("CREATE TABLE %s (%s)", tableName, tableColumns);
+
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSQL)) {
+                        preparedStatement.execute();
+                    }
                 }
             }
         } catch (SQLException ex) {
@@ -302,14 +332,20 @@ public final class DatabaseUtil {
      */
     public static void deleteTableIfExists(String tableName) throws SQLException {
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
-            DatabaseMetaData metaData = Objects.requireNonNull(connection).getMetaData();
-            ResultSet tables = metaData.getTables(null, null, tableName, null);
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return;
+            }
 
-            if (tables.next()) {
-                String deleteTableSQL = String.format("DROP TABLE %s", tableName);
+            DatabaseMetaData metaData = connection.getMetaData();
 
-                try (PreparedStatement preparedStatement = connection.prepareStatement(deleteTableSQL)) {
-                    preparedStatement.execute();
+            try (ResultSet tables = metaData.getTables(null, null, tableName, null)) {
+                if (tables.next()) {
+                    String deleteTableSQL = String.format("DROP TABLE %s", tableName);
+
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(deleteTableSQL)) {
+                        preparedStatement.execute();
+                    }
                 }
             }
         }
@@ -322,8 +358,11 @@ public final class DatabaseUtil {
      * @param tableData The data to be added.
      */
     private static void addDataToTable(String tableName, @NotNull Map<String, Object> tableData) {
-        String columns = String.join(", ", tableData.keySet());
-        String placeholders = IntStream.range(0, tableData.size())
+        int size = tableData.size();
+        Set<String> keySet = tableData.keySet();
+        String columns = String.join(", ", keySet);
+
+        String placeholders = IntStream.range(0, size)
                 .mapToObj(i -> "?")
                 .collect(Collectors.joining(", "));
 
@@ -335,7 +374,7 @@ public final class DatabaseUtil {
                     tableName, columns, placeholders);
         } else {
             // MySQL/MariaDB's syntax with ON DUPLICATE KEY UPDATE
-            String updateStatement = " ON DUPLICATE KEY UPDATE " + tableData.keySet().stream()
+            String updateStatement = " ON DUPLICATE KEY UPDATE " + keySet.stream()
                     .map(column -> String.format("%s = VALUES(%s)", column, column))
                     .collect(Collectors.joining(", "));
 
@@ -344,8 +383,14 @@ public final class DatabaseUtil {
         }
 
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
-            try (PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(insertSQL)) {
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return;
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
                 int index = 1;
+
                 for (Object value : tableData.values()) {
                     preparedStatement.setObject(index, value);
                     index++;
@@ -369,26 +414,34 @@ public final class DatabaseUtil {
         // Check if the table is empty
         String checkTableEmptySQL = String.format("SELECT COUNT(*) FROM %s", tableName);
 
-        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
-             PreparedStatement checkTableEmptyStmt = Objects.requireNonNull(connection).prepareStatement(checkTableEmptySQL)) {
-            @Cleanup ResultSet resultSet = checkTableEmptyStmt.executeQuery();
-
-            if (resultSet.next() && resultSet.getInt(1) > 0) {
-                return; // Table is not empty, no need to insert default data
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return;
             }
 
-            // Proceed with insert since table is empty
-            String columns = String.join(", ", tableData.keySet());
-            String placeholders = String.join(", ", Collections.nCopies(tableData.size(), "?"));
-            String insertSQL = String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
-
-            try (PreparedStatement insertStmt = connection.prepareStatement(insertSQL)) {
-                int index = 1;
-                for (Object value : tableData.values()) {
-                    insertStmt.setObject(index, value);
-                    index++;
+            try (PreparedStatement checkTableEmptyStmt = connection.prepareStatement(checkTableEmptySQL)) {
+                try (ResultSet resultSet = checkTableEmptyStmt.executeQuery()) {
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
+                        return; // Table is not empty, no need to insert default data
+                    }
                 }
-                insertStmt.executeUpdate();
+
+                // Proceed with insert since table is empty
+                int size = tableData.size();
+                Set<String> keySet = tableData.keySet();
+                String columns = String.join(", ", keySet);
+                String placeholders = String.join(", ", Collections.nCopies(size, "?"));
+                String insertSQL = String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
+
+                try (PreparedStatement insertStmt = connection.prepareStatement(insertSQL)) {
+                    int index = 1;
+                    for (Object value : tableData.values()) {
+                        insertStmt.setObject(index, value);
+                        index++;
+                    }
+                    insertStmt.executeUpdate();
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -410,9 +463,15 @@ public final class DatabaseUtil {
         String selectSQL = String.format("SELECT * FROM %s WHERE %s", tableName, condition);
 
         try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
-            try (PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(selectSQL)) {
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return Collections.emptyList();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
                 for (int i = 0; i < parameters.size(); i++) {
-                    preparedStatement.setObject(i + 1, parameters.get(i));
+                    Object obj = parameters.get(i);
+                    preparedStatement.setObject(i + 1, obj);
                 }
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -420,9 +479,14 @@ public final class DatabaseUtil {
 
                     while (resultSet.next()) {
                         HashMap<String, Object> row = new HashMap<>();
-                        for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                            row.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+                        ResultSetMetaData metaData = resultSet.getMetaData();
+
+                        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                            String columnName = metaData.getColumnName(i);
+                            Object object = resultSet.getObject(i);
+                            row.put(columnName, object);
                         }
+
                         rows.add(row);
                     }
                     return rows;
@@ -442,12 +506,20 @@ public final class DatabaseUtil {
                                             @NotNull List<Object> parameters) {
         String deleteSQL = String.format("DELETE FROM %s WHERE %s", tableName, condition);
 
-        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection());
-             PreparedStatement preparedStatement = Objects.requireNonNull(connection).prepareStatement(deleteSQL)) {
-            for (int i = 0; i < parameters.size(); i++) {
-                preparedStatement.setObject(i + 1, parameters.get(i));
+        try (Connection connection = (Settings.usingFlatFile ? getSQLiteConnection() : dataSource.getConnection())) {
+            if (connection == null) {
+                MessageUtil.log(Level.SEVERE, "Failed to establish a connection to the database.");
+                return;
             }
-            preparedStatement.executeUpdate();
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+                for (int i = 0; i < parameters.size(); i++) {
+                    Object obj = parameters.get(i);
+                    preparedStatement.setObject(i + 1, obj);
+                }
+
+                preparedStatement.executeUpdate();
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

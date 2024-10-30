@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -30,18 +31,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 /**
  * Command for placing bounties on other players.
  *
  * @author Foulest
  */
+@Data
 public class BountyCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "bounty", aliases = "bounties",
             description = "Allows players to place bounties on each other.",
             permission = "kitpvp.bounties", usage = "/bounty [player]", inGameOnly = true)
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
@@ -52,7 +55,12 @@ public class BountyCmd {
         }
 
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        Player benefactor = Bukkit.getPlayer(playerData.getBenefactor());
+        UUID playerUUID = player.getUniqueId();
+        String playerName = player.getName();
+
+        UUID benefactorUUID = playerData.getBenefactor();
+        Player benefactor = Bukkit.getPlayer(benefactorUUID);
+        String benefactorName = benefactor.getName();
 
         // Checks if the bounties feature is enabled.
         if (!Settings.bountiesEnabled) {
@@ -62,13 +70,14 @@ public class BountyCmd {
 
         if (args.length() == 0) {
             MessageUtil.messagePlayer(player, "");
+            int activeBounty = playerData.getBounty();
 
-            if (playerData.getBounty() == 0 || playerData.getBenefactor() == null || !benefactor.isOnline()) {
+            if (activeBounty == 0 || benefactorUUID == null || !benefactor.isOnline()) {
                 MessageUtil.messagePlayer(player, " &aYou currently don't have a");
                 MessageUtil.messagePlayer(player, " &abounty on your head.");
             } else {
-                MessageUtil.messagePlayer(player, " &cYou currently have a &e$" + playerData.getBounty() + " &cbounty");
-                MessageUtil.messagePlayer(player, " &con your head set by &e" + benefactor.getName() + "&c.");
+                MessageUtil.messagePlayer(player, " &cYou currently have a &e$" + activeBounty + " &cbounty");
+                MessageUtil.messagePlayer(player, " &con your head set by &e" + benefactorName + "&c.");
             }
 
             MessageUtil.messagePlayer(player, "");
@@ -86,7 +95,8 @@ public class BountyCmd {
             return;
         }
 
-        Player target = Bukkit.getPlayer(args.getArgs(1));
+        String targetName = args.getArgs(1);
+        Player target = Bukkit.getPlayer(targetName);
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         if (target.equals(player)) {
@@ -94,14 +104,20 @@ public class BountyCmd {
             return;
         }
 
-        // TODO: Implement cooldown in between placing bounties.
-
-        if (!StringUtils.isNumeric(args.getArgs(2))) {
-            MessageUtil.messagePlayer(player, "&c'" + args.getArgs(3) + "' is not a valid amount.");
+        if (!target.isOnline()) {
+            MessageUtil.messagePlayer(player, ConstantUtil.PLAYER_NOT_FOUND);
             return;
         }
 
-        int amount = Integer.parseInt(args.getArgs(2));
+        targetName = target.getName();
+        String bountyAmount = args.getArgs(2);
+
+        if (!StringUtils.isNumeric(bountyAmount)) {
+            MessageUtil.messagePlayer(player, "&c'" + bountyAmount + "' is not a valid amount.");
+            return;
+        }
+
+        int amount = Integer.parseInt(bountyAmount);
         int minCoins = Settings.bountiesMinAmount;
         int maxCoins = Settings.bountiesMaxAmount;
 
@@ -120,38 +136,42 @@ public class BountyCmd {
             return;
         }
 
-        if (targetData.getBounty() > amount) {
-            MessageUtil.messagePlayer(player, "&c" + target.getName() + " already has a higher bounty.");
+        int targetBounty = targetData.getBounty();
+
+        if (targetBounty > amount) {
+            MessageUtil.messagePlayer(player, "&c" + targetName + " already has a higher bounty.");
             return;
         }
 
-        MessageUtil.messagePlayer(player, "&aYou set a $" + amount + " bounty on " + target.getName() + "'s head.");
+        MessageUtil.messagePlayer(player, "&aYou set a $" + amount + " bounty on " + targetName + "'s head.");
 
         MessageUtil.messagePlayer(target, "");
-        MessageUtil.messagePlayer(target, " &c" + player.getName() + " &eset a &c$" + amount + " &ebounty on your head.");
+        MessageUtil.messagePlayer(target, " &c" + playerName + " &eset a &c$" + amount + " &ebounty on your head.");
         MessageUtil.messagePlayer(target, "");
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (!online.equals(target) && !online.equals(player)) {
-                MessageUtil.messagePlayer(online, "&c" + player.getName() + " &eset a &c$" + amount + " &ebounty on &c" + target.getName() + "&e's head.");
+                MessageUtil.messagePlayer(online, "&c" + playerName + " &eset a &c$" + amount + " &ebounty on &c" + targetName + "&e's head.");
             }
         }
 
-        targetData.addBounty(amount, player.getUniqueId());
+        targetData.addBounty(amount, playerUUID);
         playerData.removeCoins(amount);
 
-        // Refund the original benefactor if they set a new bounty on the same player.
-        if (targetData.getBenefactor() != null) {
-            Player targetBenefactor = Bukkit.getPlayer(targetData.getBenefactor());
-            PlayerData targetBenefactorData = PlayerDataManager.getPlayerData(targetBenefactor);
+        UUID targetBenefactor = targetData.getBenefactor();
 
-            if (targetBenefactor.isOnline()) {
-                MessageUtil.messagePlayer(targetBenefactor, "&aYour bounty on " + target.getName() + "'s head has been refunded.");
+        // Refund the original benefactor if they set a new bounty on the same player.
+        if (targetBenefactor != null) {
+            Player targetBenefactorPlayer = Bukkit.getPlayer(targetBenefactor);
+            PlayerData targetBenefactorData = PlayerDataManager.getPlayerData(targetBenefactorPlayer);
+
+            if (targetBenefactorPlayer.isOnline()) {
+                MessageUtil.messagePlayer(targetBenefactorPlayer, "&aYour bounty on " + targetName + "'s head has been refunded.");
             } else {
                 targetBenefactorData.load();
             }
 
-            targetBenefactorData.addCoins(targetData.getBounty());
+            targetBenefactorData.addCoins(targetBounty);
         }
     }
 }

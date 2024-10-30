@@ -19,8 +19,7 @@ package net.foulest.kitpvp.util.item;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -46,8 +45,8 @@ import java.util.UUID;
  * @author deanveloper
  * @see <a href="https://github.com/deanveloper/SkullCreator">SkullCreator GitHub</a>
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SkullBuilder {
+@Data
+public class SkullBuilder {
 
     private static Field blockProfileField;
     private static Method metaSetProfileMethod;
@@ -136,7 +135,9 @@ public final class SkullBuilder {
     @Contract("_, _ -> param1")
     private static @NotNull ItemStack itemWithUuid(@NotNull ItemStack item, UUID id) {
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwner(Bukkit.getOfflinePlayer(id).getName());
+        String playerName = Bukkit.getOfflinePlayer(id).getName();
+
+        meta.setOwner(playerName);
         item.setItemMeta(meta);
         return item;
     }
@@ -194,8 +195,11 @@ public final class SkullBuilder {
      */
     private static void blockWithUuid(Block block, UUID id) {
         setToSkull(block);
+
         Skull state = (Skull) block.getState();
-        state.setOwner(Bukkit.getOfflinePlayer(id).getName());
+        String playerName = Bukkit.getOfflinePlayer(id).getName();
+
+        state.setOwner(playerName);
         state.update(false, false);
     }
 
@@ -260,7 +264,8 @@ public final class SkullBuilder {
         }
 
         String toEncode = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl + "\"}}}";
-        return Base64.getEncoder().encodeToString(toEncode.getBytes(StandardCharsets.UTF_8));
+        byte[] bytes = toEncode.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
@@ -270,8 +275,11 @@ public final class SkullBuilder {
      * @return The GameProfile with the specified texture.
      */
     private static @NotNull GameProfile makeProfile(@NotNull String b64) {
-        UUID id = new UUID(b64.substring(b64.length() - 20).hashCode(),
-                b64.substring(b64.length() - 10).hashCode());
+        int length = b64.length();
+        int mostSigBits = b64.substring(length - 20).hashCode();
+        int leastSigBits = b64.substring(length - 10).hashCode();
+        UUID id = new UUID(mostSigBits, leastSigBits);
+
         GameProfile profile = new GameProfile(id, "aaaaa");
         profile.getProperties().put("textures", new Property("textures", b64));
         return profile;

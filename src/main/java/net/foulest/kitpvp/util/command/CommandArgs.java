@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.util.command;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +31,8 @@ import org.jetbrains.annotations.Nullable;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
+@Data
 @SuppressWarnings("WeakerAccess")
-@Getter
-@Setter
 public class CommandArgs {
 
     private final CommandSender sender;

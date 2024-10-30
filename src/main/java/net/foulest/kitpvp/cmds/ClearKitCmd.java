@@ -17,19 +17,23 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,21 +41,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class ClearKitCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "clearkit", description = "Clears your kit.",
             aliases = {"ck", "ckit"},
             permission = "kitpvp.clearkit", usage = "/clearkit (player)", inGameOnly = true)
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
-
-        // Checks if the sender is a player.
-        if (!(sender instanceof Player)) {
-            MessageUtil.messagePlayer(args.getSender(), ConstantUtil.IN_GAME_ONLY);
-            return;
-        }
-
         Player player = args.getPlayer();
 
         // Checks if the player is null.
@@ -60,16 +57,17 @@ public class ClearKitCmd {
             return;
         }
 
+        Location location = player.getLocation();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         // Handles clearing your own kit.
         if (args.length() == 0) {
-            if (CombatTag.isInCombat(args.getPlayer())) {
-                MessageUtil.messagePlayer(args.getPlayer(), ConstantUtil.COMBAT_TAGGED);
+            if (CombatTag.isInCombat(player)) {
+                MessageUtil.messagePlayer(player, ConstantUtil.COMBAT_TAGGED);
                 return;
             }
 
-            if (Regions.isInSafezone(player.getLocation())) {
+            if (Regions.isInSafezone(location)) {
                 if (playerData.getActiveKit() == null) {
                     MessageUtil.messagePlayer(player, ConstantUtil.NO_KIT_SELECTED);
                     return;
@@ -86,22 +84,24 @@ public class ClearKitCmd {
 
         // Handles clearing kits from other players.
         if (args.getPlayer().hasPermission("kitpvp.clearkit.others")) {
-            Player target = Bukkit.getPlayer(args.getArgs(1));
-            PlayerData targetData = PlayerDataManager.getPlayerData(target);
+            String target = args.getArgs(1);
+            Player targetPlayer = Bukkit.getPlayer(target);
+            String targetName = targetPlayer.getName();
+            PlayerData targetData = PlayerDataManager.getPlayerData(targetPlayer);
 
-            if (!target.isOnline()) {
+            if (!targetPlayer.isOnline()) {
                 MessageUtil.messagePlayer(player, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
             if (targetData.getActiveKit() == null) {
-                MessageUtil.messagePlayer(target, ConstantUtil.NO_KIT_SELECTED);
+                MessageUtil.messagePlayer(targetPlayer, ConstantUtil.NO_KIT_SELECTED);
                 return;
             }
 
             clearKit(targetData);
-            MessageUtil.messagePlayer(target, "&aYour kit has been cleared by a staff member.");
-            MessageUtil.messagePlayer(player, "&aYou cleared " + target.getName() + "'s kit.");
+            MessageUtil.messagePlayer(targetPlayer, "&aYour kit has been cleared by a staff member.");
+            MessageUtil.messagePlayer(player, "&aYou cleared " + targetName + "'s kit.");
         }
     }
 
@@ -112,8 +112,10 @@ public class ClearKitCmd {
      */
     private static void clearKit(@NotNull PlayerData playerData) {
         Player player = playerData.getPlayer();
+        Location location = player.getLocation();
+        Kit activeKit = playerData.getActiveKit();
 
-        playerData.setPreviousKit(playerData.getActiveKit());
+        playerData.setPreviousKit(activeKit);
         playerData.clearCooldowns();
         playerData.setActiveKit(null);
 
@@ -121,10 +123,11 @@ public class ClearKitCmd {
         player.getInventory().setHeldItemSlot(0);
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
+            PotionEffectType effectType = effect.getType();
+            player.removePotionEffect(effectType);
         }
 
         playerData.giveDefaultItems();
-        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
+        player.playSound(location, Sound.SLIME_WALK, 1, 1);
     }
 }

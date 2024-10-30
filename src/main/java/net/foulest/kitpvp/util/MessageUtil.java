@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -38,9 +37,8 @@ import java.util.stream.IntStream;
  *
  * @author Foulest
  */
-@SuppressWarnings("unused")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MessageUtil {
+@Data
+public class MessageUtil {
 
     private static final Logger logger = Bukkit.getLogger();
 

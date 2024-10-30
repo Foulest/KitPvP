@@ -17,9 +17,7 @@
  */
 package net.foulest.kitpvp.data;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
@@ -29,6 +27,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import net.foulest.kitpvp.util.item.SkullBuilder;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -49,11 +48,8 @@ import java.util.*;
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@ToString
-@SuppressWarnings("unused")
-public final class PlayerData {
+@Data
+public class PlayerData {
 
     // Player data
     private final UUID uniqueId;
@@ -90,6 +86,12 @@ public final class PlayerData {
     private @Nullable BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportToSpawnTask;
 
+    // Flask data
+    private @Nullable BukkitTask flaskCooldownTask;
+
+    // Vampire task
+    private @Nullable BukkitTask lifeStealCooldown;
+
     /**
      * Creates a new player data object.
      *
@@ -113,9 +115,13 @@ public final class PlayerData {
 
         if (cooldown > 0) {
             if (sendMessage) {
-                MessageUtil.messagePlayer(player, "&cYou are still on cooldown for %time% seconds."
-                        .replace("%time%", String.valueOf(BigDecimal.valueOf((double) cooldown / 1000)
-                                .setScale(1, RoundingMode.HALF_UP).doubleValue())));
+                BigDecimal cooldownDecimal = BigDecimal.valueOf((double) cooldown / 1000).setScale(1, RoundingMode.HALF_UP);
+                double cooldownDouble = cooldownDecimal.doubleValue();
+
+                String cooldownMsg = "&cYou are still on cooldown for %time% seconds.";
+                cooldownMsg = cooldownMsg.replace("%time%", String.valueOf(cooldownDouble));
+
+                MessageUtil.messagePlayer(player, cooldownMsg);
             }
             return true;
         }
@@ -131,6 +137,16 @@ public final class PlayerData {
         if (abilityCooldownNotifier != null) {
             abilityCooldownNotifier.cancel();
             abilityCooldownNotifier = null;
+        }
+
+        if (flaskCooldownTask != null) {
+            flaskCooldownTask.cancel();
+            flaskCooldownTask = null;
+        }
+
+        if (lifeStealCooldown != null) {
+            lifeStealCooldown.cancel();
+            lifeStealCooldown = null;
         }
     }
 
@@ -163,7 +179,9 @@ public final class PlayerData {
     public boolean load() {
         // Inserts default values into PlayerStats.
         Map<String, Object> defaultStats = new HashMap<>();
-        defaultStats.put("uuid", uniqueId.toString());
+        String uuidString = uniqueId.toString();
+
+        defaultStats.put("uuid", uuidString);
         defaultStats.put("coins", 500);
         defaultStats.put("experience", 0);
         defaultStats.put("kills", 0);
@@ -177,7 +195,7 @@ public final class PlayerData {
         // Loads values from PlayerStats.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats",
-                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
+                    "uuid = ?", Collections.singletonList(uuidString));
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
@@ -188,7 +206,9 @@ public final class PlayerData {
                 killstreak = (Integer) playerData.get("killstreak");
                 topKillstreak = (Integer) playerData.get("topKillstreak");
                 usingSoup = (Integer) playerData.get("usingSoup") == 1;
-                previousKit = KitManager.getKit((String) playerData.get("previousKit"));
+
+                Object previousKitObj = playerData.get("previousKit");
+                previousKit = KitManager.getKit((String) previousKitObj);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -197,18 +217,22 @@ public final class PlayerData {
 
         // Inserts default values into PlayerKits.
         Map<String, Object> defaultKits = new HashMap<>();
-        defaultKits.put("uuid", uniqueId.toString());
+        defaultKits.put("uuid", uuidString);
         defaultKits.put("kitName", "Knight");
         DatabaseUtil.addDefaultDataToTable("PlayerKits", defaultKits);
 
         // Loads values from PlayerKits.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits",
-                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
+                    "uuid = ?", Collections.singletonList(uuidString));
 
             if (!data.isEmpty()) {
-                for (HashMap<String, Object> row : data) {
-                    ownedKits.add(KitManager.getKit((String) row.get("kitName")));
+                for (Map<String, Object> row : data) {
+                    Object kitNameObj = row.get("kitName");
+
+                    if (kitNameObj != null && !kitNameObj.equals("")) {
+                        ownedKits.add(KitManager.getKit((String) kitNameObj));
+                    }
                 }
             }
         } catch (SQLException ex) {
@@ -219,14 +243,16 @@ public final class PlayerData {
         // Loads values from Bounties.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties",
-                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
+                    "uuid = ?", Collections.singletonList(uuidString));
 
             if (!data.isEmpty()) {
                 HashMap<String, Object> playerData = data.get(0);
                 bounty = (Integer) playerData.get("bounty");
 
-                if (!playerData.get("benefactor").equals("")) {
-                    benefactor = UUID.fromString((String) playerData.get("benefactor"));
+                Object benefactorObj = playerData.get("benefactor");
+
+                if (!benefactorObj.equals("")) {
+                    benefactor = UUID.fromString((String) benefactorObj);
                 }
             }
         } catch (SQLException ex) {
@@ -237,7 +263,7 @@ public final class PlayerData {
         // Loads values from Enchants.
         try {
             List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants",
-                    "uuid = ?", Collections.singletonList(uniqueId.toString()));
+                    "uuid = ?", Collections.singletonList(uuidString));
 
             if (!data.isEmpty()) {
                 Map<String, Object> playerData = data.get(0);
@@ -462,7 +488,9 @@ public final class PlayerData {
         } else {
             decimal = ((float) (experience - pastLevelXP) / (nextLevelXP - pastLevelXP));
         }
-        return Float.parseFloat(format.format(decimal));
+
+        String formatted = format.format(decimal);
+        return Float.parseFloat(formatted);
     }
 
     /**
@@ -500,7 +528,8 @@ public final class PlayerData {
     public String getKDRText() {
         String decimalFormatStr = "####0.00";
         DecimalFormat format = new DecimalFormat(decimalFormatStr);
-        return format.format(getKDR());
+        double kdr = getKDR();
+        return format.format(kdr);
     }
 
     /**
@@ -516,50 +545,53 @@ public final class PlayerData {
                 level += 1;
 
                 if (afterKill) {
-                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
+                    Location location = player.getLocation();
+                    player.playSound(location, Sound.LEVEL_UP, 1.0F, 1.0F);
+
                     MessageUtil.messagePlayer(player, "");
                     MessageUtil.messagePlayer(player, " &b&lLevel Up");
                     MessageUtil.messagePlayer(player, " &7You leveled up to &fLevel " + level + " &7and");
                     MessageUtil.messagePlayer(player, " &7earned yourself &f250 Coins&7!");
+
                     setCoins(coins + 250);
                 }
             }
         }
 
+        float expDecimal = getExpDecimal();
+
         player.setLevel(level);
-        player.setExp(getExpDecimal());
+        player.setExp(expDecimal);
     }
 
     /**
      * Gives the player their default items.
      */
-    @SuppressWarnings("LocalVariableHidesMemberVariable")
     public void giveDefaultItems() {
+        UUID playerUUID = player.getUniqueId();
+
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
 
-        ItemStack kitSelector = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").getItem();
-        player.getInventory().setItem(0, kitSelector);
+        ItemStack kitSelectorItem = new ItemBuilder(Material.NETHER_STAR).name("&aKit Selector &7(Right Click)").getItem();
+        player.getInventory().setItem(0, kitSelectorItem);
 
-        ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").getItem();
-        player.getInventory().setItem(1, shopSelector);
+        ItemStack kitShopItem = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").getItem();
+        player.getInventory().setItem(1, kitShopItem);
 
-        ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").getItem();
-        player.getInventory().setItem(2, previousKit);
+        ItemStack previousKitItem = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").getItem();
+        player.getInventory().setItem(2, previousKitItem);
 
-        ItemStack yourStats = new ItemBuilder(SkullBuilder.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").getItem();
-        player.getInventory().setItem(4, yourStats);
+        ItemStack yourStatsItem = new ItemBuilder(SkullBuilder.itemFromUuid(playerUUID)).name("&aYour Stats &7(Right Click)").getItem();
+        player.getInventory().setItem(4, yourStatsItem);
 
-        ItemStack healingItem;
-        if (usingSoup) {
-            healingItem = new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem();
-        } else {
-            healingItem = new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
-        }
+        ItemStack healingItem = usingSoup
+                ? new ItemBuilder(Material.MUSHROOM_SOUP).name("&aUsing Soup &7(Right Click)").getItem()
+                : new ItemBuilder(Material.POTION).hideInfo().durability(16421).name("&aUsing Potions &7(Right Click)").getItem();
         player.getInventory().setItem(6, healingItem);
 
-        ItemStack kitEnchanter = new ItemBuilder(Material.ENCHANTED_BOOK).name("&aKit Enchanter &7(Right Click)").getItem();
-        player.getInventory().setItem(7, kitEnchanter);
+        ItemStack kitEnchanterItem = new ItemBuilder(Material.ENCHANTED_BOOK).name("&aKit Enchanter &7(Right Click)").getItem();
+        player.getInventory().setItem(7, kitEnchanterItem);
 
         player.updateInventory();
     }

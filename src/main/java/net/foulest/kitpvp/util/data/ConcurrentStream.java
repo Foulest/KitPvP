@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.util.data;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,10 +34,8 @@ import java.util.stream.Stream;
  * @see Stream
  * @author Foulest
  */
-@Getter
-@Setter
-@SuppressWarnings("unused")
-public final class ConcurrentStream<T> {
+@Data
+public class ConcurrentStream<T> {
 
     /**
      * The supplier of the stream.

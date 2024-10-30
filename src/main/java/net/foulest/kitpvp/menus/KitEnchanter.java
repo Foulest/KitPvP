@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.menus;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
@@ -38,6 +39,7 @@ import java.util.List;
  *
  * @author Foulest
  */
+@Data
 public class KitEnchanter {
 
     private final Inventory inventory;
@@ -47,12 +49,13 @@ public class KitEnchanter {
      *
      * @param player The player to open the GUI for.
      */
-    public KitEnchanter(Player player) {
+    public KitEnchanter(@NotNull Player player) {
+        player.closeInventory();
+
         String inventoryName = MessageUtil.colorize("Kit Enchanter");
         inventory = Bukkit.createInventory(player, 27, inventoryName);
 
         populateInventory(player);
-        player.closeInventory();
         player.openInventory(inventory);
     }
 

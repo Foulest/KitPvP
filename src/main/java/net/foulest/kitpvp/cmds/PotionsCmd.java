@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
@@ -25,6 +26,7 @@ import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
 import net.foulest.kitpvp.util.item.ItemBuilder;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,12 +38,12 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class PotionsCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "potions", aliases = "pots", description = "Sets your healing item to Potions.",
             usage = "/potions", inGameOnly = true, permission = "kitpvp.potions")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
@@ -52,19 +54,20 @@ public class PotionsCmd {
         }
 
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        Location location = player.getLocation();
 
-        if (!Regions.isInSafezone(player.getLocation())) {
+        if (!Regions.isInSafezone(location)) {
             MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 
         if (args.length() != 0) {
-            MessageUtil.messagePlayer(args.getSender(), "&cUsage: /pots");
+            MessageUtil.messagePlayer(sender, "&cUsage: /pots");
             return;
         }
 
         if (!playerData.isUsingSoup()) {
-            MessageUtil.messagePlayer(args.getSender(), "&cYou are already using Potions.");
+            MessageUtil.messagePlayer(sender, "&cYou are already using Potions.");
             return;
         }
 

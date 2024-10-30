@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.kits.type;
 
+import javafx.scene.effect.SepiaTone;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
@@ -30,7 +31,6 @@ import org.bukkit.potion.PotionEffect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents the Mage kit.
@@ -46,7 +46,7 @@ public class Mage implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.GLOWSTONE_DUST));
+        return new ItemStack(Material.GLOWSTONE_DUST);
     }
 
     @Override
@@ -56,9 +56,11 @@ public class Mage implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Damage value: 5.0
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+
         ItemBuilder special = new ItemBuilder(Material.GLOWSTONE_DUST).name("&aRandom Effect &7(Right Click)")
-                .lore("&7Gives you random potion effects.");
+                .lore("&7Gives you a random potion effect.");
         return Arrays.asList(sword, special);
     }
 
@@ -68,6 +70,7 @@ public class Mage implements Kit {
                 + "MmIxNTQ4NTQ1ZTJhMjQ5N2JkMjRhYWM3OTE3OTI2NTRlZjU4N2E1YWI3M2QzNmFiN2Y1ZDliZjcyYTU0NyJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 5.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fMage's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),
@@ -77,7 +80,7 @@ public class Mage implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Gives you random potion effects."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Gives you a random potion effect."));
     }
 
     @Override

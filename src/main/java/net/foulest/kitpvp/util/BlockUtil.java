@@ -17,27 +17,25 @@
  */
 package net.foulest.kitpvp.util;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import net.foulest.kitpvp.util.data.ConcurrentStream;
 import net.foulest.kitpvp.util.raytrace.BoundingBox;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Utility class for block-related methods.
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BlockUtil {
+@Data
+public class BlockUtil {
 
     /**
      * Checks if a player is in an unloaded chunk.
@@ -46,8 +44,10 @@ public final class BlockUtil {
      * @return Whether the player is in an unloaded chunk.
      */
     private static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
-        return !player.getLocation().getWorld().isChunkLoaded(player.getLocation().getBlockX() >> 4,
-                player.getLocation().getBlockZ() >> 4);
+        Location location = player.getLocation();
+        int blockX = location.getBlockX();
+        int blockZ = location.getBlockZ();
+        return !location.getWorld().isChunkLoaded(blockX >> 4, blockZ >> 4);
     }
 
     /**
@@ -59,7 +59,8 @@ public final class BlockUtil {
      */
     @Contract("_, _ -> new")
     private static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
-        return new ConcurrentStream<>(boundingBox.getCollidingBlocks(player), false);
+        List<Block> collidingBlocks = boundingBox.getCollidingBlocks(player);
+        return new ConcurrentStream<>(collidingBlocks, false);
     }
 
     /**
@@ -71,12 +72,16 @@ public final class BlockUtil {
     private static boolean collidesWithSolid(Player player, BoundingBox boundingBox) {
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
-        return collidingBlocks.any(block -> block.getType().isSolid()
-                || block.getType() == Material.WATER_LILY
-                || block.getType() == Material.FLOWER_POT
-                || block.getType() == Material.CARPET
-                || block.getType() == Material.SNOW
-                || block.getType() == Material.SKULL);
+        return collidingBlocks.any(block -> {
+            Material type = block.getType();
+
+            return type.isSolid()
+                    || type == Material.WATER_LILY
+                    || type == Material.FLOWER_POT
+                    || type == Material.CARPET
+                    || type == Material.SNOW
+                    || type == Material.SKULL;
+        });
     }
 
     /**

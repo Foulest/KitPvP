@@ -31,7 +31,6 @@ import org.bukkit.potion.PotionEffect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents the Vampire kit.
@@ -47,7 +46,7 @@ public class Vampire implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.REDSTONE));
+        return new ItemStack(Material.REDSTONE);
     }
 
     @Override
@@ -57,9 +56,11 @@ public class Vampire implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Damage value: 5.0
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
-        ItemBuilder special = new ItemBuilder(Material.REDSTONE).name("&aDrain Effects &7(Right Click)")
-                .lore("&7Drains players potion effects.");
+
+        ItemBuilder special = new ItemBuilder(Material.REDSTONE).name("&aLife-Steal &7(Right Click)")
+                .lore("&7Get life-steal on hit.");
         return Arrays.asList(sword, special);
     }
 
@@ -69,6 +70,7 @@ public class Vampire implements Kit {
                 + "0NDc1NmUwYjRlY2U4ZDc0NjI5NmEzZDVlMjk3ZTE0MTVmNGJhMTc2NDdmZmUyMjgzODUzODNkMTYxYTkifX19";
 
         return new ItemBuilder[]{
+                // Armor value: 5.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fVampire's Head").unbreakable(true),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x191919)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),
@@ -78,7 +80,7 @@ public class Vampire implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Drains players potion effects."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Get life-steal on hit."));
     }
 
     @Override

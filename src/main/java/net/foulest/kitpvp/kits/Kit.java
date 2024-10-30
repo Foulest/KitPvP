@@ -20,8 +20,10 @@ package net.foulest.kitpvp.kits;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
+import net.foulest.kitpvp.listeners.FlaskListener;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.item.ItemBuilder;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -30,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,9 +118,11 @@ public interface Kit {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Collection<Integer> airSlots = new ArrayList<>();
 
+        String kitName = getName();
+
         // Checks if the player owns the kit they're trying to equip.
         if (getCost() > 0 && !playerData.getOwnedKits().contains(this)) {
-            MessageUtil.messagePlayer(player, "&cYou do not own the " + getName() + " kit.");
+            MessageUtil.messagePlayer(player, "&cYou do not own the " + kitName + " kit.");
             return;
         }
 
@@ -128,9 +133,10 @@ public interface Kit {
         }
 
         // Checks if the player has permission to use the kit.
-        if (permission() != null
-                && permission().getDefault() != PermissionDefault.TRUE
-                && !player.hasPermission(permission())) {
+        Permission permission = permission();
+        if (permission != null
+                && permission.getDefault() != PermissionDefault.TRUE
+                && !player.hasPermission(permission)) {
             MessageUtil.messagePlayer(player, "&cYou do not have permission to use this kit.");
             return;
         }
@@ -142,7 +148,8 @@ public interface Kit {
 
         // Clears the player's potion effects.
         for (PotionEffect effects : player.getActivePotionEffects()) {
-            player.removePotionEffect(effects.getType());
+            PotionEffectType effectType = effects.getType();
+            player.removePotionEffect(effectType);
         }
 
         // Sets the player's kit data.
@@ -162,10 +169,12 @@ public interface Kit {
         // Sets the player's kit items.
         for (ItemBuilder item : getItems()) {
             ItemBuilder itemBuilder = item;
+            ItemStack itemStack = itemBuilder.getItem();
+            int slot = itemBuilder.getSlot();
 
-            if (itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("sword")
-                    || itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("cactus")
-                    || itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("axe")) {
+            if (itemStack.getType().toString().toLowerCase(Locale.ROOT).contains("sword")
+                    || itemStack.getType().toString().toLowerCase(Locale.ROOT).contains("cactus")
+                    || itemStack.getType().toString().toLowerCase(Locale.ROOT).contains("axe")) {
                 if (playerData.getEnchants().contains(Enchants.KNOCKBACK)) {
                     itemBuilder = itemBuilder.enchant(Enchantment.KNOCKBACK, 2);
                 }
@@ -175,7 +184,7 @@ public interface Kit {
                 }
             }
 
-            if (itemBuilder.getItem().getType().toString().toLowerCase(Locale.ROOT).contains("bow")) {
+            if (itemStack.getType().toString().toLowerCase(Locale.ROOT).contains("bow")) {
                 if (playerData.getEnchants().contains(Enchants.PUNCH)) {
                     itemBuilder = itemBuilder.enchant(Enchantment.ARROW_KNOCKBACK, 2);
                 }
@@ -185,14 +194,16 @@ public interface Kit {
                 }
             }
 
-            if (itemBuilder.getSlot() == 0) {
-                player.getInventory().addItem(itemBuilder.getItem());
+            itemStack = itemBuilder.getItem();
+
+            if (slot == 0) {
+                player.getInventory().addItem(itemStack);
             } else {
-                if (itemBuilder.getItem().getType() == Material.AIR) {
-                    airSlots.add(itemBuilder.getSlot());
+                if (itemStack.getType() == Material.AIR) {
+                    airSlots.add(slot);
                 }
 
-                player.getInventory().setItem(itemBuilder.getSlot(), itemBuilder.getItem());
+                player.getInventory().setItem(slot, itemStack);
             }
         }
 
@@ -202,11 +213,22 @@ public interface Kit {
                 continue;
             }
 
-            if (playerData.isUsingSoup()) {
-                player.getInventory().setItem(i, new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew").getItem());
-            } else {
-                player.getInventory().setItem(i, new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing").getItem());
-            }
+            // Set the flask item.
+            ItemStack flaskItem = new ItemBuilder(Material.POTION).name("&aFlask &7(Right Click)").getItem();
+            flaskItem.setDurability((short) 8229);
+            flaskItem.setAmount(FlaskListener.MAX_FLASKS);
+            player.getInventory().setItem(i, flaskItem);
+            break;
+
+//            if (playerData.isUsingSoup()) {
+//                ItemBuilder soupItemBuilder = new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew");
+//                ItemStack soupItemStack = soupItemBuilder.getItem();
+//                player.getInventory().setItem(i, soupItemStack);
+//            } else {
+//                ItemBuilder potionItemBuilder = new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing");
+//                ItemStack potionItemStack = potionItemBuilder.getItem();
+//                player.getInventory().setItem(i, potionItemStack);
+//            }
         }
 
         // Sets the player's armor.
@@ -216,57 +238,68 @@ public interface Kit {
         ItemBuilder boots = (getArmor()[3] == null ? new ItemBuilder(Material.AIR) : getArmor()[3]);
 
         // Sets the player's thorns enchantments.
+        ItemStack helmetItem = helmet.getItem();
+        ItemStack chestplateItem = chestplate.getItem();
+        ItemStack leggingsItem = leggings.getItem();
+        ItemStack bootsItem = boots.getItem();
+
         if (playerData.getEnchants().contains(Enchants.THORNS)) {
-            if (helmet.getItem().getType() != Material.AIR && helmet.getItem().getType() != Material.SKULL_ITEM) {
+            if (helmetItem.getType() != Material.AIR && helmetItem.getType() != Material.SKULL_ITEM) {
                 helmet = helmet.enchant(Enchantment.THORNS, 2);
             }
 
-            if (chestplate.getItem().getType() != Material.AIR) {
+            if (chestplateItem.getType() != Material.AIR) {
                 chestplate = chestplate.enchant(Enchantment.THORNS, 2);
             }
 
-            if (leggings.getItem().getType() != Material.AIR) {
+            if (leggingsItem.getType() != Material.AIR) {
                 leggings = leggings.enchant(Enchantment.THORNS, 2);
             }
 
-            if (boots.getItem().getType() != Material.AIR) {
+            if (bootsItem.getType() != Material.AIR) {
                 boots = boots.enchant(Enchantment.THORNS, 2);
             }
         }
 
         // Sets the player's protection enchantments.
         if (playerData.getEnchants().contains(Enchants.PROTECTION)) {
-            if (helmet.getItem().getType() != Material.AIR && helmet.getItem().getType() != Material.SKULL_ITEM) {
+            if (helmetItem.getType() != Material.AIR && helmetItem.getType() != Material.SKULL_ITEM) {
                 helmet = helmet.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
             }
 
-            if (chestplate.getItem().getType() != Material.AIR) {
+            if (chestplateItem.getType() != Material.AIR) {
                 chestplate = chestplate.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
             }
 
-            if (leggings.getItem().getType() != Material.AIR) {
+            if (leggingsItem.getType() != Material.AIR) {
                 leggings = leggings.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
             }
 
-            if (boots.getItem().getType() != Material.AIR) {
+            if (bootsItem.getType() != Material.AIR) {
                 boots = boots.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
             }
         }
 
         // Sets the player's feather falling enchantments.
-        if (playerData.getEnchants().contains(Enchants.FEATHER_FALLING) && boots.getItem().getType() != Material.AIR) {
+        if (playerData.getEnchants().contains(Enchants.FEATHER_FALLING) && bootsItem.getType() != Material.AIR) {
             boots = boots.enchant(Enchantment.PROTECTION_FALL, 4);
         }
 
+        helmetItem = helmet.getItem();
+        chestplateItem = chestplate.getItem();
+        leggingsItem = leggings.getItem();
+        bootsItem = boots.getItem();
+
         // Sets the player's armor.
-        player.getInventory().setHelmet(helmet.getItem());
-        player.getInventory().setChestplate(chestplate.getItem());
-        player.getInventory().setLeggings(leggings.getItem());
-        player.getInventory().setBoots(boots.getItem());
+        player.getInventory().setHelmet(helmetItem);
+        player.getInventory().setChestplate(chestplateItem);
+        player.getInventory().setLeggings(leggingsItem);
+        player.getInventory().setBoots(bootsItem);
 
         // Sends the player a message and plays a sound.
-        MessageUtil.messagePlayer(player, "&aYou equipped the " + getName() + " kit.");
-        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
+        MessageUtil.messagePlayer(player, "&aYou equipped the " + kitName + " kit.");
+        Location location = player.getLocation();
+        player.playSound(location, Sound.SLIME_WALK, 1, 1);
         player.updateInventory();
         player.closeInventory();
     }

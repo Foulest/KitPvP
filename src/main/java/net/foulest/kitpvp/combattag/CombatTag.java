@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.combattag;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -38,8 +37,8 @@ import java.util.Map;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CombatTag {
+@Data
+public class CombatTag {
 
     /**
      * The combat scheduler and handler for each player.
@@ -79,7 +78,7 @@ public final class CombatTag {
             } else {
                 combatHandler.put(player, Settings.combatTagDuration);
 
-                combatScheduler.put(player, new BukkitRunnable() {
+                BukkitTask task = new BukkitRunnable() {
                     @Override
                     public void run() {
                         if (isInCombat(player)) {
@@ -90,7 +89,9 @@ public final class CombatTag {
                             }
                         }
                     }
-                }.runTaskTimer(KitPvP.instance, 0L, 20L));
+                }.runTaskTimer(KitPvP.instance, 0L, 20L);
+
+                combatScheduler.put(player, task);
             }
 
             // Cancels the player's pending teleportation when taking damage for.

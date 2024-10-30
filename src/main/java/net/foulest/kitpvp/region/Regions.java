@@ -24,13 +24,13 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Vec3D;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +41,8 @@ import java.util.logging.Level;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Regions {
+@Data
+public class Regions {
 
     private static final WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
     private static Map<String, ProtectedRegion> regionMap = new HashMap<>();
@@ -51,8 +51,9 @@ public final class Regions {
      * Caches WorldGuard regions for later use.
      */
     static void cacheRegions() {
+        World world = Spawn.getLocation().getWorld();
         RegionContainer container = worldGuard.getRegionContainer();
-        RegionManager regionManager = container.get(Spawn.getLocation().getWorld());
+        RegionManager regionManager = container.get(world);
 
         if (regionManager == null) {
             MessageUtil.log(Level.WARNING, "ERROR: No regions found.");
@@ -74,12 +75,24 @@ public final class Regions {
             BlockVector regionMin = region.getMinimumPoint();
             BlockVector regionMax = region.getMaximumPoint();
 
+            double minX = regionMin.getX();
+            double minY = regionMin.getY();
+            double minZ = regionMin.getZ();
+
+            double maxX = regionMax.getX();
+            double maxY = regionMax.getY();
+            double maxZ = regionMax.getZ();
+
             AxisAlignedBB regionZone = new AxisAlignedBB(
-                    new BlockPosition(region.getMinimumPoint().getX(), regionMin.getY(), regionMin.getZ()),
-                    new BlockPosition((regionMax.getX() + 1), regionMax.getY(), (regionMax.getZ() + 1))
+                    new BlockPosition(minX, minY, minZ),
+                    new BlockPosition((maxX + 1), maxY, (maxZ + 1))
             );
 
-            Vec3D vec3D = new Vec3D(loc.getX(), loc.getY(), loc.getZ());
+            double locX = loc.getX();
+            double locY = loc.getY();
+            double locZ = loc.getZ();
+
+            Vec3D vec3D = new Vec3D(locX, locY, locZ);
 
             if (regionZone.a(vec3D) && region.getFlag(DefaultFlag.PVP) == StateFlag.State.DENY) {
                 return true;

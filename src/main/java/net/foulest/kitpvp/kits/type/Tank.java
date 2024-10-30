@@ -28,7 +28,10 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the Tank kit.
@@ -44,20 +47,24 @@ public class Tank implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.DIAMOND_CHESTPLATE));
+        return new ItemBuilder(Material.DIAMOND_CHESTPLATE).hideInfo().getItem();
     }
 
     @Override
     public PotionEffect[] getPotionEffects() {
         return new PotionEffect[]{
-                new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 1, false, false)
+                new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 0, false, false)
         };
     }
 
     @Override
     public List<ItemBuilder> getItems() {
-        ItemBuilder weapon = new ItemBuilder(Material.STONE_AXE).unbreakable(true).hideInfo();
-        return Collections.singletonList(weapon);
+        // Damage value: 4.0
+        ItemBuilder axe = new ItemBuilder(Material.STONE_AXE).unbreakable(true).hideInfo();
+
+        ItemBuilder special = new ItemBuilder(Material.ANVIL).name("&aFortify &7(Right Click)")
+                .lore("&7Reduce all incoming damage.");
+        return Arrays.asList(axe, special);
     }
 
     @Override
@@ -66,10 +73,11 @@ public class Tank implements Kit {
                 + "Y1OWIyYmIwNzBjMTIwOGJhNTE0NTIzNjFmZDMwYTY2NzIxMzI5NWYyMWRiNDM3ZGY1NzI4MWQ1ODJjODlhZCJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 6.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fTank's Head"),
                 new ItemBuilder(Material.DIAMOND_CHESTPLATE).unbreakable(true).hideInfo(),
-                new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).hideInfo(),
-                new ItemBuilder(Material.DIAMOND_BOOTS).unbreakable(true).hideInfo()
+                new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),
+                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).hideInfo()
         };
     }
 

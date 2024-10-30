@@ -17,10 +17,14 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.menus.KitEnchanter;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,16 +32,28 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class KitEnchanterCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
-    @Command(name = "enchanter", aliases = "kitenchanter", description = "Opens the Kit Enchanter.", usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
-    public void onCommand(@NotNull CommandArgs args) {
-        if (args.length() != 0) {
-            MessageUtil.messagePlayer(args.getSender(), "&cUsage: /enchanter");
+    @Command(name = "enchanter", aliases = "kitenchanter", description = "Opens the Kit Enchanter.",
+            usage = "/enchanter", inGameOnly = true, permission = "kitpvp.kitenchanter")
+    public static void onCommand(@NotNull CommandArgs args) {
+        CommandSender sender = args.getSender();
+        Player player = args.getPlayer();
+
+        // Checks if the player is null.
+        if (player == null) {
+            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
             return;
         }
 
-        new KitEnchanter(args.getPlayer());
+        // Prints the usage message.
+        if (args.length() != 0) {
+            MessageUtil.messagePlayer(sender, "&cUsage: /enchanter");
+            return;
+        }
+
+        // Opens the Kit Enchanter.
+        new KitEnchanter(player);
     }
 }

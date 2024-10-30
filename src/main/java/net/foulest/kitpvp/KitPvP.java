@@ -27,6 +27,7 @@ import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.kits.type.*;
 import net.foulest.kitpvp.listeners.DeathListener;
 import net.foulest.kitpvp.listeners.EventListener;
+import net.foulest.kitpvp.listeners.FlaskListener;
 import net.foulest.kitpvp.listeners.KitListener;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.DatabaseUtil;
@@ -42,7 +43,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.logging.Level;
 
 /**
@@ -72,6 +72,7 @@ public class KitPvP extends JavaPlugin {
 
     @Override
     @SneakyThrows
+    @SuppressWarnings("NestedMethodCall")
     public void onEnable() {
         // Kicks all online players.
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
@@ -96,7 +97,7 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
-        loadListeners(new DeathListener(), new EventListener(), new KitListener());
+        loadListeners(new DeathListener(), new EventListener(), new KitListener(), new FlaskListener());
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Commands...");
@@ -107,10 +108,8 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the plugin's kits.
         MessageUtil.log(Level.INFO, "Loading Kits...");
-        loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
-                new Hulk(), new Imprisoner(), new Kangaroo(), new Knight(), new Mage(), new Monk(), new Ninja(),
-                new Pyro(), new Spiderman(), new Summoner(), new Tank(), new Thor(), new Timelord(), new Vampire(),
-                new Zen());
+        loadKits(new Archer(), new Fisherman(), new Kangaroo(), new Knight(), new Mage(),
+                new Ninja(), new Pyro(), new Tank(), new Vampire());
 
         // Loads the spawn.
         MessageUtil.log(Level.INFO, "Loading Spawn...");
@@ -125,7 +124,12 @@ public class KitPvP extends JavaPlugin {
         // Loads online players' user data.
         MessageUtil.log(Level.INFO, "Loading Player Data...");
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Objects.requireNonNull(PlayerDataManager.getPlayerData(player)).load();
+            PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+            if (playerData != null) {
+                playerData.load();
+            }
+
             Spawn.teleport(player);
             player.getInventory().setHeldItemSlot(0);
         }

@@ -24,6 +24,7 @@ import net.foulest.kitpvp.util.item.SkullBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Dye;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
@@ -45,7 +46,7 @@ public class Ninja implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.NETHER_STAR));
+        return new ItemStack(Material.NETHER_STAR);
     }
 
     @Override
@@ -57,8 +58,12 @@ public class Ninja implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Damage value: 5.0
         ItemBuilder weapon = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
-        return Collections.singletonList(weapon);
+
+        ItemBuilder special = new ItemBuilder(Material.INK_SACK).durability(8).name("&aShadow Sneak &7(Right Click)")
+                .lore("&7Turns you completely invisible.");
+        return Arrays.asList(weapon, special);
     }
 
     @Override
@@ -67,6 +72,7 @@ public class Ninja implements Kit {
                 + "jQ2ZmZlNGY2OGRhYWEwZjgzNDUzNmNiNTM4NmEzYTc5ZTZiM2U4NDM1OTY5NDM4MDRlMWIwOGE4MmVkNDRhNiJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 3.5
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fNinja's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x0C0C0C)),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),

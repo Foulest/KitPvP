@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -39,14 +40,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class SpawnCmd {
 
     private static final int SECONDS_TO_WAIT = 5;
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "spawn", description = "Teleports you to spawn.",
             usage = "/spawn", inGameOnly = true, permission = "kitpvp.spawn")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 

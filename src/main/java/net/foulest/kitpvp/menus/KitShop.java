@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.menus;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
@@ -37,7 +38,7 @@ import java.util.*;
  *
  * @author Foulest
  */
-@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+@Data
 public class KitShop {
 
     private static final Map<Player, Integer> pages = new HashMap<>();
@@ -59,15 +60,17 @@ public class KitShop {
      * @param page   The page to open the GUI on.
      */
     public KitShop(@NotNull Player player, int page) {
-        String inventoryName = MessageUtil.colorize("Kit Shop");
         player.closeInventory();
+
+        String inventoryName = MessageUtil.colorize("Kit Shop");
+        int kitsSize = KitManager.getKits().size();
 
         if (page > 0) {
             inventory = Bukkit.createInventory(player,
-                    ensureSize(KitManager.getKits().size()) + 18, inventoryName + " - Page: " + (page + 1));
+                    ensureSize(kitsSize) + 18, inventoryName + " - Page: " + (page + 1));
         } else {
             inventory = Bukkit.createInventory(player,
-                    ensureSize(KitManager.getKits().size()) + 18, inventoryName);
+                    ensureSize(kitsSize) + 18, inventoryName);
         }
 
         if (populateInventory(player, page)) {
@@ -95,6 +98,7 @@ public class KitShop {
         if ((size + halfMaxSize) % rowSize == 0) {
             return size;
         }
+
         ++size;
         return ensureSize(size);
     }
@@ -106,17 +110,20 @@ public class KitShop {
      * @return The kit item.
      */
     private static ItemStack createKitItem(@NotNull Kit kit) {
+        ItemStack displayItem = kit.getDisplayItem();
         List<String> lore = kit.getLore();
+        String name = kit.getName();
+        int cost = kit.getCost();
 
-        if (kit.getCost() == 0) {
+        if (cost == 0) {
             lore.add(1, "&7Cost: &fFree");
         } else {
-            lore.add(1, "&7Cost: &f" + kit.getCost() + " coins");
+            lore.add(1, "&7Cost: &f" + cost + " coins");
         }
 
         lore.add("");
         lore.add("&aClick to purchase this kit.");
-        return new ItemBuilder(kit.getDisplayItem()).name("&c" + kit.getName()).lore(lore).getItem();
+        return new ItemBuilder(displayItem).name("&c" + name).lore(lore).getItem();
     }
 
     /**
@@ -135,21 +142,29 @@ public class KitShop {
         for (int i = 0; i < rowSize; i++) {
             inventory.setItem(i, glass);
         }
-        for (int i = (inventory.getSize() - rowSize); i < inventory.getSize(); i++) {
+
+        int inventorySize = inventory.getSize();
+        int kitsSize = KitManager.getKits().size();
+
+        for (int i = (inventorySize - rowSize); i < inventorySize; i++) {
             inventory.setItem(i, glass);
         }
 
         // Previous page item
         if (page > 0) {
-            inventory.setItem(inventory.getSize() - 9, new ItemBuilder(Material.BOOK).name("&aPrevious Page").getItem());
+            ItemBuilder previousPage = new ItemBuilder(Material.BOOK).name("&aPrevious Page");
+            ItemStack previousPageItem = previousPage.getItem();
+            inventory.setItem(inventorySize - 9, previousPageItem);
         }
 
         int start = page * kitsPerPage;
-        int end = Math.min((page + 1) * kitsPerPage, KitManager.getKits().size()); // Correct calculation of the end index
+        int end = Math.min((page + 1) * kitsPerPage, kitsSize);
 
         // Next page item
-        if (end < KitManager.getKits().size()) { // Correct check for the existence of a next page
-            inventory.setItem(inventory.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").getItem());
+        if (end < kitsSize) {
+            ItemBuilder nextPage = new ItemBuilder(Material.BOOK).name("&aNext Page");
+            ItemStack nextPageItem = nextPage.getItem();
+            inventory.setItem(inventorySize - 1, nextPageItem);
         }
 
         List<Kit> pageKits = KitManager.getKits().subList(start, end);

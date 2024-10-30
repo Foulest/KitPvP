@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.util.item;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 import net.foulest.kitpvp.util.MessageUtil;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -39,9 +38,7 @@ import java.util.List;
  * @author nonamesldev
  * @see <a href="https://www.spigotmc.org/threads/util-itembuilder-manage-items-easily.48397">Spigot Thread</a>
  */
-@Getter
-@ToString
-@SuppressWarnings("unused")
+@Data
 public class ItemBuilder {
 
     private final ItemStack item;
@@ -216,7 +213,8 @@ public class ItemBuilder {
      */
     public ItemBuilder enchant(Enchantment enchantment, int level) {
         if (item.containsEnchantment(enchantment)) {
-            item.addUnsafeEnchantment(enchantment, level + item.getEnchantmentLevel(enchantment));
+            int enchantmentLevel = item.getEnchantmentLevel(enchantment);
+            item.addUnsafeEnchantment(enchantment, level + enchantmentLevel);
         } else {
             item.addUnsafeEnchantment(enchantment, level);
         }

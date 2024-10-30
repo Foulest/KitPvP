@@ -17,12 +17,14 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,12 +34,12 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class SetSpawnCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "setspawn", usage = "/setspawn", description = "Sets the spawn point.",
             permission = "kitpvp.setspawn", inGameOnly = true)
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
@@ -47,14 +49,16 @@ public class SetSpawnCmd {
             return;
         }
 
+        Location location = player.getLocation();
+
         // Checks if the player is in a safezone.
-        if (!Regions.isInSafezone(player.getLocation())) {
+        if (!Regions.isInSafezone(location)) {
             MessageUtil.messagePlayer(player, "&cYou cannot set spawn outside of a safezone.");
             return;
         }
 
         // Sets the spawn point to the player's location.
-        Spawn.setLocation(player.getLocation());
+        Spawn.setLocation(location);
         MessageUtil.messagePlayer(player, "&aSpawn has been set.");
     }
 }

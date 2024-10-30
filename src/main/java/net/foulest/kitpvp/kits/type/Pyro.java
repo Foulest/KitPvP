@@ -27,11 +27,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents the Pyro kit.
@@ -47,20 +47,24 @@ public class Pyro implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.FLINT_AND_STEEL));
+        return new ItemBuilder(Material.FLINT_AND_STEEL).hideInfo().getItem();
     }
 
     @Override
     public PotionEffect[] getPotionEffects() {
-        return new PotionEffect[0];
+        return new PotionEffect[]{
+                new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false)
+        };
     }
 
     @Override
     public List<ItemBuilder> getItems() {
-        ItemBuilder weapon = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo().enchant(Enchantment.FIRE_ASPECT, 1);
-        ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo().enchant(Enchantment.ARROW_FIRE, 1);
-        ItemBuilder arrow = new ItemBuilder(Material.ARROW).amount(16).slot(9);
-        return Arrays.asList(weapon, bow, arrow);
+        // Damage value: 4.0
+        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).hideInfo();
+
+        ItemBuilder special = new ItemBuilder(Material.FIREBALL).name("&aIgnite &7(Right Click)")
+                .lore("&7Ignites players on fire.");
+        return Arrays.asList(sword, special);
     }
 
     @Override
@@ -69,10 +73,11 @@ public class Pyro implements Kit {
                 + "mNTc2NDU0Y2I2NDFhNmU1OTVlZGY0ZTc3YTcwYzIwM2U4OGVjYWIwZjIyMGQzZmUzMGZiM2NjYzhjOGJhOCJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 4.5
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fPyro's Head"),
-                new ItemBuilder(Material.CHAINMAIL_CHESTPLATE).unbreakable(true).hideInfo(),
+                new ItemBuilder(Material.GOLD_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).hideInfo(),
-                new ItemBuilder(Material.GOLD_BOOTS).unbreakable(true).hideInfo().enchant(Enchantment.PROTECTION_FIRE, 4)
+                new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).hideInfo()
         };
     }
 

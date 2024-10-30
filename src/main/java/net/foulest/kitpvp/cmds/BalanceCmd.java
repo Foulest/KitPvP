@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.util.ConstantUtil;
@@ -33,13 +34,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class BalanceCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "balance", aliases = {"bal", "money", "coins"},
             description = "Shows your current balance.",
             permission = "kitpvp.balance", usage = "/balance [player]", inGameOnly = true)
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
@@ -53,11 +54,13 @@ public class BalanceCmd {
 
         // Prints the usage message.
         if (args.length() != 1) {
-            MessageUtil.messagePlayer(sender, "&fCoins: &6" + playerData.getCoins());
+            int coins = playerData.getCoins();
+            MessageUtil.messagePlayer(sender, "&fCoins: &6" + coins);
             return;
         }
 
-        Player target = Bukkit.getPlayer(args.getArgs(0));
+        String targetName = args.getArgs(0);
+        Player target = Bukkit.getPlayer(targetName);
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         if (!target.isOnline()) {
@@ -65,6 +68,9 @@ public class BalanceCmd {
             return;
         }
 
-        MessageUtil.messagePlayer(args.getSender(), "&f" + target.getName() + "'s Coins: &6" + targetData.getCoins());
+        targetName = target.getName();
+        int targetCoins = targetData.getCoins();
+
+        MessageUtil.messagePlayer(sender, "&f" + targetName + "'s Coins: &6" + targetCoins);
     }
 }

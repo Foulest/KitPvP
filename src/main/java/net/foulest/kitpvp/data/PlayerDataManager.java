@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.data;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,8 +30,8 @@ import java.util.UUID;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PlayerDataManager {
+@Data
+public class PlayerDataManager {
 
     /**
      * Map of player UUIDs to their stored data.
@@ -46,12 +45,14 @@ public final class PlayerDataManager {
      * @return The player's data.
      */
     public static PlayerData getPlayerData(@NotNull Player player) {
-        if (playerDataMap.containsKey(player.getUniqueId())) {
-            return playerDataMap.get(player.getUniqueId());
+        UUID playerUUID = player.getUniqueId();
+
+        if (playerDataMap.containsKey(playerUUID)) {
+            return playerDataMap.get(playerUUID);
         } else {
             addPlayerData(player);
         }
-        return playerDataMap.get(player.getUniqueId());
+        return playerDataMap.get(playerUUID);
     }
 
     /**
@@ -60,9 +61,11 @@ public final class PlayerDataManager {
      * @param player The player to add.
      */
     private static void addPlayerData(@NotNull Player player) {
-        if (!playerDataMap.containsKey(player.getUniqueId())) {
-            PlayerData data = new PlayerData(player.getUniqueId(), player);
-            playerDataMap.put(player.getUniqueId(), data);
+        UUID playerUUID = player.getUniqueId();
+
+        if (!playerDataMap.containsKey(playerUUID)) {
+            PlayerData data = new PlayerData(playerUUID, player);
+            playerDataMap.put(playerUUID, data);
         }
     }
 
@@ -72,7 +75,8 @@ public final class PlayerDataManager {
      * @param player The player to remove.
      */
     public static void removePlayerData(@NotNull Player player) {
-        playerDataMap.remove(player.getUniqueId());
+        UUID playerUUID = player.getUniqueId();
+        playerDataMap.remove(playerUUID);
     }
 
     /**
@@ -82,6 +86,7 @@ public final class PlayerDataManager {
      * @return True if the player has data stored, otherwise false.
      */
     public static boolean hasPlayerData(@NotNull Player player) {
-        return playerDataMap.containsKey(player.getUniqueId());
+        UUID playerUUID = player.getUniqueId();
+        return playerDataMap.containsKey(playerUUID);
     }
 }

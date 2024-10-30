@@ -17,9 +17,8 @@
  */
 package net.foulest.kitpvp.kits;
 
-import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,8 +29,8 @@ import java.util.List;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class KitManager {
+@Data
+public class KitManager {
 
     /**
      * The list of loaded kits.

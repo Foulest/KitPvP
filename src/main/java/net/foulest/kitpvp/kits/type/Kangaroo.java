@@ -33,7 +33,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents the Kangaroo kit.
@@ -49,7 +48,7 @@ public class Kangaroo implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.FIREWORK));
+        return new ItemStack(Material.FIREWORK);
     }
 
     @Override
@@ -61,7 +60,9 @@ public class Kangaroo implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Damage value: 5.0
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+
         ItemBuilder special = new ItemBuilder(Material.FIREWORK).name("&aHop &7(Right Click)")
                 .lore("&7Hop around like a Kangaroo.");
         return Arrays.asList(sword, special);
@@ -73,6 +74,7 @@ public class Kangaroo implements Kit {
                 + "hYjQyYWZhOTJhZGYxNWFiZmJmNDljZDA5NjY0NDA5NjQ5Mzk3N2YzNjYyMDNmNTIzMTFlYzk3ODJiY2YyNCJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 5.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fKangaroo's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x7F4A19)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),

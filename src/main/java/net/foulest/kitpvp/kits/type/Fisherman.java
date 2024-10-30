@@ -31,7 +31,6 @@ import org.bukkit.potion.PotionEffect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents the Fisherman kit.
@@ -47,7 +46,7 @@ public class Fisherman implements Kit {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(Objects.requireNonNull(Material.FISHING_ROD));
+        return new ItemStack(Material.FISHING_ROD);
     }
 
     @Override
@@ -57,7 +56,9 @@ public class Fisherman implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
+        // Damage value: 4.0
         ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
+
         ItemBuilder special = new ItemBuilder(Material.FISHING_ROD).unbreakable(true).hideInfo().name("&aHookshot &7(Right Click)")
                 .lore("&7Hooks players to your location.");
         return Arrays.asList(sword, special);
@@ -69,6 +70,7 @@ public class Fisherman implements Kit {
                 + "MTcxNTI4NzZiYzNhOTZkZDJhMjI5OTI0NWVkYjNiZWVmNjQ3YzhhNTZhYzg4NTNhNjg3YzNlN2I1ZDhiYiJ9fX0=";
 
         return new ItemBuilder[]{
+                // Armor value: 5.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fFisherman's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0xBF8426)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),

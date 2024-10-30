@@ -69,15 +69,16 @@ public enum Enchants {
      * @return The formatted name.
      */
     public @NotNull String getDatabaseName() {
-        String processedName = MessageUtil.capitalize(name().toLowerCase(Locale.ROOT)
-                        .replace("_", " "))
-                .replace(" ", "");
+        String name = name().toLowerCase(Locale.ROOT);
+        name = name.replace("_", "");
+        name = name.replace(" ", "");
+        name = MessageUtil.capitalize(name);
 
         // De-capitalizes the first letter.
-        if (!processedName.isEmpty()) {
-            processedName = processedName.substring(0, 1).toLowerCase(Locale.ROOT) + processedName.substring(1);
+        if (!name.isEmpty()) {
+            name = name.substring(0, 1).toLowerCase(Locale.ROOT) + name.substring(1);
         }
-        return processedName;
+        return name;
     }
 
     /**
@@ -87,8 +88,10 @@ public enum Enchants {
      * @return The formatted name.
      */
     public @NotNull String getFormattedName() {
-        return MessageUtil.capitalize(name().toLowerCase(Locale.ROOT)
-                .replace("_", " "));
+        String name = name().toLowerCase(Locale.ROOT);
+        name = name.replace("_", " ");
+        name = MessageUtil.capitalize(name);
+        return name;
     }
 
     /**

@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -29,8 +28,8 @@ import org.bukkit.entity.Player;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NMSUtil {
+@Data
+public class NMSUtil {
 
     /**
      * Gets the NMS ({@link net.minecraft.server}) EntityPlayer for a Bukkit Player.

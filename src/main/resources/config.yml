@@ -97,135 +97,52 @@ kitpvp:
   # Kit Settings
   # -----------------------------------------------
   kits:
-    knight:
-      enabled: true
-      cost: 0
     archer:
       enabled: true
       cost: 250
-    burrower:
-      enabled: true
-      cost: 250
       ability:
-        cooldown: 30
-        duration: 5
-    cactus:
-      enabled: true
-      cost: 250
-      passive:
-        duration: 5
-    dragon:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        duration: 8
-        range: 6
-        damage: 8
+        cooldown: 20
+        duration: 3
     fisherman:
       enabled: true
       cost: 250
       ability:
-        cooldown: 30
-    ghost:
-      enabled: true
-      cost: 250
-      ability:
-        range: 6
-    hulk:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        range: 6
-        damage: 10
-        multiplier: -4.0
-    imprisoner:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        duration: 4
-        damage: 4
-        height: 9
+        cooldown: 20
     kangaroo:
       enabled: true
       cost: 250
       ability:
         cooldown: 20
-        sneaking:
-          height: 0.3
-          multiplier: 2.5
-        normal:
-          height: 1.2
-          multiplier: 0.0
+    knight:
+      enabled: true
+      cost: 0
     mage:
       enabled: true
       cost: 250
       ability:
-        cooldown: 30
-    monk:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
+        cooldown: 20
     ninja:
       enabled: true
       cost: 250
+      ability:
+        cooldown: 20
+        duration: 3
     pyro:
-      enabled: true
-      cost: 250
-    spiderman:
       enabled: true
       cost: 250
       ability:
         cooldown: 20
         duration: 5
-    summoner:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        duration: 10
-        range: 15
-    tamer:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        duration: 10
-        amount: 3
+        damage: 6.0
     tank:
       enabled: true
       cost: 250
-    thor:
-      enabled: true
-      cost: 250
       ability:
-        cooldown: 30
+        cooldown: 20
         duration: 5
-        range: 6
-        damage: 10
-    timelord:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
-        duration: 5
-        range: 6
     vampire:
       enabled: true
       cost: 250
-      passive:
-        duration: 5
       ability:
-        cooldown: 30
-        duration: 10
-        range: 6
-    zen:
-      enabled: true
-      cost: 250
-      ability:
-        cooldown: 30
+        cooldown: 20
         duration: 5
-        range: 25

@@ -17,12 +17,14 @@
  */
 package net.foulest.kitpvp.cmds;
 
+import lombok.Data;
 import net.foulest.kitpvp.menus.KitShop;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,30 +34,33 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class KitShopCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitshop", aliases = "shop", description = "Opens the Kit Shop.",
             usage = "/kitshop", inGameOnly = true, permission = "kitpvp.kitshop")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
         Player player = args.getPlayer();
 
+        // Checks if the player is null.
         if (player == null) {
             MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
             return;
         }
 
-        if (!Regions.isInSafezone(player.getLocation())) {
+        Location location = player.getLocation();
+
+        if (!Regions.isInSafezone(location)) {
             MessageUtil.messagePlayer(player, ConstantUtil.NOT_IN_SPAWN);
             return;
         }
 
         if (args.length() != 0) {
-            MessageUtil.messagePlayer(args.getSender(), "&cUsage: /kitshop");
+            MessageUtil.messagePlayer(sender, "&cUsage: /kitshop");
             return;
         }
 
-        new KitShop(args.getPlayer(), 0);
+        new KitShop(player, 0);
     }
 }

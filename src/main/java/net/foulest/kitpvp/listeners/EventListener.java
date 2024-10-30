@@ -17,6 +17,7 @@
  */
 package net.foulest.kitpvp.listeners;
 
+import lombok.Data;
 import net.foulest.kitpvp.cmds.StatsCmd;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
@@ -24,6 +25,7 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
+import net.foulest.kitpvp.kits.type.Knight;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.menus.KitSelector;
 import net.foulest.kitpvp.menus.KitShop;
@@ -36,7 +38,10 @@ import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -50,6 +55,7 @@ import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,6 +66,7 @@ import java.util.logging.Level;
  *
  * @author Foulest
  */
+@Data
 public class EventListener implements Listener {
 
     /**
@@ -172,9 +179,10 @@ public class EventListener implements Listener {
     public static void onBowShoot(@NotNull EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
+            Location location = player.getLocation();
 
             // Cancels the event if the player is in a safezone.
-            if (Regions.isInSafezone(player.getLocation())) {
+            if (Regions.isInSafezone(location)) {
                 event.setCancelled(true);
                 player.updateInventory();
             }
@@ -188,6 +196,8 @@ public class EventListener implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public static void onArrowShoot(@NotNull EntityDamageByEntityEvent event) {
+        double finalDamage = event.getFinalDamage();
+
         if (event.getDamager() instanceof Arrow) {
             Arrow arrow = (Arrow) event.getDamager();
 
@@ -195,6 +205,8 @@ public class EventListener implements Listener {
             if (arrow.getShooter() instanceof Player && event.getEntity() instanceof Player) {
                 Player damager = (Player) arrow.getShooter();
                 Player receiver = (Player) event.getEntity();
+                String receiverName = receiver.getName();
+                double receiverHealth = receiver.getHealth();
 
                 // Cancels the event if the receiver is the damager.
                 if (receiver.equals(damager)) {
@@ -206,11 +218,14 @@ public class EventListener implements Listener {
                 CombatTag.markForCombat(damager, receiver);
 
                 // Prints the Archer arrow tag message.
-                MessageUtil.messagePlayer(damager, "&c" + receiver.getName() + " &eis on &6"
-                        + String.format("%.01f", Math.max(receiver.getHealth() - event.getFinalDamage(), 0.0)) + "\u2764&e.");
+                MessageUtil.messagePlayer(damager, "&c" + receiverName + " &eis on &6"
+                        + String.format("%.01f", Math.max(receiverHealth - finalDamage, 0.0)) + "\u2764&e.");
 
                 // Removes arrows from the receiver's body.
-                TaskUtil.runTaskLater(() -> ((CraftEntity) receiver).getHandle().getDataWatcher().watch(9, (byte) 0), 100L);
+                TaskUtil.runTaskLater(() -> {
+                    net.minecraft.server.v1_8_R3.Entity entity = ((CraftEntity) receiver).getHandle();
+                    entity.getDataWatcher().watch(9, (byte) 0);
+                }, 100L);
             }
         }
     }
@@ -271,36 +286,10 @@ public class EventListener implements Listener {
         if (damagerEntity instanceof Player) {
             Player damager = (Player) damagerEntity;
 
-            // Prevents players from hitting their own entities.
-            if ((targetEntity instanceof Wolf && ((Tameable) targetEntity).getOwner() == damager)
-                    || (targetEntity instanceof IronGolem && targetEntity.hasMetadata(damager.getName()))) {
-                event.setCancelled(true);
-                return;
-            }
-
             // Combat tags players for Player on Player damage.
             if (targetEntity instanceof Player) {
                 CombatTag.markForCombat(damager, (Player) targetEntity);
             }
-            return;
-        }
-
-        // Combat tags players for player-owned entity damage.
-        if (targetEntity instanceof Player && damagerEntity instanceof Tameable) {
-            Tameable tameable = (Tameable) damagerEntity;
-            AnimalTamer owner = tameable.getOwner();
-
-            if (tameable.isTamed() && owner instanceof Player) {
-                CombatTag.markForCombat((Player) owner, (Player) targetEntity);
-            }
-        }
-
-        // Combat tags players for Iron Golem damage.
-        if (damagerEntity instanceof IronGolem && targetEntity instanceof Player) {
-            Bukkit.getOnlinePlayers().stream()
-                    .filter(player -> damagerEntity.hasMetadata(player.getName()))
-                    .findFirst()
-                    .ifPresent(damager -> CombatTag.markForCombat(damager, (Player) targetEntity));
         }
     }
 
@@ -340,6 +329,7 @@ public class EventListener implements Listener {
 
         // Player-related variables
         Player player = (Player) event.getWhoClicked();
+        String playerName = player.getName();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLocation = player.getLocation();
 
@@ -351,6 +341,7 @@ public class EventListener implements Listener {
         // Cancels inventory clicks based on inventory type.
         switch (clickedInventoryType) {
             case PLAYER:
+                // Cancels players clicking their own inventory without a kit.
                 if (playerData.getActiveKit() == null) {
                     event.setCancelled(true);
                     player.updateInventory();
@@ -372,7 +363,8 @@ public class EventListener implements Listener {
             case ENCHANTING:
             case ENDER_CHEST:
                 // Ignores players in creative mode with the modify permission.
-                if (player.getGameMode() == GameMode.CREATIVE && player.hasPermission("kitpvp.modify")) {
+                if (player.getGameMode() == GameMode.CREATIVE
+                        && player.hasPermission("kitpvp.modify")) {
                     break;
                 }
 
@@ -380,7 +372,6 @@ public class EventListener implements Listener {
                 player.updateInventory();
                 return;
 
-            case CHEST:
             default:
                 break;
         }
@@ -396,19 +387,27 @@ public class EventListener implements Listener {
                 player.updateInventory();
                 return;
 
-            case CONTAINER:
-            case QUICKBAR:
             default:
                 break;
         }
 
-        // Ignores items without display names.
-        if (currentItem.getItemMeta() == null
-                || currentItem.getItemMeta().getDisplayName() == null) {
+        ItemMeta itemMeta = currentItem.getItemMeta();
+
+        // Ignores items without item metadata.
+        if (itemMeta == null) {
             return;
         }
 
-        String itemName = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName().trim());
+        String displayName = itemMeta.getDisplayName();
+
+        // Ignores items without display names.
+        if (displayName == null) {
+            return;
+        }
+
+        displayName = displayName.trim();
+
+        String itemName = ChatColor.stripColor(displayName);
         Kit kit = KitManager.getKit(itemName);
         int kitCost = (kit == null ? 0 : kit.getCost());
         String kitName = (kit == null ? null : kit.getName());
@@ -446,8 +445,10 @@ public class EventListener implements Listener {
                             return;
                         }
 
+                        int cost = enchant.getCost();
+
                         // Checks if the player has enough coins.
-                        if (playerData.getCoins() - enchant.getCost() < 0) {
+                        if (playerData.getCoins() - cost < 0) {
                             player.playSound(playerLocation, Sound.VILLAGER_NO, 1.0F, 1.0F);
                             MessageUtil.messagePlayer(player, "&cYou do not have enough coins to purchase this enchant.");
                             event.setCancelled(true);
@@ -460,7 +461,7 @@ public class EventListener implements Listener {
                         MessageUtil.messagePlayer(player, "&eThe &a" + enchantName + " &eenchantment has been purchased.");
                         MessageUtil.messagePlayer(player, "&eThis enchantment only lasts one life.");
                         MessageUtil.messagePlayer(player, "");
-                        playerData.removeCoins(enchant.getCost());
+                        playerData.removeCoins(cost);
                         playerData.getEnchants().add(enchant);
 
                         // Re-applies the player's active kit.
@@ -495,7 +496,7 @@ public class EventListener implements Listener {
                     default:
                         // Ignores invalid kits from being selected.
                         if (kit == null) {
-                            MessageUtil.log(Level.INFO, "Invalid kit in Kit Selector for " + player.getName() + ".");
+                            MessageUtil.log(Level.INFO, "Invalid kit in Kit Selector for " + playerName + ".");
                             return;
                         }
 
@@ -511,7 +512,7 @@ public class EventListener implements Listener {
 
                 // Ignores invalid kits from being selected.
                 if (kit == null) {
-                    MessageUtil.log(Level.INFO, "Invalid kit in Kit Shop for " + player.getName() + ".");
+                    MessageUtil.log(Level.INFO, "Invalid kit in Kit Shop for " + playerName + ".");
                     return;
                 }
 
@@ -592,6 +593,9 @@ public class EventListener implements Listener {
         Block block = event.getClickedBlock();
         Action action = event.getAction();
 
+        double health = player.getHealth();
+        double maxHealth = player.getMaxHealth();
+
         // ???
         if (action.toString().contains("RIGHT") && block != null
                 && block.getState() instanceof InventoryHolder) {
@@ -600,18 +604,12 @@ public class EventListener implements Listener {
         }
 
         if (action.toString().contains("RIGHT") && item != null) {
-            switch (item.getType()) {
-                case WEB:
-                case BLAZE_ROD:
-                case IRON_BLOCK:
-                case SLIME_BALL:
-                case DISPENSER:
-                    // Ignores right-clicking certain items.
-                    break;
+            Location playerLoc = player.getLocation();
 
+            switch (item.getType()) {
                 case FISHING_ROD:
                     // Cancels using the fishing rod in spawn.
-                    if (Regions.isInSafezone(player.getLocation())) {
+                    if (Regions.isInSafezone(playerLoc)) {
                         event.setCancelled(true);
                     }
                     break;
@@ -630,7 +628,7 @@ public class EventListener implements Listener {
                     }
 
                     // Cancels using potions in spawn.
-                    if (Regions.isInSafezone(player.getLocation())) {
+                    if (Regions.isInSafezone(playerLoc)) {
                         event.setCancelled(true);
                         player.updateInventory();
                     }
@@ -650,27 +648,39 @@ public class EventListener implements Listener {
                     }
 
                     // Cancels using soup in spawn.
-                    if (Regions.isInSafezone(player.getLocation())) {
+                    if (Regions.isInSafezone(playerLoc)) {
                         event.setCancelled(true);
                         break;
                     }
 
                     // Heals the player when using soup.
-                    if (player.getHealth() < player.getMaxHealth()) {
+                    if (health < maxHealth) {
                         event.setCancelled(true);
-                        player.setHealth(Math.min(player.getHealth() + 7, player.getMaxHealth()));
-                        player.setItemInHand(new ItemBuilder(Material.BOWL).name("&fBowl").getItem());
+                        player.setHealth(Math.min(health + 7, maxHealth));
+
+                        ItemBuilder bowl = new ItemBuilder(Material.BOWL).name("&fBowl");
+                        ItemStack bowlItem = bowl.getItem();
+                        player.setItemInHand(bowlItem);
                     }
                     break;
 
                 case WATCH:
+                    Kit previousKit = playerData.getPreviousKit();
+
+                    if (previousKit == null) {
+                        previousKit = new Knight();
+                    }
+
+                    String previousKitName = previousKit.getName();
+
                     // Handles using the Previous Kit item.
-                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Previous Kit")
-                            && playerData.getPreviousKit() != null && playerData.getActiveKit() == null) {
+                    if (item.hasItemMeta()
+                            && item.getItemMeta().getDisplayName().contains("Previous Kit")
+                            && playerData.getActiveKit() == null) {
                         event.setCancelled(true);
-                        playerData.getPreviousKit().apply(player);
-                        MessageUtil.messagePlayer(player, "&aYou equipped the " + playerData.getPreviousKit().getName() + " kit.");
-                        player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
+                        previousKit.apply(player);
+                        MessageUtil.messagePlayer(player, "&aYou equipped the " + previousKitName + " kit.");
+                        player.playSound(playerLoc, Sound.SLIME_WALK, 1, 1);
                         player.updateInventory();
                         player.closeInventory();
                     }
@@ -732,9 +742,21 @@ public class EventListener implements Listener {
     @EventHandler
     public static void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        Location location = player.getLocation();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        double deltaY = event.getTo().getY() - event.getFrom().getY();
-        double deltaXZ = StrictMath.hypot(event.getTo().getX() - event.getFrom().getX(), event.getTo().getZ() - event.getFrom().getZ());
+
+        Location to = event.getTo();
+        Location from = event.getFrom();
+
+        double toX = to.getX();
+        double toZ = to.getZ();
+
+        double fromX = from.getX();
+        double fromZ = from.getZ();
+
+        double deltaY = to.getY() - from.getY();
+        double deltaXZ = StrictMath.hypot(toX - fromX, toZ - fromZ);
+
         boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
 
         // Ignores rotation updates.
@@ -750,14 +772,14 @@ public class EventListener implements Listener {
         }
 
         // Kills the player if they leave the map/fall into the void.
-        if (player.getLocation().getY() < 0 && !player.getAllowFlight()) {
+        if (location.getY() < 0 && !player.getAllowFlight()) {
             DeathListener.handleDeath(player, false);
             return;
         }
 
         // Equips the player's previously used kit when they leave spawn without a kit equipped.
         if (playerData.getActiveKit() == null && !player.isDead() && !player.getAllowFlight()
-                && !Regions.isInSafezone(event.getFrom())) {
+                && !Regions.isInSafezone(from)) {
             player.closeInventory();
             playerData.getPreviousKit().apply(player);
             MessageUtil.messagePlayer(player, "&cYour previous kit has been automatically applied.");
@@ -766,9 +788,9 @@ public class EventListener implements Listener {
 
         // Denies entry into spawn while combat tagged.
         // Also heals the player whilst in a safe zone.
-        if (Regions.isInSafezone(event.getTo())) {
+        if (Regions.isInSafezone(to)) {
             if (Settings.combatTagDenyEnteringSpawn && CombatTag.isInCombat(player)) {
-                player.teleport(event.getFrom());
+                player.teleport(from);
                 MessageUtil.messagePlayer(player, "&cYou can't enter spawn while combat tagged.");
             } else {
                 player.setHealth(20);
@@ -782,13 +804,13 @@ public class EventListener implements Listener {
 
         // Removes the player's no-fall status.
         if (playerData.isNoFall() && !playerData.isPendingNoFallRemoval()
-                && !Regions.isInSafezone(player.getLocation())) {
+                && !Regions.isInSafezone(location)) {
             playerData.setPendingNoFallRemoval(true);
 
             TaskUtil.runTaskLater(() -> {
                 playerData.setPendingNoFallRemoval(false);
 
-                if (playerData.isNoFall() && !Regions.isInSafezone(player.getLocation())) {
+                if (playerData.isNoFall() && !Regions.isInSafezone(location)) {
                     playerData.setNoFall(false);
                 }
             }, 30L);
@@ -1004,11 +1026,26 @@ public class EventListener implements Listener {
         switch (event.getChangedType()) {
             case SAND:
             case GRAVEL:
+            case LAVA:
+            case STATIONARY_LAVA:
+            case WATER:
+            case STATIONARY_WATER:
                 event.setCancelled(true);
                 break;
 
             default:
                 break;
         }
+    }
+
+    /**
+     * Handles block spreading.
+     *
+     * @param event BlockSpreadEvent
+     */
+    @EventHandler
+    public static void onBlockSpread(@NotNull BlockSpreadEvent event) {
+        // Cancels the event.
+        event.setCancelled(true);
     }
 }

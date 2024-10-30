@@ -17,9 +17,8 @@
  */
 package net.foulest.kitpvp.region;
 
-import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
@@ -29,6 +28,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,8 +36,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Spawn {
+@Data
+public class Spawn {
 
     @Getter
     public static Location location;
@@ -57,7 +57,12 @@ public final class Spawn {
         Settings.saveConfig();
 
         location = loc;
-        loc.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+
+        int blockX = loc.getBlockX();
+        int blockY = loc.getBlockY();
+        int blockZ = loc.getBlockZ();
+
+        loc.getWorld().setSpawnLocation(blockX, blockY, blockZ);
     }
 
     /**
@@ -78,7 +83,8 @@ public final class Spawn {
         playerData.setActiveKit(null);
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
+            PotionEffectType effectType = effect.getType();
+            player.removePotionEffect(effectType);
         }
 
         playerData.giveDefaultItems();

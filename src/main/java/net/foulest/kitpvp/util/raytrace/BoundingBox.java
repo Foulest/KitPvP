@@ -18,13 +18,13 @@
 package net.foulest.kitpvp.util.raytrace;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IBlockData;
+import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
@@ -42,11 +42,8 @@ import java.util.List;
  * <p>
  * <a href="https://www.spigotmc.org/threads/hitboxes-and-ray-tracing.174358/">...</a>
  */
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
-@SuppressWarnings("unused")
 public class BoundingBox {
 
     private Vector min;
@@ -56,13 +53,28 @@ public class BoundingBox {
      * Gets the min and max point of a block.
      */
     private BoundingBox(@NotNull Block block) {
-        IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        int blockX = block.getX();
+        int blockY = block.getY();
+        int blockZ = block.getZ();
+
+        World world = block.getWorld();
+        WorldServer worldHandle = ((CraftWorld) world).getHandle();
+
+        IBlockData blockData = worldHandle.getType(new BlockPosition(blockX, blockY, blockZ));
         net.minecraft.server.v1_8_R3.Block blockNative = blockData.getBlock();
 
-        blockNative.updateShape(((CraftWorld) block.getWorld()).getHandle(), new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        blockNative.updateShape(worldHandle, new BlockPosition(blockX, blockY, blockZ));
 
-        min = new Vector(block.getX() + blockNative.B(), block.getY() + blockNative.D(), block.getZ() + blockNative.F());
-        max = new Vector(block.getX() + blockNative.C(), block.getY() + blockNative.E(), block.getZ() + blockNative.G());
+        double minX = blockNative.B();
+        double minY = blockNative.D();
+        double minZ = blockNative.F();
+
+        double maxX = blockNative.C();
+        double maxY = blockNative.E();
+        double maxZ = blockNative.G();
+
+        min = new Vector(blockX + minX, blockY + minY, blockZ + minZ);
+        max = new Vector(blockX + maxX, blockY + maxY, blockZ + maxZ);
     }
 
     /**
@@ -192,13 +204,17 @@ public class BoundingBox {
         for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
             for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    Location loc = new Location(player.getWorld(), x, y, z);
+                    World world = player.getWorld();
+                    Location loc = new Location(world, x, y, z);
+                    int blockX = loc.getBlockX();
+                    int blockZ = loc.getBlockZ();
 
-                    if (loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-                        BoundingBox boundingBox = new BoundingBox(loc.getBlock());
+                    if (loc.getWorld().isChunkLoaded(blockX >> 4, blockZ >> 4)) {
+                        Block block = loc.getBlock();
+                        BoundingBox boundingBox = new BoundingBox(block);
 
                         if (boundingBox.collidesWith(this)) {
-                            blocks.add(loc.getBlock());
+                            blocks.add(block);
                         }
                     }
                 }

@@ -17,7 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import net.foulest.kitpvp.util.ConstantUtil;
+import lombok.Data;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
 import net.foulest.kitpvp.util.command.CommandArgs;
@@ -27,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,19 +36,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
+@Data
 public class ArmorColorCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "armorcolor", description = "Colors your chestplate with an RGB hex.",
             permission = "kitpvp.armorcolor", usage = "/armorcolor [hex]", inGameOnly = true)
-    public void onCommand(@NotNull CommandArgs args) {
-        Player player = args.getPlayer();
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
-
-        if (player == null) {
-            MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
-            return;
-        }
+        Player player = args.getPlayer();
 
         // Prints the usage message.
         if (args.length() != 1) {
@@ -55,22 +51,27 @@ public class ArmorColorCmd {
             return;
         }
 
-        if (args.getArgs(0).length() != 6) {
+        String hex = args.getArgs(0);
+
+        if (hex.length() != 6) {
             MessageUtil.messagePlayer(sender, "&cInvalid hex.");
             return;
         }
 
-        if (player.getInventory().getChestplate().getType() != Material.LEATHER_CHESTPLATE) {
+        PlayerInventory inventory = player.getInventory();
+        ItemStack invChestplate = inventory.getChestplate();
+
+        if (invChestplate.getType() != Material.LEATHER_CHESTPLATE) {
             MessageUtil.messagePlayer(sender, "&cYou can't color that chestplate.");
             return;
         }
 
-        ItemStack chestplate = new ItemBuilder(player.getInventory().getChestplate())
-                .color(Color.fromRGB(Integer.parseInt(args.getArgs(0), 16))).getItem();
+        ItemStack chestplate = new ItemBuilder(invChestplate)
+                .color(Color.fromRGB(Integer.parseInt(hex, 16))).getItem();
 
-        player.getInventory().setChestplate(chestplate);
+        inventory.setChestplate(chestplate);
         player.updateInventory();
 
-        MessageUtil.messagePlayer(sender, "&aColor 0x" + args.getArgs(0) + " has been applied.");
+        MessageUtil.messagePlayer(sender, "&aColor 0x" + hex + " has been applied.");
     }
 }

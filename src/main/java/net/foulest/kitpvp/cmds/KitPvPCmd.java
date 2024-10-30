@@ -17,8 +17,7 @@
  */
 package net.foulest.kitpvp.cmds;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -37,14 +36,12 @@ import java.util.List;
  *
  * @author Foulest
  */
-@Getter
-@Setter
+@Data
 public class KitPvPCmd {
 
-    @SuppressWarnings("MethodMayBeStatic")
     @Command(name = "kitpvp", description = "Main command for KitPvP.",
             permission = "kitpvp.main", usage = "/kitpvp")
-    public void onCommand(@NotNull CommandArgs args) {
+    public static void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
 
         // No additional arguments, display help menu.
@@ -95,12 +92,14 @@ public class KitPvPCmd {
         );
 
         int itemsPerPage = 4;
-        int maxPages = (int) Math.ceil((double) commands.size() / itemsPerPage);
+        int size = commands.size();
+        int maxPages = (int) Math.ceil((double) size / itemsPerPage);
         int page = 1;
 
         if (args.length() > 1) {
             try {
-                page = Integer.parseInt(args.getArgs(1));
+                String pageNumber = args.getArgs(1);
+                page = Integer.parseInt(pageNumber);
             } catch (NumberFormatException ex) {
                 MessageUtil.messagePlayer(sender, "&cInvalid page number. Choose between 1 and " + maxPages + ".");
                 return;
@@ -113,13 +112,14 @@ public class KitPvPCmd {
         }
 
         int startIndex = (page - 1) * itemsPerPage;
-        int endIndex = Math.min(commands.size(), startIndex + itemsPerPage);
+        int endIndex = Math.min(size, startIndex + itemsPerPage);
 
         MessageUtil.messagePlayer(sender, "");
         MessageUtil.messagePlayer(sender, "&eKitPvP Help &7(Page " + page + "/" + maxPages + ")");
 
         for (int i = startIndex; i < endIndex; i++) {
-            MessageUtil.messagePlayer(sender, commands.get(i));
+            String command = commands.get(i);
+            MessageUtil.messagePlayer(sender, command);
         }
 
         MessageUtil.messagePlayer(sender, "");
