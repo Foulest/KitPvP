@@ -17,7 +17,6 @@
  */
 package net.foulest.kitpvp.kits.type;
 
-import javafx.scene.effect.SepiaTone;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
