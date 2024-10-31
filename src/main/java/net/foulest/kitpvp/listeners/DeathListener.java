@@ -68,6 +68,11 @@ public class DeathListener implements Listener {
         UUID receiverBenefactor = receiverData.getBenefactor();
         Kit currentKit = receiverData.getActiveKit();
 
+        // Un-hides the receiver.
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.showPlayer(receiver);
+        }
+
         // On-death blood splatter effect.
         world.playEffect(receiverLoc, Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
         world.playEffect(receiverLoc, Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
@@ -178,8 +183,8 @@ public class DeathListener implements Listener {
                 }
             }.runTaskLater(KitPvP.instance, 1L);
 
-            // Sends a respawn packet to the player.
-            NMSUtil.getConnection(receiver).a(new PacketPlayInClientCommand(PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN));
+            // Respawn the player.
+            receiver.spigot().respawn();
 
             // Teleports the player to spawn.
             receiver.getInventory().setHeldItemSlot(0);

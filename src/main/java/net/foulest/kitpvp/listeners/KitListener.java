@@ -340,15 +340,17 @@ public class KitListener implements Listener {
 
         // Create a task that restores the player's visibility.
         TaskUtil.runTaskLater(() -> {
-            player.getWorld().playSound(playerLoc, Sound.BAT_IDLE, 1, 1);
-            MessageUtil.messagePlayer(player, "&cYou are no longer invisible.");
+            if (playerData.getActiveKit() instanceof Ninja) {
+                player.getWorld().playSound(playerLoc, Sound.BAT_IDLE, 1, 1);
+                MessageUtil.messagePlayer(player, "&cYou are no longer invisible.");
 
-            for (Player target : Bukkit.getOnlinePlayers()) {
-                if (target == player) {
-                    continue;
+                for (Player target : Bukkit.getOnlinePlayers()) {
+                    if (target == player) {
+                        continue;
+                    }
+
+                    target.showPlayer(player);
                 }
-
-                target.showPlayer(player);
             }
         }, Settings.ninjaKitDuration * 20L);
 
@@ -431,16 +433,16 @@ public class KitListener implements Listener {
         player.getWorld().playEffect(playerLoc, Effect.MOBSPAWNER_FLAMES, 1);
 
         for (Player target : nearbyPlayers) {
+            Location targetLoc = target.getLocation();
+
             // Damage the target and light them on fire.
             target.damage(Settings.pyroKitDamage);
             target.setFireTicks(Settings.pyroKitDuration * 20);
 
             // Play a sound to the target.
-            Location targetLoc = target.getLocation();
             target.playSound(targetLoc, Sound.GHAST_FIREBALL, 1, 1);
-
-            // Play a particle effect at the target's location.
             target.playEffect(targetLoc, Effect.MOBSPAWNER_FLAMES, 1);
+            MessageUtil.messagePlayer(target, "&cYou have been set on fire by a Pyro!");
         }
 
         // Sets the player's ability cooldown.
@@ -617,7 +619,9 @@ public class KitListener implements Listener {
 
             // Ignores ineligible players.
             if (targetData.getActiveKit() == null
-                    || Regions.isInSafezone(targetLoc)) {
+                    || Regions.isInSafezone(targetLoc)
+                    || (target.hasPotionEffect(PotionEffectType.INVISIBILITY)
+                    && targetData.getActiveKit() instanceof Ninja)) {
                 continue;
             }
 
