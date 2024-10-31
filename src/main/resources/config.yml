@@ -79,6 +79,13 @@ kitpvp:
       enabled: true
       cost: 100
   # -----------------------------------------------
+  # Flask Settings
+  # -----------------------------------------------
+  flasks:
+    enabled: true
+    amount: 5
+    cooldown: 3
+  # -----------------------------------------------
   # Storage Settings
   #
   # SQLite and MariaDB are supported.
@@ -101,13 +108,14 @@ kitpvp:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
-        duration: 3
+        cooldown: 30
+        duration: 5
     fisherman:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
+        cooldown: 30
+        duration: 2
     kangaroo:
       enabled: true
       cost: 250
@@ -120,29 +128,30 @@ kitpvp:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
+        cooldown: 30
+        duration: 5
     ninja:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
-        duration: 3
+        cooldown: 30
+        duration: 5
     pyro:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
+        cooldown: 30
         duration: 5
         damage: 6.0
     tank:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
+        cooldown: 30
         duration: 5
     vampire:
       enabled: true
       cost: 250
       ability:
-        cooldown: 20
+        cooldown: 30
         duration: 5

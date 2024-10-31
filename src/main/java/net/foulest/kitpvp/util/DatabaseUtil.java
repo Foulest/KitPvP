@@ -56,7 +56,7 @@ public class DatabaseUtil {
             try {
                 // Creates the flat file database if missing.
                 if (!Files.exists(Paths.get(Settings.flatFilePath))) {
-                    MessageUtil.log(Level.INFO, "Creating flat file database...");
+                    MessageUtil.log(Level.INFO, "Creating flat file database: " + Settings.flatFilePath);
                     Files.createFile(Paths.get(Settings.flatFilePath));
                 }
             } catch (IOException ex) {
@@ -66,7 +66,6 @@ public class DatabaseUtil {
             // Sets up the DBCP instance for SQLite.
             setupDbcp("jdbc:sqlite:" + Settings.flatFilePath, "org.sqlite.JDBC",
                     null, null, null, false, null);
-
         } else {
             // Sets up the DBCP instance for MariaDB.
             setupDbcp("jdbc:mariadb://" + Settings.host + ":" + Settings.port + "/" + Settings.database,

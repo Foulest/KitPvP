@@ -62,8 +62,8 @@ public class Archer implements Kit {
         // Damage value: 4.0
         ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
 
-        // Damage value: 4.5
-        ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo().enchant(Enchantment.ARROW_DAMAGE, 1);
+        // Damage value: 2.0
+        ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FEATHER).unbreakable(true).hideInfo().name("&aSpeed Boost &7(Right Click)")
                 .lore("&7Gain a temporary speed boost.");
@@ -88,7 +88,7 @@ public class Archer implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Master of long-ranged combat."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Master of long-ranged combat."));
     }
 
     @Override

@@ -113,6 +113,12 @@ public class KitListener implements Listener {
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
         Location targetLoc = target.getLocation();
 
+        if (target == player) {
+            MessageUtil.messagePlayer(player, "&cYou can't hook yourself.");
+            event.setCancelled(true);
+            return;
+        }
+
         // Marks both players for combat.
         CombatTag.markForCombat(player, target);
 
@@ -140,7 +146,13 @@ public class KitListener implements Listener {
             return;
         }
 
+        // Play the ability sound.
+        target.getWorld().playSound(targetLoc, Sound.WATER, 1, 1);
+        target.getWorld().playEffect(targetLoc, Effect.SPLASH, 1);
+        player.playSound(playerLoc, Sound.SPLASH2, 1, 1);
+
         // Teleports the target to the player's location.
+        target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.fishermanKitDuration * 20, 0, false, false));
         MessageUtil.messagePlayer(target, "&cYou have been hooked by a Fisherman!");
         event.getCaught().teleport(playerLoc);
 
@@ -187,7 +199,7 @@ public class KitListener implements Listener {
         }
 
         // Play the ability sound.
-        player.getWorld().playSound(playerLoc, Sound.HORSE_JUMP, 1, 1);
+        player.getWorld().playSound(playerLoc, Sound.SLIME_WALK2, 1, 1);
 
         // Launches the player into the air.
         Vector direction = getKangarooLaunchVector(player);
@@ -222,7 +234,6 @@ public class KitListener implements Listener {
      *
      * @param event The event.
      */
-    @SuppressWarnings("NestedConditionalExpression")
     @EventHandler
     public static void onMageAbility(@NotNull PlayerInteractEvent event) {
         // Player data
@@ -249,89 +260,34 @@ public class KitListener implements Listener {
             return;
         }
 
-        // List of available potion effects.
-        List<PotionEffectType> effects = Arrays.asList(
-                // Good effects
-                PotionEffectType.SPEED,
-                PotionEffectType.INCREASE_DAMAGE, // Capped at Strength I
-                PotionEffectType.JUMP,
-                PotionEffectType.DAMAGE_RESISTANCE, // Capped at Resistance I
-                PotionEffectType.FIRE_RESISTANCE, // Capped at Fire Resistance I
-                PotionEffectType.ABSORPTION,
+        // Gets the nearby players within a 5 block radius.
+        Collection<Player> nearbyPlayers = getNearbyPlayers(player, 5, 5, 5);
 
-                // Bad effects
-                PotionEffectType.SLOW,
-                PotionEffectType.WEAKNESS, // Capped at Weakness I
-                PotionEffectType.POISON,
-                PotionEffectType.BLINDNESS, // Capped at Blindness I
-                PotionEffectType.WITHER,
-
-                // Neutral effects
-                PotionEffectType.FAST_DIGGING,
-                PotionEffectType.SLOW_DIGGING,
-                PotionEffectType.WATER_BREATHING, // Capped at Water Breathing I
-                PotionEffectType.INVISIBILITY // Capped at Invisibility I
-        );
-
-        // Randomly selects an effect.
-        int effectSize = effects.size();
-        int effectId = RANDOM.nextInt(effectSize);
-        PotionEffectType randomEffect = effects.get(effectId);
-        String effectName = randomEffect.getName();
-
-        // Sets the default amplifier to zero.
-        int amplifier = 0;
-
-        // Sets the effect name and amplifier if necessary.
-        if (randomEffect.equals(PotionEffectType.SPEED)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Speed " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.INCREASE_DAMAGE)) {
-            effectName = "Strength";
-        } else if (randomEffect.equals(PotionEffectType.JUMP)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Jump Boost " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.DAMAGE_RESISTANCE)) {
-            effectName = "Resistance";
-        } else if (randomEffect.equals(PotionEffectType.FIRE_RESISTANCE)) {
-            effectName = "Fire Resistance";
-        } else if (randomEffect.equals(PotionEffectType.ABSORPTION)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Absorption " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.SLOW)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Slowness " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.WEAKNESS)) {
-            effectName = "Weakness";
-        } else if (randomEffect.equals(PotionEffectType.POISON)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Poison " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.BLINDNESS)) {
-            effectName = "Blindness";
-        } else if (randomEffect.equals(PotionEffectType.WITHER)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Wither " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.FAST_DIGGING)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Haste " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.SLOW_DIGGING)) {
-            amplifier = RANDOM.nextInt(3);
-            effectName = "Mining Fatigue " + (amplifier == 0 ? "I" : amplifier == 1 ? "II" : "III");
-        } else if (randomEffect.equals(PotionEffectType.WATER_BREATHING)) {
-            effectName = "Water Breathing";
-        } else if (randomEffect.equals(PotionEffectType.INVISIBILITY)) {
-            effectName = "Invisibility";
+        // Ignores the event if there are no players nearby.
+        if (nearbyPlayers.isEmpty()) {
+            player.playSound(playerLoc, Sound.VILLAGER_NO, 1, 1);
+            MessageUtil.messagePlayer(player, "&cAbility failed: no players nearby.");
+            playerData.setCooldown(playerKit, 5, true);
+            return;
         }
 
-        // Randomly selects a duration.
-        int duration = RANDOM.nextInt(15);
-        duration = Math.max(5, (duration + 1)) * 20;
+        for (Player target : nearbyPlayers) {
+            Location targetLoc = target.getLocation();
 
-        // Applies the effect to the player.
-        player.addPotionEffect(new PotionEffect(randomEffect, duration, amplifier, false, false));
+            // Give the target Slowness, Blindness, and Weakness for 3 seconds.
+            target.playSound(targetLoc, Sound.FIZZ, 1, 1);
+            target.getWorld().playSound(targetLoc, Sound.ZOMBIE_WOODBREAK, 0.5F, 1);
+            target.getWorld().playEffect(targetLoc, Effect.LARGE_SMOKE, 1);
+            target.getWorld().playEffect(targetLoc, Effect.LARGE_SMOKE, 1);
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Settings.mageKitDuration * 20, 1, false, false));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.mageKitDuration * 20, 1, false, false));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.mageKitDuration * 20, 1, false, false));
+            MessageUtil.messagePlayer(target, "&cYou have been debuffed by a Mage!");
+        }
 
         // Sets the player's ability cooldown.
-        MessageUtil.messagePlayer(player, "&aAbility used; you rolled &e" + effectName + "&a for &e" + duration / 20 + " &aseconds.");
+        player.playSound(playerLoc, Sound.FIZZ, 1, 1);
+        MessageUtil.messagePlayer(player, "&aYour ability has been used.");
         playerData.setCooldown(playerKit, Settings.mageKitCooldown, true);
     }
 
@@ -369,6 +325,9 @@ public class KitListener implements Listener {
         // Gives the player Invisibility.
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,
                 Settings.ninjaKitDuration * 20, 0, false, false));
+
+        // Plays a smoke sound effect.
+        player.getWorld().playEffect(playerLoc, Effect.LARGE_SMOKE, 1, 1);
 
         // Hides the player from other players.
         for (Player target : Bukkit.getOnlinePlayers()) {
@@ -461,8 +420,9 @@ public class KitListener implements Listener {
 
         // Ignores the event if there are no players nearby.
         if (nearbyPlayers.isEmpty()) {
+            player.playSound(playerLoc, Sound.VILLAGER_NO, 1, 1);
             MessageUtil.messagePlayer(player, "&cAbility failed: no players nearby.");
-            playerData.setCooldown(new Pyro(), 5, true);
+            playerData.setCooldown(playerKit, 5, true);
             return;
         }
 

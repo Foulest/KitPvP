@@ -80,7 +80,7 @@ public class Vampire implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aOffensive", "", "&7Get life-steal on hit."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Get life-steal on hit."));
     }
 
     @Override

@@ -58,8 +58,8 @@ public class Tank implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
-        // Damage value: 4.0
-        ItemBuilder axe = new ItemBuilder(Material.STONE_AXE).unbreakable(true).hideInfo();
+        // Damage value: 3.0
+        ItemBuilder axe = new ItemBuilder(Material.WOOD_AXE).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.ANVIL).name("&aFortify &7(Right Click)")
                 .lore("&7Reduce all incoming damage.");

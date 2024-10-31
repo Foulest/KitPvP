@@ -93,7 +93,9 @@ public class DeathListener implements Listener {
             int damagerCoins = damagerData.getCoins();
 
             // Adds a Flask to the damager's inventory.
-            FlaskListener.addFlaskToInventory(damager, FlaskListener.MAX_FLASKS);
+            if (Settings.flaskEnabled) {
+                FlaskListener.addFlaskToInventory(damager, Settings.flaskAmount);
+            }
 
             // Adds a kill to the damager.
             damagerData.setKills(damagerKills + 1);

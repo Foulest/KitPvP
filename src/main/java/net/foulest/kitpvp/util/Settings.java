@@ -51,6 +51,11 @@ public class Settings {
     public static float spawnYaw;
     public static float spawnPitch;
 
+    // Flask settings
+    public static boolean flaskEnabled;
+    public static int flaskAmount;
+    public static int flaskCooldown;
+
     // Combat tag settings
     public static boolean combatTagEnabled;
     public static int combatTagDuration;
@@ -101,6 +106,7 @@ public class Settings {
     public static boolean fishermanKitEnabled;
     public static int fishermanKitCost;
     public static int fishermanKitCooldown;
+    public static int fishermanKitDuration;
 
     // Kangaroo kit settings
     public static boolean kangarooKitEnabled;
@@ -115,6 +121,7 @@ public class Settings {
     public static boolean mageKitEnabled;
     public static int mageKitCost;
     public static int mageKitCooldown;
+    public static int mageKitDuration;
 
     // Ninja kit settings
     public static boolean ninjaKitEnabled;
@@ -261,6 +268,11 @@ public class Settings {
         powerEnabled = config.getBoolean("kitpvp.kit-enchanter.power.enabled");
         powerCost = config.getInt("kitpvp.kit-enchanter.power.cost");
 
+        // Flask settings
+        flaskEnabled = config.getBoolean("kitpvp.flasks.enabled");
+        flaskAmount = config.getInt("kitpvp.flasks.amount");
+        flaskCooldown = config.getInt("kitpvp.flasks.cooldown");
+
         // Archer kit settings
         archerKitEnabled = config.getBoolean("kitpvp.kits.archer.enabled");
         archerKitCost = config.getInt("kitpvp.kits.archer.cost");
@@ -271,6 +283,7 @@ public class Settings {
         fishermanKitEnabled = config.getBoolean("kitpvp.kits.fisherman.enabled");
         fishermanKitCost = config.getInt("kitpvp.kits.fisherman.cost");
         fishermanKitCooldown = config.getInt("kitpvp.kits.fisherman.ability.cooldown");
+        fishermanKitDuration = config.getInt("kitpvp.kits.fisherman.ability.duration");
 
         // Kangaroo kit settings
         kangarooKitEnabled = config.getBoolean("kitpvp.kits.kangaroo.enabled");
@@ -285,6 +298,7 @@ public class Settings {
         mageKitEnabled = config.getBoolean("kitpvp.kits.mage.enabled");
         mageKitCost = config.getInt("kitpvp.kits.mage.cost");
         mageKitCooldown = config.getInt("kitpvp.kits.mage.ability.cooldown");
+        mageKitDuration = config.getInt("kitpvp.kits.mage.ability.duration");
 
         // Ninja kit settings
         ninjaKitEnabled = config.getBoolean("kitpvp.kits.ninja.enabled");
@@ -313,7 +327,7 @@ public class Settings {
 
         // Database settings
         usingFlatFile = config.getString("kitpvp.storage.type").trim().equalsIgnoreCase("sqlite");
-        flatFilePath = KitPvP.getInstance().getDataFolder() + "\\" + config.getString("kitpvp.storage.sqlite.file");
+        flatFilePath = KitPvP.getInstance().getDataFolder() + File.separator + config.getString("kitpvp.storage.sqlite.file");
         host = config.getString("kitpvp.storage.mariadb.host");
         port = config.getInt("kitpvp.storage.mariadb.port");
         database = config.getString("kitpvp.storage.mariadb.database");

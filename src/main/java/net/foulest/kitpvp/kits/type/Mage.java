@@ -58,8 +58,8 @@ public class Mage implements Kit {
         // Damage value: 5.0
         ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
 
-        ItemBuilder special = new ItemBuilder(Material.GLOWSTONE_DUST).name("&aRandom Effect &7(Right Click)")
-                .lore("&7Gives you a random potion effect.");
+        ItemBuilder special = new ItemBuilder(Material.GLOWSTONE_DUST).name("&aStasis &7(Right Click)")
+                .lore("&7Debuff nearby players.");
         return Arrays.asList(sword, special);
     }
 
@@ -79,7 +79,7 @@ public class Mage implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Gives you a random potion effect."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Debuff nearby players."));
     }
 
     @Override

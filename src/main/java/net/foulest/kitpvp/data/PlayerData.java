@@ -182,7 +182,7 @@ public class PlayerData {
         String uuidString = uniqueId.toString();
 
         defaultStats.put("uuid", uuidString);
-        defaultStats.put("coins", 500);
+        defaultStats.put("coins", Settings.startingCoins);
         defaultStats.put("experience", 0);
         defaultStats.put("kills", 0);
         defaultStats.put("deaths", 0);

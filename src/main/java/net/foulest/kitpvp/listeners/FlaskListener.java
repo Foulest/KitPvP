@@ -6,6 +6,7 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,8 +30,6 @@ import org.jetbrains.annotations.NotNull;
 @Data
 public class FlaskListener implements Listener {
 
-    public static int MAX_FLASKS = 5;
-
     private static ItemStack FLASK = new ItemBuilder(Material.POTION).hideInfo().durability(8229)
             .name("&aFlask &7(Right Click)").getItem();
 
@@ -39,17 +38,13 @@ public class FlaskListener implements Listener {
 
     /**
      * Sets a cooldown for a specific kit.
-     *
-     * @param cooldownTime The time in seconds for the cooldown.
      */
-    private static void setFlaskCooldown(@NotNull PlayerData playerData, int cooldownTime) {
+    private static void setFlaskCooldown(@NotNull PlayerData playerData) {
         Player player = playerData.getPlayer();
 
         BukkitTask cooldownTask = new BukkitRunnable() {
             @Override
             public void run() {
-                MessageUtil.messagePlayer(player, "&aYour Flask cooldown has expired.");
-
                 // Set the player's flask back to a potion.
                 for (ItemStack item : player.getInventory().getContents()) {
                     if (item == null
@@ -69,7 +64,7 @@ public class FlaskListener implements Listener {
                     }
                 }
             }
-        }.runTaskLater(KitPvP.instance, cooldownTime * 20L);
+        }.runTaskLater(KitPvP.instance, Settings.flaskCooldown * 20L);
 
         // Set the Flask cooldown and regeneration tasks.
         playerData.setFlaskCooldownTask(cooldownTask);
@@ -92,9 +87,8 @@ public class FlaskListener implements Listener {
                 // Update the Flask amount.
                 int itemAmount = item.getAmount();
 
-                if (itemAmount < MAX_FLASKS) {
-                    MessageUtil.messagePlayer(player, "&aYou received a Flask.");
-                    item.setAmount(Math.min(itemAmount + amount, MAX_FLASKS));
+                if (itemAmount < Settings.flaskAmount) {
+                    item.setAmount(Math.min(itemAmount + amount, Settings.flaskAmount));
                     player.updateInventory();
                     return;
                 }
@@ -103,7 +97,7 @@ public class FlaskListener implements Listener {
 
         if (!hasFlasks) {
             // Add the Flask to the player's inventory.
-            FLASK.setAmount(Math.min(amount, MAX_FLASKS));
+            FLASK.setAmount(Math.min(amount, Settings.flaskAmount));
             player.getInventory().addItem(FLASK);
             player.updateInventory();
         }
@@ -159,8 +153,6 @@ public class FlaskListener implements Listener {
                     // The Flask is ready to be used, as it's not a GLASS_BOTTLE.
 
                     if (health < maxHealth) {
-                        int flaskDuration = 3;
-
                         // Removes the Flask from the player's inventory if there is only one.
                         // Otherwise, sets the Flask to a GLASS_BOTTLE with the amount of the Flask.
                         if (itemAmount == 1) {
@@ -174,14 +166,13 @@ public class FlaskListener implements Listener {
                         player.updateInventory();
 
                         // Set the Flask cooldown.
-                        setFlaskCooldown(playerData, flaskDuration);
+                        setFlaskCooldown(playerData);
 
                         // Send the player a message and play a sound.
-                        MessageUtil.messagePlayer(player, "&aYou used a Flask.");
                         player.playSound(playerLoc, Sound.DRINK, 1, 1);
 
                         // Heal the player for 5 hearts (10 health) over 3 seconds.
-                        PotionEffect regeneration = new PotionEffect(PotionEffectType.REGENERATION, flaskDuration * 20, 3);
+                        PotionEffect regeneration = new PotionEffect(PotionEffectType.REGENERATION, 3 * 20, 3);
                         player.addPotionEffect(regeneration);
                     } else {
                         MessageUtil.messagePlayer(player, "&cYou are already at full health.");

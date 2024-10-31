@@ -56,8 +56,8 @@ public class Fisherman implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
-        // Damage value: 4.0
-        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
+        // Damage value: 5.0
+        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FISHING_ROD).unbreakable(true).hideInfo().name("&aHookshot &7(Right Click)")
                 .lore("&7Hooks players to your location.");
@@ -80,7 +80,7 @@ public class Fisherman implements Kit {
 
     @Override
     public List<String> getLore() {
-        return new ArrayList<>(Arrays.asList("&7Style: &aDefensive", "", "&7Hooks players to your location."));
+        return new ArrayList<>(Arrays.asList("&7Style: &aMixed", "", "&7Hooks players to your location."));
     }
 
     @Override

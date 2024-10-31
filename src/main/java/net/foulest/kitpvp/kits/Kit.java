@@ -20,8 +20,8 @@ package net.foulest.kitpvp.kits;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.enchants.Enchants;
-import net.foulest.kitpvp.listeners.FlaskListener;
 import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.item.ItemBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -214,21 +214,23 @@ public interface Kit {
             }
 
             // Set the flask item.
-            ItemStack flaskItem = new ItemBuilder(Material.POTION).name("&aFlask &7(Right Click)").getItem();
-            flaskItem.setDurability((short) 8229);
-            flaskItem.setAmount(FlaskListener.MAX_FLASKS);
-            player.getInventory().setItem(i, flaskItem);
-            break;
-
-//            if (playerData.isUsingSoup()) {
-//                ItemBuilder soupItemBuilder = new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew");
-//                ItemStack soupItemStack = soupItemBuilder.getItem();
-//                player.getInventory().setItem(i, soupItemStack);
-//            } else {
-//                ItemBuilder potionItemBuilder = new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing");
-//                ItemStack potionItemStack = potionItemBuilder.getItem();
-//                player.getInventory().setItem(i, potionItemStack);
-//            }
+            if (Settings.flaskEnabled) {
+                ItemStack flaskItem = new ItemBuilder(Material.POTION).name("&aFlask &7(Right Click)").getItem();
+                flaskItem.setDurability((short) 8229);
+                flaskItem.setAmount(Settings.flaskAmount);
+                player.getInventory().setItem(i, flaskItem);
+                break;
+            } else {
+                if (playerData.isUsingSoup()) {
+                    ItemBuilder soupItemBuilder = new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Stew");
+                    ItemStack soupItemStack = soupItemBuilder.getItem();
+                    player.getInventory().setItem(i, soupItemStack);
+                } else {
+                    ItemBuilder potionItemBuilder = new ItemBuilder(Material.POTION).durability(16421).name("&fSplash Potion of Healing");
+                    ItemStack potionItemStack = potionItemBuilder.getItem();
+                    player.getInventory().setItem(i, potionItemStack);
+                }
+            }
         }
 
         // Sets the player's armor.
