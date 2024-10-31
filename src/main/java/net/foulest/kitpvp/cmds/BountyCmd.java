@@ -60,7 +60,6 @@ public class BountyCmd {
 
         UUID benefactorUUID = playerData.getBenefactor();
         Player benefactor = Bukkit.getPlayer(benefactorUUID);
-        String benefactorName = benefactor.getName();
 
         // Checks if the bounties feature is enabled.
         if (!Settings.bountiesEnabled) {
@@ -76,6 +75,7 @@ public class BountyCmd {
                 MessageUtil.messagePlayer(player, " &aYou currently don't have a");
                 MessageUtil.messagePlayer(player, " &abounty on your head.");
             } else {
+                String benefactorName = benefactor.getName();
                 MessageUtil.messagePlayer(player, " &cYou currently have a &e$" + activeBounty + " &cbounty");
                 MessageUtil.messagePlayer(player, " &con your head set by &e" + benefactorName + "&c.");
             }
