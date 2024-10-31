@@ -52,9 +52,7 @@ public class Archer implements Kit {
 
     @Override
     public PotionEffect[] getPotionEffects() {
-        return new PotionEffect[]{
-                new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false)
-        };
+        return new PotionEffect[0];
     }
 
     @Override

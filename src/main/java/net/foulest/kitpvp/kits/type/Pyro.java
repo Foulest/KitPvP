@@ -60,7 +60,7 @@ public class Pyro implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).enchant(Enchantment.FIRE_ASPECT, 1).unbreakable(true).hideInfo();
+        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FIREBALL).name("&aIgnite &7(Right Click)")
                 .lore("&7Ignites players on fire.");
