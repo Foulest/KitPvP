@@ -419,7 +419,9 @@ kitpvp:
         - "&7Style: &aOffensive"
         - ""
         - "&7An agile, stealthy class."
-      effects: [ ]
+      effects:
+        - type: "SPEED"
+          amplifier: 1
       items:
         - material: "GOLD_SWORD"
           name: "&aNinja's Blade"
