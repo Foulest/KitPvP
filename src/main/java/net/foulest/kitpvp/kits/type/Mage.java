@@ -56,11 +56,25 @@ public class Mage implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).name("&aMage's Sword")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &7No notable changes."
+                )).unbreakable(true).hideInfo();
+
+        // Damage value: 3.0
+        ItemBuilder sunStaff = new ItemBuilder(Material.BLAZE_ROD).name("&aSun Staff")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &b+100% damage against burning players",
+                        "&8\u2503 &b+25% fire damage resistance while active",
+                        "&8\u2503 &c-40% damage penalty"
+                )).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.GLOWSTONE_DUST).name("&aStasis &7(Right Click)")
                 .lore("&7Debuff nearby players.");
-        return Arrays.asList(sword, special);
+
+        return Arrays.asList(sword, sunStaff, special);
     }
 
     @Override

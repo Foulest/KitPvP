@@ -59,11 +59,25 @@ public class Tank implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 3.0
-        ItemBuilder axe = new ItemBuilder(Material.WOOD_AXE).unbreakable(true).hideInfo();
+        ItemBuilder axe = new ItemBuilder(Material.WOOD_AXE).name("&aTank's Axe")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &c-40% damage penalty"
+                )).unbreakable(true).hideInfo();
 
-        ItemBuilder special = new ItemBuilder(Material.ANVIL).name("&aFortify &7(Right Click)")
-                .lore("&7Reduce all incoming damage.");
-        return Arrays.asList(axe, special);
+        // Damage value: 3.0
+        ItemBuilder fistsOfSteel = new ItemBuilder(Material.IRON_SPADE).name("&aFists of Steel")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &b-40% damage from ranged damage while active",
+                        "&8\u2503 &c+40% damage from melee damage while active",
+                        "&8\u2503 &c-40% damage penalty"
+                )).unbreakable(true).hideInfo();
+
+        ItemBuilder fortify = new ItemBuilder(Material.ANVIL).name("&aFortify &7(Right Click)")
+                .lore("&7Get a temporary resistance boost.");
+
+        return Arrays.asList(axe, fistsOfSteel, fortify);
     }
 
     @Override

@@ -59,12 +59,29 @@ public class Pyro implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
-        // Damage value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        // Damage value: 4.0
+        ItemBuilder axtinguisher = new ItemBuilder(Material.STONE_AXE).name("&aAxtinguisher")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &bMini-crits burning players and extinguishes them",
+                        "&8\u2503 &bKilling blows on burning players grant a speed boost",
+                        "&8\u2503 &c-25% damage penalty"))
+                .unbreakable(true).hideInfo();
+
+        // Damage value: 3.0
+        ItemBuilder powerjack = new ItemBuilder(Material.GOLD_AXE).name("&aPowerjack")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &bRestores 3 hearts on kill",
+                        "&8\u2503 &b+20% movement speed when active",
+                        "&8\u2503 &c+20% damage vulnerability when active",
+                        "&8\u2503 &c-40% damage penalty"))
+                .unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FIREBALL).name("&aIgnite &7(Right Click)")
                 .lore("&7Ignites players on fire.");
-        return Arrays.asList(sword, special);
+
+        return Arrays.asList(axtinguisher, powerjack, special);
     }
 
     @Override

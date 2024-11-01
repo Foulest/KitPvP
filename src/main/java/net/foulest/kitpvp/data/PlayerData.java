@@ -79,7 +79,6 @@ public class PlayerData {
 
     // No-fall data
     private boolean noFall;
-    private boolean pendingNoFallRemoval;
 
     // Cooldowns and timers
     private final Map<Kit, Long> cooldowns = new HashMap<>();

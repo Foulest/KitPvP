@@ -1,3 +1,20 @@
+/*
+ * KitPvP - a fully-featured core plugin for the KitPvP gamemode.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.kitpvp.listeners;
 
 import lombok.Data;
@@ -30,11 +47,13 @@ import org.jetbrains.annotations.NotNull;
 @Data
 public class FlaskListener implements Listener {
 
-    private static ItemStack FLASK = new ItemBuilder(Material.POTION).hideInfo().durability(8229)
-            .name("&aFlask &7(Right Click)").getItem();
+    public static ItemStack FLASK = new ItemBuilder(Material.POTION).name("&aFlask &7(Right Click)")
+            .lore("&7Regenerates 5 hearts over 3 seconds.")
+            .hideInfo().durability(8229).getItem();
 
-    private static ItemStack EMPTY_FLASK = new ItemBuilder(Material.GLASS_BOTTLE)
-            .name("&cFlask &7(On Cooldown)").getItem();
+    public static ItemStack EMPTY_FLASK = new ItemBuilder(Material.GLASS_BOTTLE).name("&cFlask &7(On Cooldown)")
+            .lore("&7Regenerates 5 hearts over 3 seconds.")
+            .hideInfo().getItem();
 
     /**
      * Sets a cooldown for a specific kit.
@@ -113,18 +132,10 @@ public class FlaskListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ItemStack item = event.getItem();
-        Block block = event.getClickedBlock();
         Action action = event.getAction();
 
         double health = player.getHealth();
         double maxHealth = player.getMaxHealth();
-
-        // ???
-        if (action.toString().contains("RIGHT") && block != null
-                && block.getState() instanceof InventoryHolder) {
-            event.setCancelled(true);
-            return;
-        }
 
         if (action.toString().contains("RIGHT") && item != null) {
             Location playerLoc = player.getLocation();
@@ -143,7 +154,9 @@ public class FlaskListener implements Listener {
                     }
 
                     // Check if the item contains the name "Flask".
-                    if (item.hasItemMeta() && !item.getItemMeta().getDisplayName().contains("Flask")) {
+                    if (!item.hasItemMeta()
+                            || !item.getItemMeta().hasDisplayName()
+                            || !item.getItemMeta().getDisplayName().contains("Flask")) {
                         break;
                     }
 
@@ -151,6 +164,14 @@ public class FlaskListener implements Listener {
 
                     // We can assume the player right-clicked the Flask.
                     // The Flask is ready to be used, as it's not a GLASS_BOTTLE.
+
+                    // Cancels using the Flask if the player is already regenerating health.
+                    if (player.hasPotionEffect(PotionEffectType.REGENERATION)) {
+                        MessageUtil.messagePlayer(player, "&cYou are already regenerating health.");
+                        event.setCancelled(true);
+                        player.updateInventory();
+                        return;
+                    }
 
                     if (health < maxHealth) {
                         // Removes the Flask from the player's inventory if there is only one.
@@ -217,12 +238,16 @@ public class FlaskListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         ItemStack currentItem = event.getCurrentItem();
 
-        // Cancels players clicking flasks.
-        if (currentItem != null
-                && currentItem.hasItemMeta()
-                && currentItem.getItemMeta().getDisplayName().contains("Flask")) {
-            event.setCancelled(true);
-            player.updateInventory();
+        // Nullability checks.
+        if (currentItem == null
+                || !currentItem.hasItemMeta()
+                || !currentItem.getItemMeta().hasDisplayName()
+                || !currentItem.getItemMeta().getDisplayName().contains("Flask")) {
+            return;
         }
+
+        // Cancels players clicking flasks.
+        event.setCancelled(true);
+        player.updateInventory();
     }
 }

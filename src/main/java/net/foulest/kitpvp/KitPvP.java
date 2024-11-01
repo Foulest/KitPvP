@@ -28,7 +28,7 @@ import net.foulest.kitpvp.kits.type.*;
 import net.foulest.kitpvp.listeners.DeathListener;
 import net.foulest.kitpvp.listeners.EventListener;
 import net.foulest.kitpvp.listeners.FlaskListener;
-import net.foulest.kitpvp.listeners.KitListener;
+import net.foulest.kitpvp.listeners.kits.*;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.DatabaseUtil;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -97,7 +97,10 @@ public class KitPvP extends JavaPlugin {
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
-        loadListeners(new DeathListener(), new EventListener(), new KitListener(), new FlaskListener());
+        loadListeners(new DeathListener(), new EventListener(), new FlaskListener(),
+                new ArcherListener(), new FishermanListener(), new KangarooListener(),
+                new MageListener(), new NinjaListener(), new PyroListener(),
+                new TankListener(), new VampireListener());
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Commands...");

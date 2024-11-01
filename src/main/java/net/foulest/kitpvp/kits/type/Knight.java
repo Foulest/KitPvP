@@ -57,7 +57,12 @@ public class Knight implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Attack value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).name("&aKnight's Sword")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &7No notable changes."
+                )).unbreakable(true).hideInfo();
+
         return Collections.singletonList(sword);
     }
 

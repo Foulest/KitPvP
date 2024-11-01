@@ -496,7 +496,6 @@ public class EventListener implements Listener {
                     default:
                         // Ignores invalid kits from being selected.
                         if (kit == null) {
-                            MessageUtil.log(Level.INFO, "Invalid kit in Kit Selector for " + playerName + ".");
                             return;
                         }
 
@@ -801,20 +800,6 @@ public class EventListener implements Listener {
                 }
             }
         }
-
-        // Removes the player's no-fall status.
-        if (playerData.isNoFall() && !playerData.isPendingNoFallRemoval()
-                && !Regions.isInSafezone(location)) {
-            playerData.setPendingNoFallRemoval(true);
-
-            TaskUtil.runTaskLater(() -> {
-                playerData.setPendingNoFallRemoval(false);
-
-                if (playerData.isNoFall() && !Regions.isInSafezone(location)) {
-                    playerData.setNoFall(false);
-                }
-            }, 30L);
-        }
     }
 
     /**
@@ -827,10 +812,19 @@ public class EventListener implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
+            Location playerLoc = player.getLocation();
 
             // Cancels fall damage if the player has no-fall.
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALL && playerData.isNoFall()) {
-                event.setCancelled(true);
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                if (Regions.isInSafezone(playerLoc)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (playerData.isNoFall()) {
+                    event.setCancelled(true);
+                    playerData.setNoFall(false);
+                }
             }
         }
     }

@@ -58,10 +58,18 @@ public class Archer implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 4.0
-        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).unbreakable(true).hideInfo();
+        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).name("&aArcher's Sword")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &c-25% damage penalty"
+                )).unbreakable(true).hideInfo();
 
         // Damage value: 2.0
-        ItemBuilder bow = new ItemBuilder(Material.BOW).unbreakable(true).hideInfo();
+        ItemBuilder bow = new ItemBuilder(Material.BOW).name("&aArcher's Bow")
+                .lore(Arrays.asList(
+                        "&7Compared to Bow:",
+                        "&8\u2503 &7No notable changes."
+                )).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FEATHER).unbreakable(true).hideInfo().name("&aSpeed Boost &7(Right Click)")
                 .lore("&7Gain a temporary speed boost.");
@@ -80,7 +88,7 @@ public class Archer implements Kit {
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fArcher's Head"),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo(),
                 new ItemBuilder(Material.LEATHER_LEGGINGS).unbreakable(true).hideInfo(),
-                new ItemBuilder(Material.LEATHER_BOOTS).unbreakable(true).hideInfo().enchant(Enchantment.PROTECTION_FALL, 4)
+                new ItemBuilder(Material.LEATHER_BOOTS).unbreakable(true).hideInfo()
         };
     }
 

@@ -57,10 +57,15 @@ public class Vampire implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).name("&aVampire's Sword")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &7No notable changes."
+                )).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.REDSTONE).name("&aLife-Steal &7(Right Click)")
                 .lore("&7Get life-steal on hit.");
+
         return Arrays.asList(sword, special);
     }
 

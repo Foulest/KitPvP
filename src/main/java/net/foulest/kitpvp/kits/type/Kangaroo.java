@@ -60,25 +60,42 @@ public class Kangaroo implements Kit {
 
     @Override
     public List<ItemBuilder> getItems() {
-        // Damage value: 5.0
-        ItemBuilder sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        // Damage value: 4.0
+        ItemBuilder sword = new ItemBuilder(Material.WOOD_SWORD).name("&aKangaroo's Sword")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &c-25% damage penalty"
+                )).unbreakable(true).hideInfo();
+
+        // Damage value: 3.0
+        // Mid-air damage value: 7.5
+        ItemBuilder shovel = new ItemBuilder(Material.STONE_SPADE).name("&aMarket Gardener")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &b+150% damage bonus while hopping",
+                        "&8\u2503 &c-40% damage penalty"
+                )).unbreakable(true).hideInfo();
 
         ItemBuilder special = new ItemBuilder(Material.FIREWORK).name("&aHop &7(Right Click)")
                 .lore("&7Hop around like a Kangaroo.");
-        return Arrays.asList(sword, special);
+
+        return Arrays.asList(sword, shovel, special);
     }
 
     @Override
     public ItemBuilder[] getArmor() {
-        String base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTR"
-                + "hYjQyYWZhOTJhZGYxNWFiZmJmNDljZDA5NjY0NDA5NjQ5Mzk3N2YzNjYyMDNmNTIzMTFlYzk3ODJiY2YyNCJ9fX0=";
+        String base64 = "ewogICJ0aW1lc3RhbXAiIDogMTYyMjI4MzIxMTIwOSwKICAicHJvZmlsZUlkIiA6ICIzOTg5OGFiODFmMjU0NmQxOGIyY2"
+                + "ExMTE1MDRkZGU1MCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNeVV1aWRJcyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCi"
+                + "AgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZX"
+                + "QvdGV4dHVyZS9kM2I2MWVjNGI1MjU2NDUzZWRjOTU0MTZhODJiNTRkMjQyMzdhZTgxNGQzNjYzMjQ1MzZhZTkxYzgxYzM5NWVlIg"
+                + "ogICAgfQogIH0KfQ==";
 
         return new ItemBuilder[]{
                 // Armor value: 5.0
                 new ItemBuilder(SkullBuilder.itemFromBase64(base64)).name("&fKangaroo's Head"),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x7F4A19)),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).unbreakable(true).hideInfo().color(Color.fromRGB(0x7A6738)),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).hideInfo(),
-                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).hideInfo().enchant(Enchantment.PROTECTION_FALL, 4)
+                new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).hideInfo()
         };
     }
 

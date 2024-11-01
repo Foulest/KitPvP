@@ -60,10 +60,17 @@ public class Ninja implements Kit {
     @Override
     public List<ItemBuilder> getItems() {
         // Damage value: 5.0
-        ItemBuilder weapon = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).hideInfo();
+        ItemBuilder weapon = new ItemBuilder(Material.GOLD_SWORD).name("&aNinja's Blade")
+                .lore(Arrays.asList(
+                        "&7Compared to Stone Sword:",
+                        "&8\u2503 &b+50% damage when behind target",
+                        "&8\u2503 &c-25% damage penalty"
+                )).unbreakable(true).hideInfo();
 
-        ItemBuilder special = new ItemBuilder(Material.INK_SACK).durability(8).name("&aShadow Sneak &7(Right Click)")
-                .lore("&7Turns you completely invisible.");
+        ItemBuilder special = new ItemBuilder(Material.INK_SACK).name("&aShadow Sneak &7(Right Click)")
+                .lore("&7Temporarily vanish from sight.")
+                .durability(8).hideInfo();
+
         return Arrays.asList(weapon, special);
     }
 
