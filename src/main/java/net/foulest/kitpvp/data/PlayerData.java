@@ -42,6 +42,7 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Main class for storing player data.
@@ -175,112 +176,114 @@ public class PlayerData {
      *
      * @return Whether the data was loaded successfully.
      */
-    public boolean load() {
-        // Inserts default values into PlayerStats.
-        Map<String, Object> defaultStats = new HashMap<>();
-        String uuidString = uniqueId.toString();
+    public CompletableFuture<Boolean> load() {
+        return CompletableFuture.supplyAsync(() -> {
+            // Inserts default values into PlayerStats.
+            Map<String, Object> defaultStats = new HashMap<>();
+            String uuidString = uniqueId.toString();
 
-        defaultStats.put("uuid", uuidString);
-        defaultStats.put("coins", Settings.startingCoins);
-        defaultStats.put("experience", 0);
-        defaultStats.put("kills", 0);
-        defaultStats.put("deaths", 0);
-        defaultStats.put("killstreak", 0);
-        defaultStats.put("topKillstreak", 0);
-        defaultStats.put("usingSoup", 0);
-        defaultStats.put("previousKit", "Knight");
-        DatabaseUtil.addDefaultDataToTable("PlayerStats", defaultStats);
+            defaultStats.put("uuid", uuidString);
+            defaultStats.put("coins", Settings.startingCoins);
+            defaultStats.put("experience", 0);
+            defaultStats.put("kills", 0);
+            defaultStats.put("deaths", 0);
+            defaultStats.put("killstreak", 0);
+            defaultStats.put("topKillstreak", 0);
+            defaultStats.put("usingSoup", 0);
+            defaultStats.put("previousKit", "Knight");
+            DatabaseUtil.addDefaultDataToTable("PlayerStats", defaultStats);
 
-        // Loads values from PlayerStats.
-        try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats",
-                    "uuid = ?", Collections.singletonList(uuidString));
+            // Loads values from PlayerStats.
+            try {
+                List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerStats",
+                        "uuid = ?", Collections.singletonList(uuidString));
 
-            if (!data.isEmpty()) {
-                HashMap<String, Object> playerData = data.get(0);
-                coins = (Integer) playerData.get("coins");
-                experience = (Integer) playerData.get("experience");
-                kills = (Integer) playerData.get("kills");
-                deaths = (Integer) playerData.get("deaths");
-                killstreak = (Integer) playerData.get("killstreak");
-                topKillstreak = (Integer) playerData.get("topKillstreak");
-                usingSoup = (Integer) playerData.get("usingSoup") == 1;
+                if (!data.isEmpty()) {
+                    HashMap<String, Object> playerData = data.get(0);
+                    coins = (Integer) playerData.get("coins");
+                    experience = (Integer) playerData.get("experience");
+                    kills = (Integer) playerData.get("kills");
+                    deaths = (Integer) playerData.get("deaths");
+                    killstreak = (Integer) playerData.get("killstreak");
+                    topKillstreak = (Integer) playerData.get("topKillstreak");
+                    usingSoup = (Integer) playerData.get("usingSoup") == 1;
 
-                Object previousKitObj = playerData.get("previousKit");
-                previousKit = KitManager.getKit((String) previousKitObj);
+                    Object previousKitObj = playerData.get("previousKit");
+                    previousKit = KitManager.getKit((String) previousKitObj);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
 
-        // Inserts default values into PlayerKits.
-        Map<String, Object> defaultKits = new HashMap<>();
-        defaultKits.put("uuid", uuidString);
-        defaultKits.put("kitName", "Knight");
-        DatabaseUtil.addDefaultDataToTable("PlayerKits", defaultKits);
+            // Inserts default values into PlayerKits.
+            Map<String, Object> defaultKits = new HashMap<>();
+            defaultKits.put("uuid", uuidString);
+            defaultKits.put("kitName", "Knight");
+            DatabaseUtil.addDefaultDataToTable("PlayerKits", defaultKits);
 
-        // Loads values from PlayerKits.
-        try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits",
-                    "uuid = ?", Collections.singletonList(uuidString));
+            // Loads values from PlayerKits.
+            try {
+                List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("PlayerKits",
+                        "uuid = ?", Collections.singletonList(uuidString));
 
-            if (!data.isEmpty()) {
-                for (Map<String, Object> row : data) {
-                    Object kitNameObj = row.get("kitName");
+                if (!data.isEmpty()) {
+                    for (Map<String, Object> row : data) {
+                        Object kitNameObj = row.get("kitName");
 
-                    if (kitNameObj != null && !kitNameObj.equals("")) {
-                        ownedKits.add(KitManager.getKit((String) kitNameObj));
+                        if (kitNameObj != null && !kitNameObj.equals("")) {
+                            ownedKits.add(KitManager.getKit((String) kitNameObj));
+                        }
                     }
                 }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
 
-        // Loads values from Bounties.
-        try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties",
-                    "uuid = ?", Collections.singletonList(uuidString));
+            // Loads values from Bounties.
+            try {
+                List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Bounties",
+                        "uuid = ?", Collections.singletonList(uuidString));
 
-            if (!data.isEmpty()) {
-                HashMap<String, Object> playerData = data.get(0);
-                bounty = (Integer) playerData.get("bounty");
+                if (!data.isEmpty()) {
+                    HashMap<String, Object> playerData = data.get(0);
+                    bounty = (Integer) playerData.get("bounty");
 
-                Object benefactorObj = playerData.get("benefactor");
+                    Object benefactorObj = playerData.get("benefactor");
 
-                if (!benefactorObj.equals("")) {
-                    benefactor = UUID.fromString((String) benefactorObj);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-
-        // Loads values from Enchants.
-        try {
-            List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants",
-                    "uuid = ?", Collections.singletonList(uuidString));
-
-            if (!data.isEmpty()) {
-                Map<String, Object> playerData = data.get(0);
-
-                for (Enchants enchant : Enchants.values()) {
-                    String key = enchant.getDatabaseName();
-                    Object value = playerData.get(key);
-
-                    if (Integer.valueOf(1).equals(value)) {
-                        enchants.add(enchant);
+                    if (!benefactorObj.equals("")) {
+                        benefactor = UUID.fromString((String) benefactorObj);
                     }
                 }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
+
+            // Loads values from Enchants.
+            try {
+                List<HashMap<String, Object>> data = DatabaseUtil.loadDataFromTable("Enchants",
+                        "uuid = ?", Collections.singletonList(uuidString));
+
+                if (!data.isEmpty()) {
+                    Map<String, Object> playerData = data.get(0);
+
+                    for (Enchants enchant : Enchants.values()) {
+                        String key = enchant.getDatabaseName();
+                        Object value = playerData.get(key);
+
+                        if (Integer.valueOf(1).equals(value)) {
+                            enchants.add(enchant);
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+            return true;
+        });
     }
 
     /**

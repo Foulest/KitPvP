@@ -23,18 +23,17 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Kangaroo;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.BlockUtil;
-import net.foulest.kitpvp.util.ConstantUtil;
-import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.Settings;
+import net.foulest.kitpvp.util.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,17 +41,28 @@ import org.jetbrains.annotations.NotNull;
 public class KangarooListener implements Listener {
 
     /**
-     * Handles the Kangaroo ability.
+     * Handles Kangaroo's ability.
      *
      * @param event The event.
      */
     @EventHandler
     public static void onKangarooAbility(@NotNull PlayerInteractEvent event) {
-        // Player data
+        // Ignores the event if the player isn't right-clicking.
+        if (event.getAction() != Action.RIGHT_CLICK_AIR
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
+        ItemStack item = event.getItem();
+
+        // Checks for common ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.FIREWORK)) {
+            return;
+        }
 
         // Ignores the event if the player isn't using the Kangaroo ability.
         if (!(playerKit instanceof Kangaroo)
@@ -75,8 +85,18 @@ public class KangarooListener implements Listener {
         // Play the ability sound.
         player.getWorld().playSound(playerLoc, Sound.SLIME_WALK2, 1, 1);
 
+        // Gets the launch vector.
+        Vector direction = player.getEyeLocation().getDirection();
+
+        // Adjusts the direction based on whether the player is sneaking.
+        if (BlockUtil.isOnGroundOffset(player, 0.1)) {
+            direction.setY(0.3);
+            direction.multiply(2.5);
+        } else {
+            direction.setY(1.2);
+        }
+
         // Launches the player into the air.
-        Vector direction = getKangarooLaunchVector(player);
         player.setVelocity(direction);
         playerData.setNoFall(true);
 
@@ -86,31 +106,12 @@ public class KangarooListener implements Listener {
     }
 
     /**
-     * Returns the launch vector for the Kangaroo ability.
-     *
-     * @param player The player.
-     * @return The launch vector.
-     */
-    private static @NotNull Vector getKangarooLaunchVector(@NotNull Player player) {
-        Vector direction = player.getEyeLocation().getDirection();
-
-        // Adjusts the direction based on whether the player is sneaking.
-        if (BlockUtil.isOnGroundOffset(player, 0.01)) {
-            direction.setY(0.3);
-            direction.multiply(2.5);
-        } else {
-            direction.setY(1.2);
-        }
-        return direction;
-    }
-
-    /**
-     * Handles the Kangaroo's Market Gardener item.
+     * Handles Kangaroo's Market Gardener item.
      *
      * @param event The event.
      */
     @EventHandler(ignoreCancelled = true)
-    public static void onKangarooHit(@NotNull EntityDamageByEntityEvent event) {
+    public static void onMarketGardenerHit(@NotNull EntityDamageByEntityEvent event) {
         // Ignores the event if the damager or target is not a player.
         if (!(event.getDamager() instanceof Player)
                 || !(event.getEntity() instanceof Player)) {

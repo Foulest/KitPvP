@@ -22,12 +22,9 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Mage;
-import net.foulest.kitpvp.kits.type.Ninja;
 import net.foulest.kitpvp.kits.type.Pyro;
-import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.AbilityUtil;
 import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.PlayerUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -36,9 +33,11 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -55,32 +54,25 @@ public class MageListener implements Listener {
      */
     @EventHandler
     public static void onMageAbility(@NotNull PlayerInteractEvent event) {
-        // Player data
+        // Ignores the event if the player isn't right-clicking.
+        if (event.getAction() != Action.RIGHT_CLICK_AIR
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
+        ItemStack item = event.getItem();
 
-        // Ignores the event if the player isn't using the Mage ability.
-        if (!(playerKit instanceof Mage)
-                || !event.getAction().toString().contains("RIGHT")
-                || player.getItemInHand().getType() != Material.GLOWSTONE_DUST) {
-            return;
-        }
-
-        // Ignores the event if the player is in spawn.
-        if (Regions.isInSafezone(playerLoc)) {
-            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
-            return;
-        }
-
-        // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
+        // Checks for common ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.GLOWSTONE_DUST)) {
             return;
         }
 
         // Gets the nearby players within a 5 block radius.
-        Collection<Player> nearbyPlayers = PlayerUtil.getNearbyPlayers(player, 5, 5, 5);
+        Collection<Player> nearbyPlayers = AbilityUtil.getNearbyPlayers(player, 5, 5, 5);
 
         // Ignores the event if there are no players nearby.
         if (nearbyPlayers.isEmpty()) {
@@ -116,7 +108,7 @@ public class MageListener implements Listener {
      * @param event The event.
      */
     @EventHandler
-    public static void onSunOnAStickHit(@NotNull EntityDamageByEntityEvent event) {
+    public static void onSunStaffHit(@NotNull EntityDamageByEntityEvent event) {
         // Ignores the event if the damager or target is not a player.
         if (!(event.getDamager() instanceof Player)
                 || !(event.getEntity() instanceof Player)) {
@@ -160,7 +152,7 @@ public class MageListener implements Listener {
      * @param event EntityDamageEvent
      */
     @EventHandler
-    public static void onMageFireDamage(@NotNull EntityDamageEvent event) {
+    public static void onFireDamage(@NotNull EntityDamageEvent event) {
         // Ignores the event if the target is not a player.
         if (!(event.getEntity() instanceof Player)) {
             return;

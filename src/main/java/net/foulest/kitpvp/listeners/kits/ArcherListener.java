@@ -21,9 +21,7 @@ import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
-import net.foulest.kitpvp.kits.type.Archer;
-import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.AbilityUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Location;
@@ -32,7 +30,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -41,33 +41,26 @@ import org.jetbrains.annotations.NotNull;
 public class ArcherListener implements Listener {
 
     /**
-     * Handles the Archer ability.
+     * Handles Archer's ability.
      *
      * @param event The event.
      */
     @EventHandler
     public static void onArcherAbility(@NotNull PlayerInteractEvent event) {
-        // Player data
+        // Ignores the event if the player isn't right-clicking.
+        if (event.getAction() != Action.RIGHT_CLICK_AIR
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
+        ItemStack item = event.getItem();
 
-        // Ignores the event if the player isn't using the Archer ability.
-        if (!(playerKit instanceof Archer)
-                || !event.getAction().toString().contains("RIGHT")
-                || player.getItemInHand().getType() != Material.FEATHER) {
-            return;
-        }
-
-        // Ignores the event if the player is in spawn.
-        if (Regions.isInSafezone(playerLoc)) {
-            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
-            return;
-        }
-
-        // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
+        // Checks for common ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.FEATHER)) {
             return;
         }
 
@@ -84,14 +77,6 @@ public class ArcherListener implements Listener {
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Settings.archerKitDuration * 20, 0, false, false));
         player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.archerKitDuration * 20, 1, false, false));
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Settings.archerKitDuration * 20, 1, false, false));
-
-//        // Create a task that restores the Archer's speed.
-//        TaskUtil.runTaskLater(() -> {
-//            if (playerData.getActiveKit() instanceof Archer) {
-//                player.removePotionEffect(PotionEffectType.SPEED);
-//                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
-//            }
-//        }, Settings.archerKitDuration * 20L);
 
         // Sets the player's ability cooldown.
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");

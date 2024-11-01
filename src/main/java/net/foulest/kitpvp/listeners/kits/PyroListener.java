@@ -23,9 +23,8 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Pyro;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.AbilityUtil;
 import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.PlayerUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -34,9 +33,11 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -53,32 +54,25 @@ public class PyroListener implements Listener {
      */
     @EventHandler
     public static void onPyroAbility(@NotNull PlayerInteractEvent event) {
-        // Player data
+        // Ignores the event if the player isn't right-clicking.
+        if (event.getAction() != Action.RIGHT_CLICK_AIR
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
+        ItemStack item = event.getItem();
 
-        // Ignores the event if the player isn't using the Tank ability.
-        if (!(playerKit instanceof Pyro)
-                || !event.getAction().toString().contains("RIGHT")
-                || player.getItemInHand().getType() != Material.FIREBALL) {
-            return;
-        }
-
-        // Ignores the event if the player is in spawn.
-        if (Regions.isInSafezone(playerLoc)) {
-            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
-            return;
-        }
-
-        // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
+        // Checks for common ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.FIREBALL)) {
             return;
         }
 
         // Gets the nearby players within a 5 block radius.
-        Collection<Player> nearbyPlayers = PlayerUtil.getNearbyPlayers(player, 5, 5, 5);
+        Collection<Player> nearbyPlayers = AbilityUtil.getNearbyPlayers(player, 5, 5, 5);
 
         // Ignores the event if there are no players nearby.
         if (nearbyPlayers.isEmpty()) {
@@ -149,12 +143,14 @@ public class PyroListener implements Listener {
             return;
         }
 
+        // ----------------------------------------------------------------
         // If a player hits a target with the Axtinguisher...
         // 1. If the target is on fire...
         // 1a. Extinguish the target.
         // 1b. Deal damage to the target.
         // 1c. Play effects at the target's location.
         // 2. If the hit was a kill, give the Pyro a speed boost.
+        // ----------------------------------------------------------------
 
         // 1. If the target is on fire...
         if (target.getFireTicks() > 0) {

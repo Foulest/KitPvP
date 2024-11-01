@@ -22,9 +22,8 @@ import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
-import net.foulest.kitpvp.kits.type.Fisherman;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.AbilityUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Effect;
@@ -42,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
 public class FishermanListener implements Listener {
 
     /**
-     * Handles the Fisherman ability.
+     * Handles Fisherman's ability.
      *
      * @param event The event.
      */
@@ -53,19 +52,21 @@ public class FishermanListener implements Listener {
             return;
         }
 
-        // Player data
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        Location playerLoc = player.getLocation();
-        Kit playerKit = playerData.getActiveKit();
-
-        // Target data
         Player target = (Player) event.getCaught();
+
+        // Ignores the event if the player hooks themselves.
+        if (target == player) {
+            MessageUtil.messagePlayer(player, "&cYou can't hook yourself.");
+            event.setCancelled(true);
+            return;
+        }
+
         PlayerData targetData = PlayerDataManager.getPlayerData(target);
         Location targetLoc = target.getLocation();
 
-        if (target == player) {
-            MessageUtil.messagePlayer(player, "&cYou can't hook yourself.");
+        // Ignores ineligible players.
+        if (targetData.getActiveKit() == null || Regions.isInSafezone(targetLoc)) {
             event.setCancelled(true);
             return;
         }
@@ -73,27 +74,17 @@ public class FishermanListener implements Listener {
         // Marks both players for combat.
         CombatTag.markForCombat(player, target);
 
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        Location playerLoc = player.getLocation();
+        Kit playerKit = playerData.getActiveKit();
+
+        // Checks for ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit)) {
+            return;
+        }
+
         // Ignores the event if the player isn't using the Fisherman ability.
-        if (!(playerKit instanceof Fisherman)
-                || event.getState() != PlayerFishEvent.State.CAUGHT_ENTITY) {
-            return;
-        }
-
-        // Ignores the event if the player is in spawn.
-        if (Regions.isInSafezone(playerLoc)) {
-            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
-            return;
-        }
-
-        // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
-            return;
-        }
-
-        // Ignores ineligible players.
-        if (targetData.getActiveKit() == null
-                || Regions.isInSafezone(targetLoc)) {
-            event.setCancelled(true);
+        if (event.getState() != PlayerFishEvent.State.CAUGHT_ENTITY) {
             return;
         }
 
@@ -103,8 +94,8 @@ public class FishermanListener implements Listener {
         player.playSound(playerLoc, Sound.SPLASH2, 1, 1);
 
         // Teleports the target to the player's location.
-        target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.fishermanKitDuration * 20, 0, false, false));
         MessageUtil.messagePlayer(target, "&cYou have been hooked by a Fisherman!");
+        target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.fishermanKitDuration * 20, 0, false, false));
         event.getCaught().teleport(playerLoc);
 
         // Sets the player's ability cooldown.

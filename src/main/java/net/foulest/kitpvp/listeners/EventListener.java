@@ -79,27 +79,37 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
-        // Returns if the player's data is null or if it fails to load.
-        if (playerData == null || !playerData.load()) {
+        // Check if playerData is null
+        if (playerData == null) {
             player.kickPlayer("Disconnected");
             return;
         }
 
-        // Sets the player's initial settings.
-        player.setHealth(20);
-        player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().setHeldItemSlot(0);
-        playerData.calcLevel(false);
-
-        // Adds free kits to player's owned kits list.
-        for (Kit kit : KitManager.getKits()) {
-            if (kit.enabled() && kit.getCost() == 0) {
-                playerData.getOwnedKits().add(kit);
+        // Load player data asynchronously
+        playerData.load().thenAccept(success -> {
+            if (!success) {
+                // If loading failed, kick the player
+                player.kickPlayer(MessageUtil.colorize("&cYour data could not be loaded. Please try again."));
+                return;
             }
-        }
 
-        // Teleports the player to spawn.
-        Spawn.teleport(player);
+            // The rest of the initialization happens here only after data is loaded
+            TaskUtil.runTaskLater(() -> {
+                player.setHealth(20);
+                player.setGameMode(GameMode.ADVENTURE);
+                player.getInventory().setHeldItemSlot(0);
+                playerData.calcLevel(false);
+
+                // Add free kits
+                for (Kit kit : KitManager.getKits()) {
+                    if (kit.enabled() && kit.getCost() == 0) {
+                        playerData.getOwnedKits().add(kit);
+                    }
+                }
+
+                Spawn.teleport(player);
+            }, 1L);
+        });
     }
 
     /**
@@ -124,25 +134,6 @@ public class EventListener implements Listener {
 
         // Removes the player's data from the map.
         PlayerDataManager.removePlayerData(player);
-    }
-
-    /**
-     * Handles players dying.
-     *
-     * @param event PlayerDeathEvent
-     */
-    @EventHandler
-    public static void onPlayerDeath(@NotNull PlayerDeathEvent event) {
-        Player player = event.getEntity();
-
-        // Removes the death message and drops.
-        event.setKeepInventory(true);
-        event.getDrops().clear();
-        event.setDroppedExp(0);
-        event.setDeathMessage("");
-
-        // Handles the player's death.
-        DeathListener.handleDeath(player, false);
     }
 
     /**

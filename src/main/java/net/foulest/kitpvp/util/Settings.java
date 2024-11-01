@@ -97,54 +97,34 @@ public class Settings {
     public static int powerCost;
 
     // Archer kit settings
-    public static boolean archerKitEnabled;
-    public static int archerKitCost;
     public static int archerKitCooldown;
     public static int archerKitDuration;
 
     // Fisherman kit settings
-    public static boolean fishermanKitEnabled;
-    public static int fishermanKitCost;
     public static int fishermanKitCooldown;
     public static int fishermanKitDuration;
 
     // Kangaroo kit settings
-    public static boolean kangarooKitEnabled;
-    public static int kangarooKitCost;
     public static int kangarooKitCooldown;
 
-    // Knight kit settings
-    public static boolean knightKitEnabled;
-    public static int knightKitCost;
-
     // Mage kit settings
-    public static boolean mageKitEnabled;
-    public static int mageKitCost;
     public static int mageKitCooldown;
     public static int mageKitDuration;
 
     // Ninja kit settings
-    public static boolean ninjaKitEnabled;
-    public static int ninjaKitCost;
     public static int ninjaKitCooldown;
     public static int ninjaKitDuration;
 
     // Pyro kit settings
-    public static boolean pyroKitEnabled;
-    public static int pyroKitCost;
     public static int pyroKitCooldown;
     public static int pyroKitDuration;
     public static double pyroKitDamage;
 
     // Tank kit settings
-    public static boolean tankKitEnabled;
-    public static int tankKitCost;
     public static int tankKitCooldown;
     public static int tankKitDuration;
 
     // Vampire kit settings
-    public static boolean vampireKitEnabled;
-    public static int vampireKitCost;
     public static int vampireKitCooldown;
     public static int vampireKitDuration;
 
@@ -274,54 +254,34 @@ public class Settings {
         flaskCooldown = config.getInt("kitpvp.flasks.cooldown");
 
         // Archer kit settings
-        archerKitEnabled = config.getBoolean("kitpvp.kits.archer.enabled");
-        archerKitCost = config.getInt("kitpvp.kits.archer.cost");
         archerKitCooldown = config.getInt("kitpvp.kits.archer.ability.cooldown");
         archerKitDuration = config.getInt("kitpvp.kits.archer.ability.duration");
 
         // Fisherman kit settings
-        fishermanKitEnabled = config.getBoolean("kitpvp.kits.fisherman.enabled");
-        fishermanKitCost = config.getInt("kitpvp.kits.fisherman.cost");
         fishermanKitCooldown = config.getInt("kitpvp.kits.fisherman.ability.cooldown");
         fishermanKitDuration = config.getInt("kitpvp.kits.fisherman.ability.duration");
 
         // Kangaroo kit settings
-        kangarooKitEnabled = config.getBoolean("kitpvp.kits.kangaroo.enabled");
-        kangarooKitCost = config.getInt("kitpvp.kits.kangaroo.cost");
         kangarooKitCooldown = config.getInt("kitpvp.kits.kangaroo.ability.cooldown");
 
-        // Knight kit settings
-        knightKitEnabled = config.getBoolean("kitpvp.kits.knight.enabled");
-        knightKitCost = config.getInt("kitpvp.kits.knight.cost");
-
         // Mage kit settings
-        mageKitEnabled = config.getBoolean("kitpvp.kits.mage.enabled");
-        mageKitCost = config.getInt("kitpvp.kits.mage.cost");
         mageKitCooldown = config.getInt("kitpvp.kits.mage.ability.cooldown");
         mageKitDuration = config.getInt("kitpvp.kits.mage.ability.duration");
 
         // Ninja kit settings
-        ninjaKitEnabled = config.getBoolean("kitpvp.kits.ninja.enabled");
-        ninjaKitCost = config.getInt("kitpvp.kits.ninja.cost");
         ninjaKitCooldown = config.getInt("kitpvp.kits.ninja.ability.cooldown");
         ninjaKitDuration = config.getInt("kitpvp.kits.ninja.ability.duration");
 
         // Pyro kit settings
-        pyroKitEnabled = config.getBoolean("kitpvp.kits.pyro.enabled");
-        pyroKitCost = config.getInt("kitpvp.kits.pyro.cost");
         pyroKitCooldown = config.getInt("kitpvp.kits.pyro.ability.cooldown");
         pyroKitDuration = config.getInt("kitpvp.kits.pyro.ability.duration");
         pyroKitDamage = config.getDouble("kitpvp.kits.pyro.ability.damage");
 
         // Tank kit settings
-        tankKitEnabled = config.getBoolean("kitpvp.kits.tank.enabled");
-        tankKitCost = config.getInt("kitpvp.kits.tank.cost");
         tankKitCooldown = config.getInt("kitpvp.kits.tank.ability.cooldown");
         tankKitDuration = config.getInt("kitpvp.kits.tank.ability.duration");
 
         // Vampire kit settings
-        vampireKitEnabled = config.getBoolean("kitpvp.kits.vampire.enabled");
-        vampireKitCost = config.getInt("kitpvp.kits.vampire.cost");
         vampireKitCooldown = config.getInt("kitpvp.kits.vampire.ability.cooldown");
         vampireKitDuration = config.getInt("kitpvp.kits.vampire.ability.duration");
 

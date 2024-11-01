@@ -124,17 +124,9 @@ public class KitPvP extends JavaPlugin {
                     + " This will cause issues with hostile mobs in certain kits.");
         }
 
-        // Loads online players' user data.
-        MessageUtil.log(Level.INFO, "Loading Player Data...");
+        // Kicks all online players.
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-            if (playerData != null) {
-                playerData.load();
-            }
-
-            Spawn.teleport(player);
-            player.getInventory().setHeldItemSlot(0);
+            player.kickPlayer("Disconnected");
         }
 
         MessageUtil.log(Level.INFO, "Loaded successfully.");

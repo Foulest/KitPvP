@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.4.3'
+version = '1.4.4'
 description = 'KitPvP'
 
 // Set the project's language level

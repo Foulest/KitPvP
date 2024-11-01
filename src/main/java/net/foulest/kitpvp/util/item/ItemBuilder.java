@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -41,8 +42,8 @@ import java.util.List;
 @Data
 public class ItemBuilder {
 
-    private final ItemStack item;
-    private int slot;
+    public ItemStack item;
+    public int slot;
 
     /**
      * Creates a new ItemBuilder with the given Material.
@@ -70,6 +71,7 @@ public class ItemBuilder {
      */
     public ItemBuilder name(String name) {
         ItemMeta meta = item.getItemMeta();
+        item.setData(new MaterialData(item.getType()));
         meta.setDisplayName(MessageUtil.colorize(name));
         item.setItemMeta(meta);
         return this;

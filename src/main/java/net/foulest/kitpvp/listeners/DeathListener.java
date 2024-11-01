@@ -18,20 +18,19 @@
 package net.foulest.kitpvp.listeners;
 
 import lombok.Data;
-import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.NMSUtil;
 import net.foulest.kitpvp.util.Settings;
-import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
+import net.foulest.kitpvp.util.TaskUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -174,22 +173,19 @@ public class DeathListener implements Listener {
             // Plays a death sound at the player's death location.
             receiver.playSound(receiverLoc, Sound.FALL_BIG, 0.5f, 0.0f);
 
-            // Removes knockback before teleporting the player to spawn.
+            // Removes knockback before and after teleporting the player to spawn.
             receiver.setVelocity(new Vector());
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    receiver.setVelocity(new Vector());
-                }
-            }.runTaskLater(KitPvP.instance, 1L);
+            TaskUtil.runTaskLater(() -> receiver.setVelocity(new Vector()), 2L);
 
-            // Respawn the player.
-            receiver.spigot().respawn();
+            TaskUtil.runTaskLater(() -> {
+                // Respawn the player.
+                receiver.spigot().respawn();
 
-            // Teleports the player to spawn.
-            receiver.getInventory().setHeldItemSlot(0);
-            Spawn.teleport(receiver);
-            receiver.getInventory().setHeldItemSlot(0);
+                // Teleport the player to spawn.
+                receiver.getInventory().setHeldItemSlot(0);
+                receiver.teleport(Spawn.getLocation());
+                receiver.getInventory().setHeldItemSlot(0);
+            }, 1L);
         }
 
         // Removes enchantments from the player.
@@ -200,5 +196,24 @@ public class DeathListener implements Listener {
 
         // Resets the player's killstreak.
         receiverData.setKillstreak(0);
+    }
+
+    /**
+     * Handles players dying.
+     *
+     * @param event PlayerDeathEvent
+     */
+    @EventHandler
+    public static void onPlayerDeath(@NotNull PlayerDeathEvent event) {
+        Player player = event.getEntity();
+
+        // Removes the death message and drops.
+        event.setKeepInventory(true);
+        event.getDrops().clear();
+        event.setDroppedExp(0);
+        event.setDeathMessage("");
+
+        // Handles the player's death.
+        handleDeath(player, false);
     }
 }

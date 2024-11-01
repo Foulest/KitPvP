@@ -24,7 +24,7 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Vampire;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.AbilityUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.TaskUtil;
@@ -34,8 +34,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -51,27 +53,20 @@ public class VampireListener implements Listener {
     @EventHandler
     @SuppressWarnings("NestedMethodCall")
     public static void onVampireAbility(@NotNull PlayerInteractEvent event) {
-        // Player data
+        // Ignores the event if the player isn't right-clicking.
+        if (event.getAction() != Action.RIGHT_CLICK_AIR
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
+        ItemStack item = event.getItem();
 
-        // Ignores the event if the player isn't using the Tank ability.
-        if (!(playerKit instanceof Vampire)
-                || !event.getAction().toString().contains("RIGHT")
-                || player.getItemInHand().getType() != Material.REDSTONE) {
-            return;
-        }
-
-        // Ignores the event if the player is in spawn.
-        if (Regions.isInSafezone(playerLoc)) {
-            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
-            return;
-        }
-
-        // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
+        // Checks for common ability exclusions.
+        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.REDSTONE)) {
             return;
         }
 
@@ -131,7 +126,6 @@ public class VampireListener implements Listener {
         if (playerData.getLifeStealCooldown() != null) {
             double health = player.getHealth();
             double maxHealth = player.getMaxHealth();
-            player.playSound(playerLoc, Sound.CHICKEN_WALK, 1, 1);
             player.setHealth(Math.min(health + 1, maxHealth));
         }
     }
