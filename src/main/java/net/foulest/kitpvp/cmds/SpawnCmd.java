@@ -24,7 +24,6 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
-import net.foulest.kitpvp.util.BlockUtil;
 import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.command.Command;
@@ -66,7 +65,7 @@ public class SpawnCmd {
         }
 
         // Checks if the player is on the ground.
-        if (!BlockUtil.isOnGroundOffset(player, 0.001)) {
+        if (player.getVelocity().getY() != -0.0784000015258789) {
             MessageUtil.messagePlayer(args.getPlayer(), ConstantUtil.NOT_ON_GROUND);
             return;
         }

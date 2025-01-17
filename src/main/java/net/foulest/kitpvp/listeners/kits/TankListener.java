@@ -22,7 +22,8 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Tank;
-import net.foulest.kitpvp.util.AbilityUtil;
+import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import net.foulest.kitpvp.util.TaskUtil;
@@ -62,10 +63,30 @@ public class TankListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
-        ItemStack item = event.getItem();
+        ItemStack itemStack = event.getItem();
+        Material abilityItem = Material.ANVIL;
 
-        // Checks for common ability exclusions.
-        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.ANVIL)) {
+        // Ignores the event if the given item does not match the desired item.
+        if (itemStack == null
+                || !itemStack.hasItemMeta()
+                || !itemStack.getItemMeta().hasDisplayName()
+                || itemStack.getType() != abilityItem) {
+            return;
+        }
+
+        // Ignores the event if the player is not using the desired kit.
+        if (!(playerKit instanceof Tank)) {
+            return;
+        }
+
+        // Ignores the event if the player is in a safe zone.
+        if (Regions.isInSafezone(playerLoc)) {
+            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
+            return;
+        }
+
+        // Ignores the event if the player's ability is on cooldown.
+        if (playerData.hasCooldown(abilityItem, true)) {
             return;
         }
 
@@ -97,7 +118,7 @@ public class TankListener implements Listener {
 
         // 4. Sets the player's ability cooldown.
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-        playerData.setCooldown(playerKit, Settings.tankKitCooldown, true);
+        playerData.setCooldown(playerKit, abilityItem, Settings.tankKitCooldown, true);
     }
 
     /**
@@ -137,6 +158,8 @@ public class TankListener implements Listener {
                 double damage = event.getDamage();
                 event.setDamage(damage * 1.4);
 
+                // TODO: Play sound to indicate the Tank takes more melee damage.
+
             } else if (event.getDamager() instanceof Arrow) {
                 Arrow arrow = (Arrow) event.getDamager();
 
@@ -154,6 +177,10 @@ public class TankListener implements Listener {
                     // 3. If the source is ranged, decrease the damage by 40%.
                     double damage = event.getDamage();
                     event.setDamage(damage * 0.6);
+
+                    // Plays the sound for the Tank's Shovel.
+                    Location location = receiver.getLocation();
+                    receiver.getWorld().playSound(location, Sound.ZOMBIE_METAL, 0.5F, 1);
                 }
             }
         }

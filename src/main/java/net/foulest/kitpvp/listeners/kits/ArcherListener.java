@@ -21,9 +21,12 @@ import lombok.Data;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
-import net.foulest.kitpvp.util.AbilityUtil;
+import net.foulest.kitpvp.kits.type.Archer;
+import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.ConstantUtil;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
+import net.foulest.kitpvp.util.TaskUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -57,29 +60,57 @@ public class ArcherListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
-        ItemStack item = event.getItem();
+        ItemStack itemStack = event.getItem();
+        Material abilityItem = Material.FEATHER;
 
-        // Checks for common ability exclusions.
-        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.FEATHER)) {
+        // Ignores the event if the given item does not match the desired item.
+        if (itemStack == null
+                || !itemStack.hasItemMeta()
+                || !itemStack.getItemMeta().hasDisplayName()
+                || itemStack.getType() != abilityItem) {
+            return;
+        }
+
+        // Ignores the event if the player is not using the desired kit.
+        if (!(playerKit instanceof Archer)) {
+            return;
+        }
+
+        // Ignores the event if the player is in a safe zone.
+        if (Regions.isInSafezone(playerLoc)) {
+            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
+            return;
+        }
+
+        // Ignores the event if the player's ability is on cooldown.
+        if (playerData.hasCooldown(abilityItem, true)) {
             return;
         }
 
         // Plays the ability sound.
         player.getWorld().playSound(playerLoc, Sound.BAT_TAKEOFF, 1, 1);
 
-        // Remove the player's existing speed, resistance, and weakness effects.
+        // Remove the player's existing speed and resistance effects.
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-        player.removePotionEffect(PotionEffectType.WEAKNESS);
 
-        // Gives the player speed, resistance, weakness, and regeneration.
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Settings.archerKitDuration * 20, 2, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Settings.archerKitDuration * 20, 0, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.archerKitDuration * 20, 1, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Settings.archerKitDuration * 20, 1, false, false));
+        // Gives the player speed, resistance, and regeneration.
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Settings.archerKitDuration * 20, 2, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Settings.archerKitDuration * 20, 0, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Settings.archerKitDuration * 20, 1, true, true));
+
+        // Gives the kit's default potion effects back after the ability duration.
+        int changeCount = playerData.getChangeCount();
+        TaskUtil.runTaskLater(() -> {
+            if (playerData.getChangeCount() == changeCount) {
+                for (PotionEffect effect : playerKit.getPotionEffects()) {
+                    player.addPotionEffect(effect);
+                }
+            }
+        }, Settings.archerKitDuration * 20L + 1L);
 
         // Sets the player's ability cooldown.
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-        playerData.setCooldown(playerKit, Settings.archerKitCooldown, true);
+        playerData.setCooldown(playerKit, abilityItem, Settings.archerKitCooldown, true);
     }
 }

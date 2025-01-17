@@ -209,13 +209,12 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param contents The YAML data to parse and store comments for.
      */
     private void parseAndStoreComments(@NotNull String contents) {
-        String[] lines = contents.split("\n");
-        StringBuilder commentBuilder = new StringBuilder();
-        String lastComment = commentBuilder.toString();
+        String @NotNull [] lines = contents.split("\n");
+        @NotNull StringBuilder commentBuilder = new StringBuilder();
         boolean isHeader = true; // Assume the first comments are header comments
 
         // Define the pattern within this method
-        Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
+        @NotNull Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
 
         for (String entry : lines) {
             String line = entry;
@@ -235,17 +234,19 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             } else {
                 if (!line.trim().isEmpty() && isHeader) {
                     // Store header comments and mark that we've found a non-comment line
+                    @NotNull String lastComment = commentBuilder.toString();
                     commentsMap.put("__header__", lastComment);
                     commentBuilder.setLength(0);
                     isHeader = false; // No longer reading header comments
                 }
 
-                Matcher matcher = keyPattern.matcher(line);
+                @NotNull Matcher matcher = keyPattern.matcher(line);
 
                 if (matcher.find()) {
                     // Found a key, store the accumulated comments if any
                     String key = matcher.group(1);
                     if (commentBuilder.length() > 0) {
+                        @NotNull String lastComment = commentBuilder.toString();
                         commentsMap.put(key, lastComment);
                         commentBuilder.setLength(0); // Reset comment builder
                     }
@@ -255,6 +256,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
 
         // In case the file ends with comments not associated with a key
         if (commentBuilder.length() > 0 && !isHeader) {
+            @NotNull String lastComment = commentBuilder.toString();
             commentsMap.put("__footer__", lastComment);
         }
     }

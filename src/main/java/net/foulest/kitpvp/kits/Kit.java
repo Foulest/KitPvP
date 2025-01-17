@@ -58,6 +58,15 @@ public interface Kit {
     }
 
     /**
+     * Gets the max health of the kit.
+     *
+     * @return The max health of the kit.
+     */
+    default double getMaxHealth() {
+        return 20;
+    }
+
+    /**
      * Gets the config path of the kit.
      * <p>
      * Default location(s):
@@ -82,12 +91,28 @@ public interface Kit {
         String configPath = getConfigPath();
         String itemName = Settings.config.getString(configPath + ".display-item");
         Material material = Material.getMaterial(itemName);
+        ItemBuilder item;
 
+        // Check if the material is valid.
         if (material == null) {
             MessageUtil.log(Level.WARNING, "Invalid display item for " + kitName + ": " + itemName);
             return new ItemBuilder(Material.BARRIER).hideInfo().getItem();
+        } else {
+            // Checks if the item is a SKULL_ITEM. If so, it grabs the other SKULL_ITEM
+            // from the getArmor() helmet and sets the display item's texture to that.
+            if (material == Material.SKULL_ITEM) {
+                List<ItemBuilder> armor = getArmor();
+
+                if (!armor.isEmpty() && armor.get(0).getItem().getType() == Material.SKULL_ITEM) {
+                    item = armor.get(0).hideInfo();
+                    return item.getItem();
+                }
+            }
+
+            // Construct the item with the specified material.
+            item = new ItemBuilder(material).hideInfo();
         }
-        return new ItemBuilder(material).hideInfo().getItem();
+        return item.getItem();
     }
 
     /**
@@ -124,15 +149,16 @@ public interface Kit {
         for (Map<?, ?> itemConfig : itemsConfigList) {
             String materialName = (String) itemConfig.get("material");
             Material material = Material.getMaterial(materialName);
+            ItemBuilder item;
 
             // Check if the material is valid.
             if (material == null) {
-                MessageUtil.log(Level.WARNING, "Invalid material for " + kitName + "'s item: " + material);
+                MessageUtil.log(Level.WARNING, "Invalid material for " + kitName + "'s item: " + materialName);
                 continue;
+            } else {
+                // Construct the item with the specified material.
+                item = new ItemBuilder(material);
             }
-
-            // Construct the item with the specified material.
-            ItemBuilder item = new ItemBuilder(material);
 
             // Set the item's name.
             if (itemConfig.containsKey("name")) {
@@ -483,6 +509,10 @@ public interface Kit {
         // Sets the player's kit data.
         playerData.setActiveKit(this);
 
+        // Sets the player's max health.
+        double maxHealth = getMaxHealth();
+        player.setMaxHealth(maxHealth);
+
         // Sets the player's potion effects.
         List<PotionEffect> effects = getPotionEffects();
         if (effects != null) {
@@ -633,5 +663,9 @@ public interface Kit {
         player.playSound(location, Sound.SLIME_WALK, 1, 1);
         player.updateInventory();
         player.closeInventory();
+
+        // Update the player's kit change count.
+        int changeCount = playerData.getChangeCount();
+        playerData.setChangeCount(changeCount + 1);
     }
 }

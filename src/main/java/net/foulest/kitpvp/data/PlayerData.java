@@ -19,6 +19,7 @@ package net.foulest.kitpvp.data;
 
 import lombok.Data;
 import net.foulest.kitpvp.KitPvP;
+import net.foulest.kitpvp.cooldown.Cooldown;
 import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
@@ -60,6 +61,7 @@ public class PlayerData {
     private final Set<Kit> ownedKits = new HashSet<>();
     private Kit activeKit;
     private Kit previousKit = KitManager.getKit("Knight");
+    private int changeCount;
 
     // Player stats
     private int coins = Settings.startingCoins;
@@ -80,9 +82,11 @@ public class PlayerData {
 
     // No-fall data
     private boolean noFall;
+    private double lastVelocityY;
+    private long onGroundTicks;
 
     // Cooldowns and timers
-    private final Map<Kit, Long> cooldowns = new HashMap<>();
+    private final List<Cooldown> cooldowns = new ArrayList<>();
     private @Nullable BukkitTask abilityCooldownNotifier;
     private BukkitTask teleportToSpawnTask;
 
@@ -91,6 +95,12 @@ public class PlayerData {
 
     // Vampire task
     private @Nullable BukkitTask lifeStealCooldown;
+
+    // Reaper mark
+    private Player activeReaperMark;
+
+    // Soldier rage
+    private double soldierRage;
 
     /**
      * Creates a new player data object.
@@ -104,26 +114,30 @@ public class PlayerData {
     }
 
     /**
-     * Checks if the player has a cooldown for their active kit.
+     * Checks if the player has a cooldown for their active kit and item.
      *
      * @param sendMessage Whether to send a message to the player.
      * @return Whether the player has a cooldown.
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean hasCooldown(boolean sendMessage) {
-        long cooldown = cooldowns.containsKey(activeKit) ? (cooldowns.get(activeKit) - System.currentTimeMillis()) : 0L;
+    public boolean hasCooldown(Material itemType, boolean sendMessage) {
+        for (Cooldown cooldown : cooldowns) {
+            if (cooldown.getPlayer() == player && cooldown.getItemType() == itemType) {
+                long duration = cooldown.getDuration() - System.currentTimeMillis();
 
-        if (cooldown > 0) {
-            if (sendMessage) {
-                BigDecimal cooldownDecimal = BigDecimal.valueOf((double) cooldown / 1000).setScale(1, RoundingMode.HALF_UP);
-                double cooldownDouble = cooldownDecimal.doubleValue();
+                if (duration > 0) {
+                    if (sendMessage) {
+                        BigDecimal cooldownDecimal = BigDecimal.valueOf((double) duration / 1000).setScale(1, RoundingMode.HALF_UP);
+                        double cooldownDouble = cooldownDecimal.doubleValue();
 
-                String cooldownMsg = "&cYou are still on cooldown for %time% seconds.";
-                cooldownMsg = cooldownMsg.replace("%time%", String.valueOf(cooldownDouble));
+                        String cooldownMsg = "&cYou are still on cooldown for %time% seconds.";
+                        cooldownMsg = cooldownMsg.replace("%time%", String.valueOf(cooldownDouble));
 
-                MessageUtil.messagePlayer(player, cooldownMsg);
+                        MessageUtil.messagePlayer(player, cooldownMsg);
+                    }
+                    return true;
+                }
             }
-            return true;
         }
         return false;
     }
@@ -154,21 +168,53 @@ public class PlayerData {
      * Sets a cooldown for a specific kit.
      *
      * @param kit          The kit to set the cooldown for.
+     * @param itemType     The item type to set the cooldown for.
      * @param cooldownTime The time in seconds for the cooldown.
      * @param notify       Whether to notify the player when the cooldown expires.
      */
-    public void setCooldown(Kit kit, int cooldownTime, boolean notify) {
-        cooldowns.put(kit, System.currentTimeMillis() + cooldownTime * 1000L);
+    public void setCooldown(Kit kit, Material itemType, int cooldownTime, boolean notify) {
+        Cooldown cooldown = new Cooldown(player, kit, itemType, System.currentTimeMillis() + cooldownTime * 1000L);
+
+        // Removes any existing cooldowns for the player, kit, and item type.
+        for (Cooldown existingCooldown : cooldowns) {
+            if (existingCooldown.getPlayer() == player
+                    && existingCooldown.getKit() == kit
+                    && existingCooldown.getItemType() == itemType) {
+                cooldowns.remove(existingCooldown);
+                break;
+            }
+        }
+
+        // Adds the new cooldown.
+        cooldowns.add(cooldown);
 
         if (notify) {
             abilityCooldownNotifier = new BukkitRunnable() {
                 @Override
                 public void run() {
                     MessageUtil.messagePlayer(player, "&aYour ability cooldown has expired.");
-                    cooldowns.remove(kit);
+
+                    // Remove the cooldown that just expired.
+                    cooldowns.remove(cooldown);
                 }
             }.runTaskLater(KitPvP.instance, cooldownTime * 20L);
         }
+    }
+
+    /**
+     * Gets a cooldown for a specific kit and item type.
+     *
+     * @param kit The kit to get the cooldown for.
+     * @param itemType The item type to get the cooldown for.
+     * @return The cooldown.
+     */
+    public @Nullable Cooldown getCooldown(Kit kit, Material itemType) {
+        for (Cooldown cooldown : cooldowns) {
+            if (cooldown.getPlayer() == player && cooldown.getKit() == kit && cooldown.getItemType() == itemType) {
+                return cooldown;
+            }
+        }
+        return null;
     }
 
     /**

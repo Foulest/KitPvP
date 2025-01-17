@@ -19,9 +19,11 @@ package net.foulest.kitpvp.region;
 
 import lombok.Data;
 import lombok.Getter;
+import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
+import net.foulest.kitpvp.listeners.kits.ReaperListener;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Bukkit;
@@ -82,6 +84,13 @@ public class Spawn {
         CombatTag.remove(player);
         playerData.setActiveKit(null);
 
+        // Removes the Reaper Mark if the player has one.
+        ReaperListener.removeReaperMark(playerData, false, false);
+
+        // Removes the player's Soldier data.
+        playerData.setSoldierRage(0.0);
+        player.removeMetadata("buffBanner", KitPvP.getInstance());
+
         for (PotionEffect effect : player.getActivePotionEffects()) {
             PotionEffectType effectType = effect.getType();
             player.removePotionEffect(effectType);
@@ -89,8 +98,13 @@ public class Spawn {
 
         playerData.giveDefaultItems();
 
+        player.setMaxHealth(20);
         player.setHealth(20);
         player.teleport(location);
+
+        // Update the player's kit change count.
+        int changeCount = playerData.getChangeCount();
+        playerData.setChangeCount(changeCount + 1);
     }
 
     /**

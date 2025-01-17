@@ -23,9 +23,8 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Mage;
 import net.foulest.kitpvp.kits.type.Pyro;
-import net.foulest.kitpvp.util.AbilityUtil;
-import net.foulest.kitpvp.util.MessageUtil;
-import net.foulest.kitpvp.util.Settings;
+import net.foulest.kitpvp.region.Regions;
+import net.foulest.kitpvp.util.*;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -64,10 +63,30 @@ public class MageListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
-        ItemStack item = event.getItem();
+        ItemStack itemStack = event.getItem();
+        Material abilityItem = Material.GLOWSTONE_DUST;
 
-        // Checks for common ability exclusions.
-        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.GLOWSTONE_DUST)) {
+        // Ignores the event if the given item does not match the desired item.
+        if (itemStack == null
+                || !itemStack.hasItemMeta()
+                || !itemStack.getItemMeta().hasDisplayName()
+                || itemStack.getType() != abilityItem) {
+            return;
+        }
+
+        // Ignores the event if the player is not using the desired kit.
+        if (!(playerKit instanceof Mage)) {
+            return;
+        }
+
+        // Ignores the event if the player is in a safe zone.
+        if (Regions.isInSafezone(playerLoc)) {
+            MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
+            return;
+        }
+
+        // Ignores the event if the player's ability is on cooldown.
+        if (playerData.hasCooldown(abilityItem, true)) {
             return;
         }
 
@@ -78,11 +97,13 @@ public class MageListener implements Listener {
         if (nearbyPlayers.isEmpty()) {
             player.playSound(playerLoc, Sound.VILLAGER_NO, 1, 1);
             MessageUtil.messagePlayer(player, "&cAbility failed: no players nearby.");
-            playerData.setCooldown(playerKit, 3, true);
+            playerData.setCooldown(playerKit, abilityItem, 3, true);
             return;
         }
 
         for (Player target : nearbyPlayers) {
+            PlayerData targetData = PlayerDataManager.getPlayerData(target);
+            Kit targetKit = targetData.getActiveKit();
             Location targetLoc = target.getLocation();
 
             // Give the target Slowness, Blindness, and Weakness for 3 seconds.
@@ -94,12 +115,22 @@ public class MageListener implements Listener {
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.mageKitDuration * 20, 1, false, false));
             target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.mageKitDuration * 20, 1, false, false));
             MessageUtil.messagePlayer(target, "&cYou have been debuffed by a Mage!");
+
+            // Gives the kit's default potion effects back after the ability duration.
+            int changeCount = targetData.getChangeCount();
+            TaskUtil.runTaskLater(() -> {
+                if (targetData.getChangeCount() == changeCount) {
+                    for (PotionEffect effect : targetKit.getPotionEffects()) {
+                        target.addPotionEffect(effect);
+                    }
+                }
+            }, Settings.mageKitDuration * 20L + 1L);
         }
 
         // Sets the player's ability cooldown.
         player.playSound(playerLoc, Sound.FIZZ, 1, 1);
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-        playerData.setCooldown(playerKit, Settings.mageKitCooldown, true);
+        playerData.setCooldown(playerKit, abilityItem, Settings.mageKitCooldown, true);
     }
 
     /**

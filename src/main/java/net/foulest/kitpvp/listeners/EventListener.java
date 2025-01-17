@@ -26,6 +26,7 @@ import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.kits.type.Knight;
+import net.foulest.kitpvp.listeners.kits.ReaperListener;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.menus.KitSelector;
 import net.foulest.kitpvp.menus.KitShop;
@@ -57,6 +58,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -95,6 +97,7 @@ public class EventListener implements Listener {
 
             // The rest of the initialization happens here only after data is loaded
             TaskUtil.runTaskLater(() -> {
+                player.setMaxHealth(20);
                 player.setHealth(20);
                 player.setGameMode(GameMode.ADVENTURE);
                 player.getInventory().setHeldItemSlot(0);
@@ -127,9 +130,11 @@ public class EventListener implements Listener {
             DeathListener.handleDeath(player, true);
         }
 
+        // Removes any Reaper Marks associated with the player.
+        ReaperListener.removeReaperMark(playerData, true, true);
+        ReaperListener.removeReaperMark(playerData, false, true);
+
         // Saves the player's data.
-        playerData.clearCooldowns();
-        playerData.setKillstreak(0);
         playerData.saveAll();
 
         // Removes the player's data from the map.
@@ -749,6 +754,20 @@ public class EventListener implements Listener {
 
         boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
 
+        Vector velocity = player.getVelocity();
+        double velocityY = velocity.getY();
+
+        // Updates the player's on ground ticks.
+        if (velocityY == -0.0784000015258789) {
+            long onGroundTicks = playerData.getOnGroundTicks();
+            playerData.setOnGroundTicks(onGroundTicks + 1);
+        } else {
+            playerData.setOnGroundTicks(0);
+        }
+
+        // Updates the player's last values.
+        playerData.setLastVelocityY(velocityY);
+
         // Ignores rotation updates.
         if (!playerMoved) {
             return;
@@ -768,9 +787,14 @@ public class EventListener implements Listener {
         }
 
         // Equips the player's previously used kit when they leave spawn without a kit equipped.
-        if (playerData.getActiveKit() == null && !player.isDead() && !player.getAllowFlight()
-                && !Regions.isInSafezone(from)) {
+        if (playerData.getActiveKit() == null && !player.isDead()
+                && !player.getAllowFlight() && !Regions.isInSafezone(from)) {
             player.closeInventory();
+
+            if (playerData.getPreviousKit() == null) {
+                playerData.setPreviousKit(new Knight());
+            }
+
             playerData.getPreviousKit().apply(player);
             MessageUtil.messagePlayer(player, "&cYour previous kit has been automatically applied.");
             return;
@@ -783,7 +807,8 @@ public class EventListener implements Listener {
                 player.teleport(from);
                 MessageUtil.messagePlayer(player, "&cYou can't enter spawn while combat tagged.");
             } else {
-                player.setHealth(20);
+                double maxHealth = player.getMaxHealth();
+                player.setHealth(maxHealth);
                 player.setFireTicks(0);
 
                 if (!playerData.isNoFall()) {
@@ -794,11 +819,47 @@ public class EventListener implements Listener {
     }
 
     /**
+     * Handles removing the no-fall effect.
+     *
+     * @param event PlayerMoveEvent
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public static void onNoFallRemoval(@NotNull PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+        Location to = event.getTo();
+        Location from = event.getFrom();
+
+        double toX = to.getX();
+        double toZ = to.getZ();
+
+        double fromX = from.getX();
+        double fromZ = from.getZ();
+
+        double deltaY = to.getY() - from.getY();
+        double deltaXZ = StrictMath.hypot(toX - fromX, toZ - fromZ);
+
+        boolean playerMoved = (deltaXZ > 0.05 || Math.abs(deltaY) > 0.05);
+
+        if (!playerMoved) {
+            return;
+        }
+
+        boolean noFall = playerData.isNoFall();
+        long onGroundTicks = playerData.getOnGroundTicks();
+
+        if (noFall && !Regions.isInSafezone(to) && !Regions.isInSafezone(from) && onGroundTicks == 1) {
+            playerData.setNoFall(false);
+        }
+    }
+
+    /**
      * Handles players taking fall damage.
      *
      * @param event EntityDamageEvent
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public static void onFallDamage(@NotNull EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();

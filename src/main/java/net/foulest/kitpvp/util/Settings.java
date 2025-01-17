@@ -102,7 +102,13 @@ public class Settings {
 
     // Fisherman kit settings
     public static int fishermanKitCooldown;
+    public static int fishermanKitRodCooldown;
     public static int fishermanKitDuration;
+
+    // Jester kit settings
+    public static int jesterKitCooldown;
+    public static int jesterKitDuration;
+    public static double jesterKitDamage;
 
     // Kangaroo kit settings
     public static int kangarooKitCooldown;
@@ -119,6 +125,15 @@ public class Settings {
     public static int pyroKitCooldown;
     public static int pyroKitDuration;
     public static double pyroKitDamage;
+
+    // Reaper kit settings
+    public static int reaperKitCooldown;
+    public static int reaperKitDuration;
+
+    // Soldier kit settings
+    public static int soldierKitBattalionDuration;
+    public static int soldierKitBannerDuration;
+    public static int soldierKitMaxRage;
 
     // Tank kit settings
     public static int tankKitCooldown;
@@ -258,8 +273,14 @@ public class Settings {
         archerKitDuration = config.getInt("kitpvp.kits.archer.ability.duration");
 
         // Fisherman kit settings
+        fishermanKitRodCooldown = config.getInt("kitpvp.kits.fisherman.rod-cooldown");
         fishermanKitCooldown = config.getInt("kitpvp.kits.fisherman.ability.cooldown");
         fishermanKitDuration = config.getInt("kitpvp.kits.fisherman.ability.duration");
+
+        // Jester kit settings
+        jesterKitCooldown = config.getInt("kitpvp.kits.jester.ability.cooldown");
+        jesterKitDuration = config.getInt("kitpvp.kits.jester.ability.duration");
+        jesterKitDamage = config.getDouble("kitpvp.kits.jester.ability.damage");
 
         // Kangaroo kit settings
         kangarooKitCooldown = config.getInt("kitpvp.kits.kangaroo.ability.cooldown");
@@ -276,6 +297,15 @@ public class Settings {
         pyroKitCooldown = config.getInt("kitpvp.kits.pyro.ability.cooldown");
         pyroKitDuration = config.getInt("kitpvp.kits.pyro.ability.duration");
         pyroKitDamage = config.getDouble("kitpvp.kits.pyro.ability.damage");
+
+        // Reaper kit settings
+        reaperKitCooldown = config.getInt("kitpvp.kits.reaper.ability.cooldown");
+        reaperKitDuration = config.getInt("kitpvp.kits.reaper.ability.duration");
+
+        // Soldier kit settings
+        soldierKitBattalionDuration = config.getInt("kitpvp.kits.soldier.ability.battalion-duration");
+        soldierKitBannerDuration = config.getInt("kitpvp.kits.soldier.ability.banner-duration");
+        soldierKitMaxRage = config.getInt("kitpvp.kits.soldier.ability.max-rage");
 
         // Tank kit settings
         tankKitCooldown = config.getInt("kitpvp.kits.tank.ability.cooldown");

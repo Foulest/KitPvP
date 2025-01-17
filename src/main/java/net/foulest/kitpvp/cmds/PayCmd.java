@@ -43,26 +43,28 @@ public class PayCmd {
     @Command(name = "pay", description = "Send coins to another player.",
             usage = "/pay <player> <amount>", inGameOnly = true, permission = "kitpvp.pay")
     public static void onCommand(@NotNull CommandArgs args) {
-        CommandSender sender = args.getSender();
+        CommandSender commandSender = args.getSender();
+        Player sender = args.getPlayer();
+
+        // Checks if the player is null.
+        if (sender == null) {
+            MessageUtil.messagePlayer(commandSender, ConstantUtil.IN_GAME_ONLY);
+            return;
+        }
 
         if (args.length() == 2) {
-            Player player = args.getPlayer();
+            // Sender data
+            PlayerData senderData = PlayerDataManager.getPlayerData(sender);
+            Location senderLoc = sender.getLocation();
+            String senderName = sender.getName();
 
-            // Checks if the player is null.
-            if (player == null) {
-                MessageUtil.messagePlayer(sender, ConstantUtil.IN_GAME_ONLY);
-                return;
-            }
-
-            Location location = player.getLocation();
-            String playerName = player.getName();
-
+            // Target data
             String desiredTarget = args.getArgs(0);
             Player target = Bukkit.getPlayer(desiredTarget);
 
             // Checks if the target is online.
             if (target == null) {
-                MessageUtil.messagePlayer(player, ConstantUtil.PLAYER_NOT_FOUND);
+                MessageUtil.messagePlayer(sender, ConstantUtil.PLAYER_NOT_FOUND);
                 return;
             }
 
@@ -70,7 +72,7 @@ public class PayCmd {
 
             // Checks if the amount is a number.
             if (!StringUtils.isNumeric(desiredAmount)) {
-                MessageUtil.messagePlayer(player, "&c'" + desiredAmount + "' is not a valid amount.");
+                MessageUtil.messagePlayer(sender, "&c'" + desiredAmount + "' is not a valid amount.");
                 return;
             }
 
@@ -78,36 +80,37 @@ public class PayCmd {
 
             // Checks if the amount is negative.
             if (amount < 0) {
-                MessageUtil.messagePlayer(player, "&cThe amount must be positive.");
+                MessageUtil.messagePlayer(sender, "&cThe amount must be positive.");
                 return;
             }
 
             // Checks if the sender is the target.
-            if (sender == target) {
-                player.playSound(location, Sound.VILLAGER_NO, 1.0F, 1.0F);
-                MessageUtil.messagePlayer(player, "&cYou can't pay yourself.");
+            if (commandSender == target) {
+                sender.playSound(senderLoc, Sound.VILLAGER_NO, 1.0F, 1.0F);
+                MessageUtil.messagePlayer(sender, "&cYou can't pay yourself.");
                 return;
             }
 
+            // Target data
             PlayerData targetData = PlayerDataManager.getPlayerData(target);
-            PlayerData senderData = PlayerDataManager.getPlayerData(player);
+            int targetCoins = targetData.getCoins();
+            String targetName = target.getName();
 
             // Checks if the sender has enough coins.
             if (senderData.getCoins() - amount <= 0) {
-                MessageUtil.messagePlayer(sender, ConstantUtil.NOT_ENOUGH_COINS);
+                MessageUtil.messagePlayer(commandSender, ConstantUtil.NOT_ENOUGH_COINS);
                 return;
             }
 
-            int targetCoins = targetData.getCoins();
-
+            // Transfers the coins.
             targetData.setCoins(targetCoins + amount);
             senderData.removeCoins(amount);
 
-            MessageUtil.messagePlayer(player, "&a" + playerName + " sent you " + amount + " coins!");
-            MessageUtil.messagePlayer(sender, "&aYou sent " + playerName + " " + amount + " coins!");
-            return;
+            // Sends messages to the sender and target.
+            MessageUtil.messagePlayer(target, "&a" + senderName + " sent you " + amount + " coins!");
+            MessageUtil.messagePlayer(sender, "&aYou sent " + targetName + " " + amount + " coins!");
+        } else {
+            MessageUtil.messagePlayer(commandSender, "&cUsage: /pay <player> <amount>");
         }
-
-        MessageUtil.messagePlayer(sender, "&cUsage: /pay <player> <amount>");
     }
 }

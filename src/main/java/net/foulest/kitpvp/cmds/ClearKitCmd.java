@@ -119,6 +119,7 @@ public class ClearKitCmd {
         playerData.clearCooldowns();
         playerData.setActiveKit(null);
 
+        player.setMaxHealth(20);
         player.setHealth(20);
         player.getInventory().setHeldItemSlot(0);
 

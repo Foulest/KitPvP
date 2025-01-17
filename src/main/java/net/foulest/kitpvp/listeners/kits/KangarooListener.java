@@ -23,7 +23,9 @@ import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Kangaroo;
 import net.foulest.kitpvp.region.Regions;
-import net.foulest.kitpvp.util.*;
+import net.foulest.kitpvp.util.ConstantUtil;
+import net.foulest.kitpvp.util.MessageUtil;
+import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -57,28 +59,30 @@ public class KangarooListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
         Kit playerKit = playerData.getActiveKit();
-        ItemStack item = event.getItem();
+        ItemStack itemStack = event.getItem();
+        Material abilityItem = Material.FIREWORK;
 
-        // Checks for common ability exclusions.
-        if (AbilityUtil.shouldBeExcluded(playerLoc, player, playerData, playerKit, item, Material.FIREWORK)) {
+        // Ignores the event if the given item does not match the desired item.
+        if (itemStack == null
+                || !itemStack.hasItemMeta()
+                || !itemStack.getItemMeta().hasDisplayName()
+                || itemStack.getType() != abilityItem) {
             return;
         }
 
-        // Ignores the event if the player isn't using the Kangaroo ability.
-        if (!(playerKit instanceof Kangaroo)
-                || !event.getAction().toString().contains("RIGHT")
-                || player.getItemInHand().getType() != Material.FIREWORK) {
+        // Ignores the event if the player is not using the desired kit.
+        if (!(playerKit instanceof Kangaroo)) {
             return;
         }
 
-        // Ignores the event if the player is in spawn.
+        // Ignores the event if the player is in a safe zone.
         if (Regions.isInSafezone(playerLoc)) {
             MessageUtil.messagePlayer(player, ConstantUtil.ABILITY_IN_SPAWN);
             return;
         }
 
         // Ignores the event if the player's ability is on cooldown.
-        if (playerData.hasCooldown(true)) {
+        if (playerData.hasCooldown(abilityItem, true)) {
             return;
         }
 
@@ -89,9 +93,9 @@ public class KangarooListener implements Listener {
         Vector direction = player.getEyeLocation().getDirection();
 
         // Adjusts the direction based on whether the player is sneaking.
-        if (BlockUtil.isOnGroundOffset(player, 0.1)) {
-            direction.setY(0.3);
-            direction.multiply(2.5);
+        if (player.isSneaking() && player.getVelocity().getY() != -0.0784000015258789) {
+            direction.setY(0.2);
+            direction.multiply(2.25);
         } else {
             direction.setY(1.2);
         }
@@ -102,7 +106,7 @@ public class KangarooListener implements Listener {
 
         // Sets the player's ability cooldown.
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");
-        playerData.setCooldown(playerKit, Settings.kangarooKitCooldown, true);
+        playerData.setCooldown(playerKit, abilityItem, Settings.kangarooKitCooldown, true);
     }
 
     /**
@@ -122,6 +126,8 @@ public class KangarooListener implements Listener {
         Player player = (Player) event.getDamager();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Location playerLoc = player.getLocation();
+        ItemStack itemInHand = player.getItemInHand();
+        Material abilityItem = Material.FIREWORK;
 
         // Target data
         Player target = (Player) event.getEntity();
@@ -138,10 +144,10 @@ public class KangarooListener implements Listener {
         }
 
         // Ignores hits that aren't with the Market Gardener.
-        if (player.getItemInHand() == null
-                || !player.getItemInHand().hasItemMeta()
-                || !player.getItemInHand().getItemMeta().hasDisplayName()
-                || !player.getItemInHand().getItemMeta().getDisplayName().contains("Market Gardener")) {
+        if (itemInHand == null
+                || !itemInHand.hasItemMeta()
+                || !itemInHand.getItemMeta().hasDisplayName()
+                || !itemInHand.getItemMeta().getDisplayName().contains("Market Gardener")) {
             return;
         }
 
@@ -150,8 +156,8 @@ public class KangarooListener implements Listener {
         // 1a. Deal +150% damage to the target.
 
         // 1. If the player is airborne and has a cooldown...
-        if (playerData.isNoFall() && playerData.hasCooldown(false)) {
-            // 1a. Deal +150% damage to the target.
+        if (playerData.isNoFall() && playerData.hasCooldown(abilityItem, false)) {
+            // 1a. Deal +200% damage to the target.
             MessageUtil.messagePlayer(player, "&aYou landed a critical hit on &e" + targetName + "&a!");
             player.getWorld().playSound(playerLoc, Sound.ITEM_BREAK, 1, 1);
             double damage = event.getDamage();

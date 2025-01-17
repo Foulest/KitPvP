@@ -16,7 +16,7 @@ kitpvp:
     x: 0.5
     y: 64.0
     z: 0.5
-    yaw: 0.0
+    yaw: 90.0
     pitch: 0.0
   # -----------------------------------------------
   # Combat Tag Settings
@@ -110,299 +110,355 @@ kitpvp:
       ability:
         cooldown: 30
         duration: 5
-      display-item: "BOW"
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.archer"
+        name: kitpvp.kit.archer
         default: true
       lore:
-        - "&7Style: &aOffensive"
-        - ""
-        - "&7Master of long-ranged combat."
-      effects: [ ]
+        - '&7Style: &aOffensive'
+        - ''
+        - '&7Master of long-ranged combat.'
+      effects: []
       items:
-        - material: "WOOD_SWORD"
-          name: "&aArcher's Sword"
+        - material: WOOD_SWORD
+          name: '&aArcher''s Sword'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &c-25% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "BOW"
-          name: "&aArcher's Bow"
+        - material: BOW
+          name: '&aArcher''s Bow'
           lore:
-            - "&7Compared to Bow:"
-            - "&8\u2503 &7No notable changes."
+            - '&7Compared to Bow:'
+            - '&8┃ &7No notable changes.'
           unbreakable: true
           hide-info: true
-        - material: "FEATHER"
-          name: "&aSpeed Boost &7(Right Click)"
+        - material: FEATHER
+          name: '&aSpeed Boost &7(Right Click)'
           lore:
-            - "&7Gain a temporary speed boost."
+            - '&7Gain a temporary speed boost.'
           unbreakable: true
           hide-info: true
           amount: 1
           slot: 2
-        - material: "ARROW"
+        - material: ARROW
           unbreakable: true
           hide-info: true
           amount: 32
           slot: 8
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTMwMzIyZDM1NjgzMjI4ZjMwZmJjYThjZDFjMmE2MDIwODczMDE1MTZmNmI0MzhiNDhkNjc2ZWU1NTIwNzU3MCJ9fX0="
-          name: "&fArcher's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTMwMzIyZDM1NjgzMjI4ZjMwZmJjYThjZDFjMmE2MDIwODczMDE1MTZmNmI0MzhiNDhkNjc2ZWU1NTIwNzU3MCJ9fX0=
+          name: '&fArcher''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fArcher's Chestplate"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fArcher''s Chestplate'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "LEATHER_LEGGINGS"
-          name: "&fArcher's Leggings"
-          lore: [ ]
+          material: LEATHER_LEGGINGS
+          name: '&fArcher''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "LEATHER_BOOTS"
-          name: "&fArcher's Boots"
-          lore: [ ]
+          material: LEATHER_BOOTS
+          name: '&fArcher''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     fisherman:
       enabled: true
       cost: 0
+      rod-cooldown: 2
       ability:
         cooldown: 30
-        duration: 3
-      display-item: "FISHING_ROD"
+        duration: 2
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.fisherman"
+        name: kitpvp.kit.fisherman
         default: true
       lore:
-        - "&7Style: &aMixed"
-        - ""
-        - "&7Hooks players to your location."
+        - '&7Style: &aMixed'
+        - ''
+        - '&7Hooks players to your location.'
       effects:
-        - type: "WATER_BREATHING"
+        - type: WATER_BREATHING
       items:
-        - material: "STONE_SWORD"
-          name: "&aFisherman's Sword"
+        - material: WOOD_SWORD
+          name: '&aFisherman''s Sword'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &7No notable changes."
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+50% damage on wet players'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "FISHING_ROD"
-          name: "&aHookshot &7(Right Click)"
+        - material: FISHING_ROD
+          name: '&aHookshot &7(Right Click)'
           lore:
-            - "&7Hooks players to your location."
+            - '&7Hooks players to your location.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcxNTI4NzZiYzNhOTZkZDJhMjI5OTI0NWVkYjNiZWVmNjQ3YzhhNTZhYzg4NTNhNjg3YzNlN2I1ZDhiYiJ9fX0="
-          name: "&fFisherman's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcxNTI4NzZiYzNhOTZkZDJhMjI5OTI0NWVkYjNiZWVmNjQ3YzhhNTZhYzg4NTNhNjg3YzNlN2I1ZDhiYiJ9fX0=
+          name: '&fFisherman''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fFisherman's Chestplate"
-          color: "BF8426"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fFisherman''s Chestplate'
+          color: BF8426
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fFisherman's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fFisherman''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fFisherman's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fFisherman''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     kangaroo:
       enabled: true
       cost: 0
       ability:
-        cooldown: 15
-      display-item: "FIREWORK"
+        cooldown: 5
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.kangaroo"
+        name: kitpvp.kit.kangaroo
         default: true
       lore:
-        - "&7Style: &aMixed"
-        - ""
-        - "&7Hooks players to your location."
+        - '&7Style: &aMixed'
+        - ''
+        - '&7Hop around like a Kangaroo.'
       effects:
-        - type: "JUMP"
+        - type: JUMP
           amplifier: 1
+        - type: SPEED
+          amplifier: 0
       items:
-        - material: "WOOD_SWORD"
-          name: "&aKangaroo's Sword"
+        - material: IRON_SPADE
+          name: '&aMarket Gardener'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &c-25% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+150% damage bonus while hopping'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "STONE_SPADE"
-          name: "&aMarket Gardener"
+        - material: FIREWORK
+          name: '&aHop &7(Right Click)'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &b+150% damage bonus while hopping"
-            - "&8\u2503 &c-40% damage penalty"
-          unbreakable: true
-          hide-info: true
-        - material: "FIREWORK"
-          name: "&aHop &7(Right Click)"
-          lore:
-            - "&7Hop around like a Kangaroo."
+            - '&7Hop around like a Kangaroo.'
+            - '&8┃ &7Sneak in the air to hop forward.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "ewogICJ0aW1lc3RhbXAiIDogMTYyMjI4MzIxMTIwOSwKICAicHJvZmlsZUlkIiA6ICIzOTg5OGFiODFmMjU0NmQxOGIyY2ExMTE1MDRkZGU1MCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNeVV1aWRJcyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kM2I2MWVjNGI1MjU2NDUzZWRjOTU0MTZhODJiNTRkMjQyMzdhZTgxNGQzNjYzMjQ1MzZhZTkxYzgxYzM5NWVlIgogICAgfQogIH0KfQ=="
-          name: "&fKangaroo's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: ewogICJ0aW1lc3RhbXAiIDogMTYyMjI4MzIxMTIwOSwKICAicHJvZmlsZUlkIiA6ICIzOTg5OGFiODFmMjU0NmQxOGIyY2ExMTE1MDRkZGU1MCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNeVV1aWRJcyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kM2I2MWVjNGI1MjU2NDUzZWRjOTU0MTZhODJiNTRkMjQyMzdhZTgxNGQzNjYzMjQ1MzZhZTkxYzgxYzM5NWVlIgogICAgfQogIH0KfQ==
+          name: '&fKangaroo''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fKangaroo's Chestplate"
-          color: "6E5927"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fKangaroo''s Chestplate'
+          color: '6E5927'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fKangaroo's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fKangaroo''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fKangaroo's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fKangaroo''s Boots'
+          lore: []
+          unbreakable: true
+          hide-info: true
+    jester:
+      enabled: true
+      cost: 0
+      ability:
+        cooldown: 15
+        damage: 2.0
+        duration: 2
+      display-item: SKULL_ITEM
+      permission:
+        name: kitpvp.kit.jester
+        default: true
+      lore:
+        - '&7Style: &aOffensive'
+        - ''
+        - '&7Turns deadly under pressure.'
+      effects: []
+      items:
+        - material: STONE_SWORD
+          name: '&aJester''s Sword'
+          lore:
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+15% damage when below 50% health'
+            - '&8┃ &c-15% damage when above 50% health'
+          unbreakable: true
+          hide-info: true
+        - material: STICK
+          name: '&aWrap Assassin &7(Right Click)'
+          lore:
+            - '&7Launches an ornament that bleeds on impact.'
+          unbreakable: true
+          hide-info: true
+      armor:
+        helmet:
+          material: SKULL_ITEM
+          base64: ewogICJ0aW1lc3RhbXAiIDogMTcxMTgzNjc3MTUzOSwKICAicHJvZmlsZUlkIiA6ICJmNTBjOGRkN2FiN2Y0ZmUyYWI4ZGI1M2NjYzRiYWQxMiIsCiAgInByb2ZpbGVOYW1lIiA6ICJtYWNoYWRvVF9UIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzNiOTAyMmM4NjU1NjRhNmMyNDAxMmU0MDVhZjljZjc3OWMzMTQwZWU4ZDAzYTBjZjI1NjBlMTQ3M2QxNWJhYTMiLAogICAgICAibWV0YWRhdGEiIDogewogICAgICAgICJtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ==
+          name: '&fJester''s Head'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        chestplate:
+          material: LEATHER_CHESTPLATE
+          name: '&fJester''s Chestplate'
+          color: 9F4746
+          lore: []
+          unbreakable: true
+          hide-info: true
+        leggings:
+          material: CHAINMAIL_LEGGINGS
+          name: '&fJester''s Leggings'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        boots:
+          material: CHAINMAIL_BOOTS
+          name: '&fJester''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     knight:
       enabled: true
       cost: 0
-      display-item: "IRON_CHESTPLATE"
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.knight"
+        name: kitpvp.kit.knight
         default: true
       lore:
-        - "&7Style: &aMixed"
-        - ""
-        - "&7No perks or abilities."
-      effects: [ ]
+        - '&7Style: &aMixed'
+        - ''
+        - '&7No perks or abilities.'
+      effects: []
       items:
-        - material: "STONE_SWORD"
-          name: "&aKnight's Sword"
+        - material: STONE_SWORD
+          name: '&aKnight''s Sword'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &7No notable changes."
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &7No notable changes.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA1Mzk3M2U3YzUyMzcyYzNiMTExMzk0ZGZmOTUxOWNiYWMxZmJhM2Y2NTliMjE4NmJlZjhlZWY5ZTEwZmEyIn19fQ=="
-          name: "&fKnight's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA1Mzk3M2U3YzUyMzcyYzNiMTExMzk0ZGZmOTUxOWNiYWMxZmJhM2Y2NTliMjE4NmJlZjhlZWY5ZTEwZmEyIn19fQ==
+          name: '&fKnight''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "IRON_CHESTPLATE"
-          name: "&fKnight's Chestplate"
-          lore: [ ]
+          material: IRON_CHESTPLATE
+          name: '&fKnight''s Chestplate'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fKnight's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fKnight''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fKnight's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fKnight''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     mage:
       enabled: true
       cost: 0
       ability:
-        cooldown: 30
-        duration: 5
-      display-item: "GLOWSTONE_DUST"
+        cooldown: 20
+        duration: 3
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.mage"
+        name: kitpvp.kit.mage
         default: true
       lore:
-        - "&7Style: &aMixed"
-        - ""
-        - "&7Applies debuffs to players."
-      effects: [ ]
+        - '&7Style: &aMixed'
+        - ''
+        - '&7Applies debuffs to players.'
+      effects: []
       items:
-        - material: "STONE_SWORD"
-          name: "&aMage's Sword"
+        - material: STONE_SWORD
+          name: '&aMage''s Sword'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &7No notable changes."
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &7No notable changes.'
           unbreakable: true
           hide-info: true
-        - material: "BLAZE_ROD"
-          name: "&aSun Staff"
+        - material: BLAZE_ROD
+          name: '&aSun Staff'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &b+100% damage against burning players"
-            - "&8\u2503 &b+25% fire damage resistance while active"
-            - "&8\u2503 &c-40% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+100% damage against burning players'
+            - '&8┃ &b+25% fire damage resistance while active'
+            - '&8┃ &c-40% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "GLOWSTONE_DUST"
-          name: "&aStasis &7(Right Click)"
+        - material: GLOWSTONE_DUST
+          name: '&aStasis &7(Right Click)'
           lore:
-            - "&7Applies debuffs to players."
+            - '&7Applies debuffs to players.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmVlMmIxNTQ4NTQ1ZTJhMjQ5N2JkMjRhYWM3OTE3OTI2NTRlZjU4N2E1YWI3M2QzNmFiN2Y1ZDliZjcyYTU0NyJ9fX0="
-          name: "&fMage's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmVlMmIxNTQ4NTQ1ZTJhMjQ5N2JkMjRhYWM3OTE3OTI2NTRlZjU4N2E1YWI3M2QzNmFiN2Y1ZDliZjcyYTU0NyJ9fX0=
+          name: '&fMage''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fMage's Chestplate"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fMage''s Chestplate'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fMage's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fMage''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fMage's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fMage''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     ninja:
@@ -411,127 +467,253 @@ kitpvp:
       ability:
         cooldown: 30
         duration: 5
-      display-item: "NETHER_STAR"
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.ninja"
+        name: kitpvp.kit.ninja
         default: true
       lore:
-        - "&7Style: &aOffensive"
-        - ""
-        - "&7An agile, stealthy class."
+        - '&7Style: &aOffensive'
+        - ''
+        - '&7An agile, stealthy class.'
       effects:
-        - type: "SPEED"
+        - type: SPEED
           amplifier: 1
       items:
-        - material: "GOLD_SWORD"
-          name: "&aNinja's Blade"
+        - material: GOLD_SWORD
+          name: '&aNinja''s Blade'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &b+50% damage when behind target"
-            - "&8\u2503 &c-25% damage penalty"
-          unbreakable: true
-          hide-info: true
-        - material: "INK_SACK"
-          name: "&aShadow Sneak &7(Right Click)"
-          lore:
-            - "&7Temporarily vanish from sight."
-          durability: 8
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+50% damage when behind target'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjQ2ZmZlNGY2OGRhYWEwZjgzNDUzNmNiNTM4NmEzYTc5ZTZiM2U4NDM1OTY5NDM4MDRlMWIwOGE4MmVkNDRhNiJ9fX0="
-          name: "&fNinja's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: ewogICJ0aW1lc3RhbXAiIDogMTY4MjcxNTU5NzYyNSwKICAicHJvZmlsZUlkIiA6ICJjNDdiNWNmNDBkNTU0MWNjYjFiNTE1ZjRiNjA3ZWQzOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJ0YXZvb29oIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzg2MjA0ZjNjZTE4YTM2NWU5Yzc0MTMxZjFjYjVhYzYyMGExYmIzMzBkMTRlOGI0NGQwMTEzZTg4NjZjMmU0MTYiCiAgICB9CiAgfQp9
+          name: '&fNinja''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fNinja's Chestplate"
-          color: "0C0C0C"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fNinja''s Chestplate'
+          color: 242131
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fNinja's Leggings"
-          lore: [ ]
+          material: CHAINMAIL_LEGGINGS
+          name: '&fNinja''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fNinja's Boots"
-          lore: [ ]
+          material: CHAINMAIL_BOOTS
+          name: '&fNinja''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     pyro:
       enabled: true
       cost: 0
       ability:
-        cooldown: 30
-        duration: 5
-        damage: 5.0
-      display-item: "FLINT_AND_STEEL"
+        cooldown: 15
+        duration: 3
+        damage: 4.0
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.pyro"
+        name: kitpvp.kit.pyro
         default: true
       lore:
-        - "&7Style: &aOffensive"
-        - ""
-        - "&7Set other players ablaze."
+        - '&7Style: &aOffensive'
+        - ''
+        - '&7Set other players ablaze.'
       effects:
-        - type: "FIRE_RESISTANCE"
+        - type: FIRE_RESISTANCE
       items:
-        - material: "STONE_AXE"
-          name: "&aAxtinguisher"
+        - material: STONE_AXE
+          name: '&aAxtinguisher'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &bMini-crits burning players and extinguishes them"
-            - "&8\u2503 &bKilling blows on burning players grant a speed boost"
-            - "&8\u2503 &c-25% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b+50% damage to burning players and extinguishes them'
+            - '&8┃ &bKilling blows on burning players grant a speed boost'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "GOLD_AXE"
-          name: "&aPowerjack"
+        - material: GOLD_AXE
+          name: '&aPowerjack'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &bRestores 3 hearts on kill"
-            - "&8\u2503 &b+20% movement speed when active"
-            - "&8\u2503 &c+20% damage vulnerability when active"
-            - "&8\u2503 &c-40% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &bRestores 3 hearts on kill'
+            - '&8┃ &b+20% movement speed when active'
+            - '&8┃ &c+20% damage vulnerability when active'
+            - '&8┃ &c-40% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "FIREBALL"
-          name: "&aIgnite &7(Right Click)"
+        - material: FLINT_AND_STEEL
+          name: '&aFlare Gun &7(Right Click)'
           lore:
-            - "&7Ignites players on fire."
+            - '&7Shoots a flare that ignites players.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFmNTc2NDU0Y2I2NDFhNmU1OTVlZGY0ZTc3YTcwYzIwM2U4OGVjYWIwZjIyMGQzZmUzMGZiM2NjYzhjOGJhOCJ9fX0="
-          name: "&fPyro's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFmNTc2NDU0Y2I2NDFhNmU1OTVlZGY0ZTc3YTcwYzIwM2U4OGVjYWIwZjIyMGQzZmUzMGZiM2NjYzhjOGJhOCJ9fX0=
+          name: '&fPyro''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "GOLD_CHESTPLATE"
-          name: "&fPyro's Chestplate"
-          lore: [ ]
+          material: GOLD_CHESTPLATE
+          name: '&fPyro''s Chestplate'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "CHAINMAIL_LEGGINGS"
-          name: "&fPyro's Leggings"
-          lore: [ ]
+          material: CHAINMAIL_LEGGINGS
+          name: '&fPyro''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "CHAINMAIL_BOOTS"
-          name: "&fPyro's Boots"
-          lore: [ ]
+          material: CHAINMAIL_BOOTS
+          name: '&fPyro''s Boots'
+          lore: []
+          unbreakable: true
+          hide-info: true
+    reaper:
+      enabled: true
+      cost: 0
+      ability:
+        duration: 15
+        cooldown: 15
+      display-item: SKULL_ITEM
+      permission:
+        name: kitpvp.kit.reaper
+        default: true
+      lore:
+        - '&7Style: &aOffensive'
+        - ''
+        - '&7Marks enemies for the inevitable.'
+      effects: []
+      items:
+        - material: IRON_HOE
+          name: '&aReaper''s Scythe'
+          lore:
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &bReaper Mark is applied on hit'
+            - '&8┃ &b+50% damage against marked targets'
+            - '&8┃ &cOnly one mark can be active at a time'
+            - '&8┃ &cMarks expire after 15 seconds or on death'
+            - '&8┃ &c-25% damage penalty'
+          unbreakable: true
+          hide-info: true
+        - material: PAPER
+          name: '&aClear Marks &7(Right Click)'
+          lore:
+            - '&7Clears all active marks.'
+          unbreakable: true
+          hide-info: true
+      armor:
+        helmet:
+          material: SKULL_ITEM
+          base64: ewogICJ0aW1lc3RhbXAiIDogMTcyMDA3ODU4MjgzOCwKICAicHJvZmlsZUlkIiA6ICJhMzdlOGYyM2MyMTk0NjJiYjY3ZWUxY2I5OTM2YWY2NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJEb29yYWxleSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8zNjhlOTM1MzI2MGU4N2JjYzkyZjhiMjdiYmRhMmY2Y2FiMWYwNDc2MWQ4YzU5Y2QzZTFjYzg4YzhmYjU0NzRjIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=
+          name: '&fReaper''s Head'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        chestplate:
+          material: LEATHER_CHESTPLATE
+          name: '&fReaper''s Chestplate'
+          color: 0
+          lore: []
+          unbreakable: true
+          hide-info: true
+        leggings:
+          material: LEATHER_LEGGINGS
+          name: '&fReaper''s Leggings'
+          color: 0
+          lore: []
+          unbreakable: true
+          hide-info: true
+        boots:
+          material: LEATHER_BOOTS
+          name: '&fReaper''s Boots'
+          color: 0
+          lore: []
+          unbreakable: true
+          hide-info: true
+    soldier:
+      enabled: true
+      cost: 0
+      ability:
+        battalion-duration: 5
+        banner-duration: 5
+        max-rage: 80
+      display-item: SKULL_ITEM
+      permission:
+        name: kitpvp.kit.soldier
+        default: true
+      lore:
+        - '&7Style: &aDefensive'
+        - ''
+        - '&7Build up your rage.'
+      effects: []
+      items:
+        - material: WOOD_SWORD
+          name: '&aSoldier''s Sword'
+          lore:
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &bApplies speed boost on hit'
+            - '&8┃ &bSpeed boost applies to teammates hit'
+            - '&8┃ &c-25% damage penalty'
+          unbreakable: true
+          hide-info: true
+        - material: POWERED_MINECART
+          name: '&aBattalion''s Backup &7(Right Click)'
+          lore:
+            - '&7Provides nearby teammates with:'
+            - '&8┃ &bAbsorption and Resistance'
+            - '&8┃ &cEffect lasts for 5 seconds'
+            - '&8┃ &cCharge gained with damage dealt'
+          unbreakable: true
+          hide-info: true
+        - material: BOAT
+          name: '&aBuff Banner &7(Right Click)'
+          lore:
+            - '&7Provides nearby teammates with:'
+            - '&8┃ &b+50% damage boost'
+            - '&8┃ &cEffect lasts for 5 seconds'
+            - '&8┃ &cCharge gained with damage dealt'
+          unbreakable: true
+          hide-info: true
+      armor:
+        helmet:
+          material: SKULL_ITEM
+          base64: eyJ0aW1lc3RhbXAiOjE1MjQyNDkyNDIxNjAsInByb2ZpbGVJZCI6IjdkYTJhYjNhOTNjYTQ4ZWU4MzA0OGFmYzNiODBlNjhlIiwicHJvZmlsZU5hbWUiOiJHb2xkYXBmZWwiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzNkN2UyZmUyZWVhYmZlNTFlYmIzNzhjYjIxNTI3NjgxNGI0MzQ0ZjU2MzZjOGQxODU3N2E0ZTY2Nzg4YzJkNDcifX19
+          name: '&fSoldier''s Head'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        chestplate:
+          material: LEATHER_CHESTPLATE
+          name: '&fSoldier''s Chestplate'
+          color: 'B63A3A'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        leggings:
+          material: IRON_LEGGINGS
+          name: '&fSoldier''s Leggings'
+          lore: []
+          unbreakable: true
+          hide-info: true
+        boots:
+          material: IRON_BOOTS
+          name: '&fSoldier''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     tank:
@@ -540,63 +722,63 @@ kitpvp:
       ability:
         cooldown: 30
         duration: 5
-      display-item: "DIAMOND_CHESTPLATE"
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.tank"
+        name: kitpvp.kit.tank
         default: true
       lore:
-        - "&7Style: &aDefensive"
-        - ""
-        - "&7Slow but very resistant."
+        - '&7Style: &aDefensive'
+        - ''
+        - '&7Slow but very resistant.'
       effects:
-        - type: "SLOW"
+        - type: SLOW
       items:
-        - material: "WOOD_AXE"
-          name: "&aTank's Axe"
+        - material: WOOD_AXE
+          name: '&aTank''s Axe'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &c-40% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &c-40% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "IRON_SPADE"
-          name: "&aTank's Shovel"
+        - material: IRON_SPADE
+          name: '&aTank''s Shovel'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &b-40% damage from ranged damage while active"
-            - "&8\u2503 &c+40% damage from melee damage while active"
-            - "&8\u2503 &c-40% damage penalty"
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &b-40% damage from ranged damage while active'
+            - '&8┃ &c+40% damage from melee damage while active'
+            - '&8┃ &c-40% damage penalty'
           unbreakable: true
           hide-info: true
-        - material: "ANVIL"
-          name: "&aFortify &7(Right Click)"
+        - material: ANVIL
+          name: '&aFortify &7(Right Click)'
           lore:
-            - "&7Get a temporary resistance boost."
+            - '&7Get a temporary resistance boost.'
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTY1OWIyYmIwNzBjMTIwOGJhNTE0NTIzNjFmZDMwYTY2NzIxMzI5NWYyMWRiNDM3ZGY1NzI4MWQ1ODJjODlhZCJ9fX0="
-          name: "&fTank's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTY1OWIyYmIwNzBjMTIwOGJhNTE0NTIzNjFmZDMwYTY2NzIxMzI5NWYyMWRiNDM3ZGY1NzI4MWQ1ODJjODlhZCJ9fX0=
+          name: '&fTank''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "DIAMOND_CHESTPLATE"
-          name: "&fTank's Chestplate"
-          lore: [ ]
+          material: DIAMOND_CHESTPLATE
+          name: '&fTank''s Chestplate'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "CHAINMAIL_LEGGINGS"
-          name: "&fTank's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fTank''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "CHAINMAIL_BOOTS"
-          name: "&fTank's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fTank''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true
     vampire:
@@ -605,53 +787,54 @@ kitpvp:
       ability:
         cooldown: 30
         duration: 5
-      display-item: "REDSTONE"
+      display-item: SKULL_ITEM
       permission:
-        name: "kitpvp.kit.vampire"
+        name: kitpvp.kit.vampire
         default: true
       lore:
-        - "&7Style: &aMixed"
-        - ""
-        - "&7Get life-steal on hit."
-      effects: [ ]
+        - '&7Style: &aMixed'
+        - ''
+        - '&7Get life-steal on hit.'
+      effects: []
       items:
-        - material: "STONE_SWORD"
-          name: "&aVampire's Sword"
+        - material: STONE_SWORD
+          name: '&aVampire''s Sword'
           lore:
-            - "&7Compared to Stone Sword:"
-            - "&8\u2503 &7No notable changes."
+            - '&7Compared to Stone Sword:'
+            - '&8┃ &7No notable changes.'
           unbreakable: true
           hide-info: true
-        - material: "REDSTONE"
-          name: "&aLife-Steal &7(Right Click)"
+        - material: INK_SACK
+          name: '&aShadow Sneak &7(Right Click)'
           lore:
-            - "&7Get life-steal on hit."
+            - '&7Temporarily vanish from sight.'
+          durability: 8
           unbreakable: true
           hide-info: true
       armor:
         helmet:
-          material: "SKULL_ITEM"
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQ0NDc1NmUwYjRlY2U4ZDc0NjI5NmEzZDVlMjk3ZTE0MTVmNGJhMTc2NDdmZmUyMjgzODUzODNkMTYxYTkifX19"
-          name: "&fVampire's Head"
-          lore: [ ]
+          material: SKULL_ITEM
+          base64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQ0NDc1NmUwYjRlY2U4ZDc0NjI5NmEzZDVlMjk3ZTE0MTVmNGJhMTc2NDdmZmUyMjgzODUzODNkMTYxYTkifX19
+          name: '&fVampire''s Head'
+          lore: []
           unbreakable: true
           hide-info: true
         chestplate:
-          material: "LEATHER_CHESTPLATE"
-          name: "&fVampire's Chestplate"
-          color: "191919"
-          lore: [ ]
+          material: LEATHER_CHESTPLATE
+          name: '&fVampire''s Chestplate'
+          color: '191919'
+          lore: []
           unbreakable: true
           hide-info: true
         leggings:
-          material: "IRON_LEGGINGS"
-          name: "&fVampire's Leggings"
-          lore: [ ]
+          material: IRON_LEGGINGS
+          name: '&fVampire''s Leggings'
+          lore: []
           unbreakable: true
           hide-info: true
         boots:
-          material: "IRON_BOOTS"
-          name: "&fVampire's Boots"
-          lore: [ ]
+          material: IRON_BOOTS
+          name: '&fVampire''s Boots'
+          lore: []
           unbreakable: true
           hide-info: true

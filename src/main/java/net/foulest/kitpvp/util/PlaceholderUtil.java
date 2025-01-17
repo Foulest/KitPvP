@@ -22,6 +22,7 @@ import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
+import net.foulest.kitpvp.kits.type.Soldier;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +51,7 @@ public class PlaceholderUtil extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String identifier) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        Kit activeKit = playerData.getActiveKit();
         int bounty = playerData.getBounty();
 
         StringBuilder builder = new StringBuilder();
@@ -107,8 +109,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
                 break;
 
             case "activekit":
-                Kit activeKit = playerData.getActiveKit();
-
                 if (activeKit == null) {
                     builder.append("None");
                     break;
@@ -124,6 +124,16 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
             case "bounty_tab":
                 builder.append(bounty == 0 ? "" : "&6Bounty: &e&l$" + bounty);
+                break;
+
+            case "soldier_rage":
+                if (!(activeKit instanceof Soldier)) {
+                    builder.append("None");
+                    break;
+                }
+
+                int percentage = (int) ((playerData.getSoldierRage() / Settings.soldierKitMaxRage) * 100);
+                builder.append(percentage).append("%");
                 break;
 
             default:
