@@ -25,9 +25,10 @@ repositories {
         dirs 'libs'
     }
 
+    // For PlaceholderAPI
     maven {
-        name 'Minebench'
-        url 'https://repo.minebench.de'
+        name 'HelpChat'
+        url 'https://repo.helpch.at/releases'
     }
 }
 
@@ -42,7 +43,7 @@ dependencies {
 
     // PlaceholderAPI - for placeholders
     // https://mvnrepository.com/artifact/me.clip/placeholderapi
-    compileOnly group: 'me.clip', name: 'placeholderapi', version: '2.11.1'
+    compileOnly group: 'me.clip', name: 'placeholderapi', version: '2.11.6'
 
     // WorldEdit - required for WorldGuard
     // https://mvnrepository.com/artifact/com.sk89q.worldedit/worldedit-bukkit
