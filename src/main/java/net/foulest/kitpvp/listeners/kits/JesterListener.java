@@ -217,12 +217,12 @@ public class JesterListener implements Listener {
         double maxHealth = player.getMaxHealth();
         double damage = event.getDamage();
 
-        // If a player's health is <50%, deal 15% more damage.
+        // If a player's health is <50%, deal more damage, vice versa.
         if (health / maxHealth < 0.5) {
-            event.setDamage(damage * 1.15);
+            event.setDamage(damage * 1.16666666667);
             player.getWorld().playSound(targetLoc, Sound.SILVERFISH_HIT, 0.5F, 1.0F);
         } else {
-            event.setDamage(damage * 0.85);
+            event.setDamage(damage * 0.83333333333);
         }
     }
 }

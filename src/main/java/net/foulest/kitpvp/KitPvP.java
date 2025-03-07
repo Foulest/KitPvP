@@ -99,8 +99,7 @@ public class KitPvP extends JavaPlugin {
         MessageUtil.log(Level.INFO, "Loading Listeners...");
         loadListeners(new DeathListener(), new EventListener(), new FlaskListener(), new ArcherListener(),
                 new FishermanListener(), new JesterListener(), new KangarooListener(), new MageListener(),
-                new NinjaListener(), new PyroListener(), new ReaperListener(), new SoldierListener(),
-                new TankListener(), new VampireListener());
+                new NinjaListener(), new PyroListener(), new TankListener(), new VampireListener());
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Commands...");
@@ -112,7 +111,7 @@ public class KitPvP extends JavaPlugin {
         // Loads the plugin's kits.
         MessageUtil.log(Level.INFO, "Loading Kits...");
         loadKits(new Archer(), new Fisherman(), new Jester(), new Kangaroo(), new Knight(), new Mage(),
-                new Ninja(), new Pyro(), new Reaper(), new Soldier(), new Tank(), new Vampire());
+                new Ninja(), new Pyro(), new Tank(), new Vampire());
 
         // Loads the spawn.
         MessageUtil.log(Level.INFO, "Loading Spawn...");

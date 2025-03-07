@@ -195,12 +195,12 @@ public class VampireListener implements Listener {
         }
 
         // Gives the player Invisibility, Speed II, and Jump Boost III.
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,
-                Settings.vampireKitDuration * 20, 0, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,
-                Settings.vampireKitDuration * 20, 1, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
-                Settings.vampireKitDuration * 20, 2, false, false));
+        player.removePotionEffect(PotionEffectType.INVISIBILITY);
+        player.removePotionEffect(PotionEffectType.SPEED);
+        player.removePotionEffect(PotionEffectType.JUMP);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2, false, false));
 
         // Plays a smoke sound effect.
         player.getWorld().playEffect(playerLoc, Effect.LARGE_SMOKE, 1, 1);
@@ -223,6 +223,11 @@ public class VampireListener implements Listener {
                 player.removePotionEffect(PotionEffectType.SPEED);
                 player.removePotionEffect(PotionEffectType.JUMP);
                 MessageUtil.messagePlayer(player, "&cYou are no longer invisible.");
+
+                // Add back the player's old potion effects.
+                for (PotionEffect oldEffect : playerData.getActiveKit().getPotionEffects()) {
+                    player.addPotionEffect(oldEffect);
+                }
             }
 
             for (Player target : Bukkit.getOnlinePlayers()) {

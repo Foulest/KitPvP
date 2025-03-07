@@ -83,8 +83,9 @@ kitpvp:
   # -----------------------------------------------
   flasks:
     enabled: true
-    amount: 5
+    amount: 3
     cooldown: 3
+    on-kill: 1
   # -----------------------------------------------
   # Storage Settings
   #
@@ -120,11 +121,11 @@ kitpvp:
         - '&7Master of long-ranged combat.'
       effects: []
       items:
-        - material: WOOD_SWORD
+        - material: STONE_SWORD
           name: '&aArcher''s Sword'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &c-25% damage penalty'
+            - '&8┃ &7No notable changes.'
           unbreakable: true
           hide-info: true
         - material: BOW
@@ -191,12 +192,11 @@ kitpvp:
       effects:
         - type: WATER_BREATHING
       items:
-        - material: WOOD_SWORD
+        - material: STONE_SWORD
           name: '&aFisherman''s Sword'
           lore:
             - '&7Compared to Stone Sword:'
             - '&8┃ &b+50% damage on wet players'
-            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
         - material: FISHING_ROD
@@ -310,12 +310,13 @@ kitpvp:
         - '&7Turns deadly under pressure.'
       effects: []
       items:
-        - material: STONE_SWORD
+        - material: IRON_SWORD
           name: '&aJester''s Sword'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &b+15% damage when below 50% health'
-            - '&8┃ &c-15% damage when above 50% health'
+            - '&8┃ &b+20% damage bonus &8(6.0)'
+            - '&8┃ &bIncreased damage when below 50% health &8(7.0)'
+            - '&8┃ &cReduced damage when above 50% health &8(5.0)'
           unbreakable: true
           hide-info: true
         - material: STICK
@@ -402,7 +403,7 @@ kitpvp:
       cost: 0
       ability:
         cooldown: 20
-        duration: 3
+        duration: 2
       display-item: SKULL_ITEM
       permission:
         name: kitpvp.kit.mage
@@ -417,16 +418,7 @@ kitpvp:
           name: '&aMage''s Sword'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &7No notable changes.'
-          unbreakable: true
-          hide-info: true
-        - material: BLAZE_ROD
-          name: '&aSun Staff'
-          lore:
-            - '&7Compared to Stone Sword:'
-            - '&8┃ &b+100% damage against burning players'
-            - '&8┃ &b+25% fire damage resistance while active'
-            - '&8┃ &c-40% damage penalty'
+            - '&8┃ &bApplies Slowness on hit'
           unbreakable: true
           hide-info: true
         - material: GLOWSTONE_DUST
@@ -483,7 +475,7 @@ kitpvp:
           name: '&aNinja''s Blade'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &b+50% damage when behind target'
+            - '&8┃ &b+75% damage when behind target'
             - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
@@ -518,9 +510,9 @@ kitpvp:
       enabled: true
       cost: 0
       ability:
-        cooldown: 15
+        cooldown: 5
         duration: 3
-        damage: 4.0
+        damage: 3.0
       display-item: SKULL_ITEM
       permission:
         name: kitpvp.kit.pyro
@@ -583,139 +575,6 @@ kitpvp:
           lore: []
           unbreakable: true
           hide-info: true
-    reaper:
-      enabled: true
-      cost: 0
-      ability:
-        duration: 15
-        cooldown: 15
-      display-item: SKULL_ITEM
-      permission:
-        name: kitpvp.kit.reaper
-        default: true
-      lore:
-        - '&7Style: &aOffensive'
-        - ''
-        - '&7Marks enemies for the inevitable.'
-      effects: []
-      items:
-        - material: IRON_HOE
-          name: '&aReaper''s Scythe'
-          lore:
-            - '&7Compared to Stone Sword:'
-            - '&8┃ &bReaper Mark is applied on hit'
-            - '&8┃ &b+50% damage against marked targets'
-            - '&8┃ &cOnly one mark can be active at a time'
-            - '&8┃ &cMarks expire after 15 seconds or on death'
-            - '&8┃ &c-25% damage penalty'
-          unbreakable: true
-          hide-info: true
-        - material: PAPER
-          name: '&aClear Marks &7(Right Click)'
-          lore:
-            - '&7Clears all active marks.'
-          unbreakable: true
-          hide-info: true
-      armor:
-        helmet:
-          material: SKULL_ITEM
-          base64: ewogICJ0aW1lc3RhbXAiIDogMTcyMDA3ODU4MjgzOCwKICAicHJvZmlsZUlkIiA6ICJhMzdlOGYyM2MyMTk0NjJiYjY3ZWUxY2I5OTM2YWY2NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJEb29yYWxleSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8zNjhlOTM1MzI2MGU4N2JjYzkyZjhiMjdiYmRhMmY2Y2FiMWYwNDc2MWQ4YzU5Y2QzZTFjYzg4YzhmYjU0NzRjIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=
-          name: '&fReaper''s Head'
-          lore: []
-          unbreakable: true
-          hide-info: true
-        chestplate:
-          material: LEATHER_CHESTPLATE
-          name: '&fReaper''s Chestplate'
-          color: 0
-          lore: []
-          unbreakable: true
-          hide-info: true
-        leggings:
-          material: LEATHER_LEGGINGS
-          name: '&fReaper''s Leggings'
-          color: 0
-          lore: []
-          unbreakable: true
-          hide-info: true
-        boots:
-          material: LEATHER_BOOTS
-          name: '&fReaper''s Boots'
-          color: 0
-          lore: []
-          unbreakable: true
-          hide-info: true
-    soldier:
-      enabled: true
-      cost: 0
-      ability:
-        battalion-duration: 5
-        banner-duration: 5
-        max-rage: 80
-      display-item: SKULL_ITEM
-      permission:
-        name: kitpvp.kit.soldier
-        default: true
-      lore:
-        - '&7Style: &aDefensive'
-        - ''
-        - '&7Build up your rage.'
-      effects: []
-      items:
-        - material: WOOD_SWORD
-          name: '&aSoldier''s Sword'
-          lore:
-            - '&7Compared to Stone Sword:'
-            - '&8┃ &bApplies speed boost on hit'
-            - '&8┃ &bSpeed boost applies to teammates hit'
-            - '&8┃ &c-25% damage penalty'
-          unbreakable: true
-          hide-info: true
-        - material: POWERED_MINECART
-          name: '&aBattalion''s Backup &7(Right Click)'
-          lore:
-            - '&7Provides nearby teammates with:'
-            - '&8┃ &bAbsorption and Resistance'
-            - '&8┃ &cEffect lasts for 5 seconds'
-            - '&8┃ &cCharge gained with damage dealt'
-          unbreakable: true
-          hide-info: true
-        - material: BOAT
-          name: '&aBuff Banner &7(Right Click)'
-          lore:
-            - '&7Provides nearby teammates with:'
-            - '&8┃ &b+50% damage boost'
-            - '&8┃ &cEffect lasts for 5 seconds'
-            - '&8┃ &cCharge gained with damage dealt'
-          unbreakable: true
-          hide-info: true
-      armor:
-        helmet:
-          material: SKULL_ITEM
-          base64: eyJ0aW1lc3RhbXAiOjE1MjQyNDkyNDIxNjAsInByb2ZpbGVJZCI6IjdkYTJhYjNhOTNjYTQ4ZWU4MzA0OGFmYzNiODBlNjhlIiwicHJvZmlsZU5hbWUiOiJHb2xkYXBmZWwiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzNkN2UyZmUyZWVhYmZlNTFlYmIzNzhjYjIxNTI3NjgxNGI0MzQ0ZjU2MzZjOGQxODU3N2E0ZTY2Nzg4YzJkNDcifX19
-          name: '&fSoldier''s Head'
-          lore: []
-          unbreakable: true
-          hide-info: true
-        chestplate:
-          material: LEATHER_CHESTPLATE
-          name: '&fSoldier''s Chestplate'
-          color: 'B63A3A'
-          lore: []
-          unbreakable: true
-          hide-info: true
-        leggings:
-          material: IRON_LEGGINGS
-          name: '&fSoldier''s Leggings'
-          lore: []
-          unbreakable: true
-          hide-info: true
-        boots:
-          material: IRON_BOOTS
-          name: '&fSoldier''s Boots'
-          lore: []
-          unbreakable: true
-          hide-info: true
     tank:
       enabled: true
       cost: 0
@@ -733,11 +592,11 @@ kitpvp:
       effects:
         - type: SLOW
       items:
-        - material: WOOD_AXE
+        - material: STONE_AXE
           name: '&aTank''s Axe'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &c-40% damage penalty'
+            - '&8┃ &c-25% damage penalty'
           unbreakable: true
           hide-info: true
         - material: IRON_SPADE
@@ -794,14 +653,14 @@ kitpvp:
       lore:
         - '&7Style: &aMixed'
         - ''
-        - '&7Get life-steal on hit.'
+        - '&7Vanish at an instant.'
       effects: []
       items:
-        - material: STONE_SWORD
+        - material: IRON_SWORD
           name: '&aVampire''s Sword'
           lore:
             - '&7Compared to Stone Sword:'
-            - '&8┃ &7No notable changes.'
+            - '&8┃ &b+20% damage bonus'
           unbreakable: true
           hide-info: true
         - material: INK_SACK

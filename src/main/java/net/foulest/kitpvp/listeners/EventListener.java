@@ -26,7 +26,6 @@ import net.foulest.kitpvp.enchants.Enchants;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.KitManager;
 import net.foulest.kitpvp.kits.type.Knight;
-import net.foulest.kitpvp.listeners.kits.ReaperListener;
 import net.foulest.kitpvp.menus.KitEnchanter;
 import net.foulest.kitpvp.menus.KitSelector;
 import net.foulest.kitpvp.menus.KitShop;
@@ -129,10 +128,6 @@ public class EventListener implements Listener {
         if (Settings.combatTagPunishLogout && CombatTag.isInCombat(player)) {
             DeathListener.handleDeath(player, true);
         }
-
-        // Removes any Reaper Marks associated with the player.
-        ReaperListener.removeReaperMark(playerData, true, true);
-        ReaperListener.removeReaperMark(playerData, false, true);
 
         // Saves the player's data.
         playerData.saveAll();
@@ -849,7 +844,7 @@ public class EventListener implements Listener {
         boolean noFall = playerData.isNoFall();
         long onGroundTicks = playerData.getOnGroundTicks();
 
-        if (noFall && !Regions.isInSafezone(to) && !Regions.isInSafezone(from) && onGroundTicks == 1) {
+        if (noFall && !Regions.isInSafezone(to) && !Regions.isInSafezone(from) && onGroundTicks == 2) {
             playerData.setNoFall(false);
         }
     }

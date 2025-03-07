@@ -23,7 +23,6 @@ import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
-import net.foulest.kitpvp.listeners.kits.ReaperListener;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.region.Spawn;
 import net.foulest.kitpvp.util.MessageUtil;
@@ -100,7 +99,7 @@ public class DeathListener implements Listener {
 
             // Adds a Flask to the damager's inventory.
             if (Settings.flaskEnabled && !Regions.isInSafezone(damagerLoc)) {
-                FlaskListener.addFlaskToInventory(damager, Settings.flaskAmount);
+                FlaskListener.addFlaskToInventory(damager, Settings.flaskOnKill);
             }
 
             // Adds a kill to the damager.
@@ -147,13 +146,6 @@ public class DeathListener implements Listener {
                 receiverData.removeBounty();
             }
 
-            // Removes Reaper marks.
-            if (damagerData.getActiveReaperMark() == receiver) {
-                ReaperListener.removeReaperMark(damagerData, true, true);
-            } else if (receiverData.getActiveReaperMark() == damager) {
-                ReaperListener.removeReaperMark(receiverData, true, true);
-            }
-
             // Prints kill messages to both the damager and receiver.
             MessageUtil.messagePlayer(receiver, "&eYou were killed by &c" + damagerName
                     + " &eon &6" + String.format("%.01f", damagerHealth) + "\u2764&e.");
@@ -162,13 +154,6 @@ public class DeathListener implements Listener {
         } else {
             MessageUtil.messagePlayer(receiver, "&cYou killed yourself.");
         }
-
-        // Resets the player's Soldier data.
-        receiverData.setSoldierRage(0.0);
-        receiver.removeMetadata("buffBanner", KitPvP.getInstance());
-
-        // Removes Reaper marks.
-        ReaperListener.removeReaperMark(receiverData, false, true);
 
         // Clears cooldowns.
         receiverData.clearCooldowns();

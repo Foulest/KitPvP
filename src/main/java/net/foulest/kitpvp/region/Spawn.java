@@ -23,7 +23,6 @@ import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
-import net.foulest.kitpvp.listeners.kits.ReaperListener;
 import net.foulest.kitpvp.util.MessageUtil;
 import net.foulest.kitpvp.util.Settings;
 import org.bukkit.Bukkit;
@@ -83,13 +82,6 @@ public class Spawn {
         playerData.clearCooldowns();
         CombatTag.remove(player);
         playerData.setActiveKit(null);
-
-        // Removes the Reaper Mark if the player has one.
-        ReaperListener.removeReaperMark(playerData, false, false);
-
-        // Removes the player's Soldier data.
-        playerData.setSoldierRage(0.0);
-        player.removeMetadata("buffBanner", KitPvP.getInstance());
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
             PotionEffectType effectType = effect.getType();

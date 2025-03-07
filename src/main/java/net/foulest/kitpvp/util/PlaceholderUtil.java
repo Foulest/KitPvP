@@ -22,7 +22,6 @@ import net.foulest.kitpvp.combattag.CombatTag;
 import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
-import net.foulest.kitpvp.kits.type.Soldier;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -124,16 +123,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
             case "bounty_tab":
                 builder.append(bounty == 0 ? "" : "&6Bounty: &e&l$" + bounty);
-                break;
-
-            case "soldier_rage":
-                if (!(activeKit instanceof Soldier)) {
-                    builder.append("None");
-                    break;
-                }
-
-                int percentage = (int) ((playerData.getSoldierRage() / Settings.soldierKitMaxRage) * 100);
-                builder.append(percentage).append("%");
                 break;
 
             default:

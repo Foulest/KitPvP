@@ -96,12 +96,6 @@ public class PlayerData {
     // Vampire task
     private @Nullable BukkitTask lifeStealCooldown;
 
-    // Reaper mark
-    private Player activeReaperMark;
-
-    // Soldier rage
-    private double soldierRage;
-
     /**
      * Creates a new player data object.
      *

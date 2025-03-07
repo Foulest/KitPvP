@@ -299,9 +299,9 @@ public class PyroListener implements Listener {
             target.setFireTicks(0);
 
             if (!(targetData.getActiveKit() instanceof Pyro)) {
-                // 1b. Deal damage to the target.
+                // 1b. Deal 50% more damage to the target.
                 MessageUtil.messagePlayer(target, "&cYou have been axtinguished by a Pyro!");
-                target.damage(Settings.pyroKitDamage);
+                event.setDamage(event.getDamage() * 1.5);
 
                 // 1c. Play effects at the target's location.
                 target.getWorld().playSound(targetLoc, Sound.FIZZ, 1, 1);
@@ -311,7 +311,7 @@ public class PyroListener implements Listener {
                 if (target.getHealth() - event.getFinalDamage() - Settings.pyroKitDamage < -4.0
                         && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                     MessageUtil.messagePlayer(player, "&aYou have been given a speed boost on kill! | Target Health: " + (target.getHealth() - event.getFinalDamage() - Settings.pyroKitDamage));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3 * 20, 1, true, true));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3 * 20, 2, true, true));
                 }
             }
         }
@@ -395,52 +395,46 @@ public class PyroListener implements Listener {
             return;
         }
 
-        // ----------------------------------------------------------------
-        // If the player is holding the Powerjack...
-        // 1. Check if they have a Speed effect with a higher amplifier than 0.
-        // 2. If they do, don't add the Powerjack bonus.
-        // 3. If they don't, add the Powerjack bonus.
-        //
-        // If the player is not holding the Powerjack...
-        // 1. Check if they have a Speed effect with a higher amplifier than 0.
-        // 2. If they do, don't remove the Speed effect.
-        // 3. If they don't, remove the Speed effect.
-        // ----------------------------------------------------------------
-
         // If the player is holding the Powerjack...
         if (player.getItemInHand() != null
                 && player.getItemInHand().hasItemMeta()
                 && player.getItemInHand().getItemMeta().hasDisplayName()
                 && player.getItemInHand().getItemMeta().getDisplayName().contains("Powerjack")) {
 
-            // 1. Check if they have a Speed effect with a higher amplifier than 0.
+            // Check if they have a Speed effect with a higher amplifier than 1.
             for (PotionEffect effect : player.getActivePotionEffects()) {
                 if (effect.getType().equals(PotionEffectType.SPEED)) {
 
-                    // 2. If they do, don't add the Powerjack bonus.
-                    if (effect.getAmplifier() > 0) {
+                    // If they do, don't add the Powerjack bonus.
+                    if (effect.getAmplifier() > 1) {
                         return;
                     }
                 }
             }
 
-            // 3. If they don't, add the Powerjack bonus.
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
+            // If they don't, add the Powerjack bonus.
+            player.removePotionEffect(PotionEffectType.SPEED);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
 
         } else {
             // If the player is not holding the Powerjack...
 
-            // 1. Check if they have a Speed effect with a higher amplifier than 0.
+            // Check if they have a Speed effect with a higher amplifier than 1.
             for (PotionEffect effect : player.getActivePotionEffects()) {
                 if (effect.getType().equals(PotionEffectType.SPEED)) {
 
-                    // 2. If they do, don't remove the Speed effect.
-                    if (effect.getAmplifier() > 0) {
+                    // If they do, don't remove the Speed effect.
+                    if (effect.getAmplifier() > 1) {
                         return;
                     }
 
-                    // 3. If they don't, remove the Speed effect.
+                    // If they don't, remove the Speed effect.
                     player.removePotionEffect(PotionEffectType.SPEED);
+
+                    // Add back the player's old effects.
+                    for (PotionEffect oldEffect : playerData.getActiveKit().getPotionEffects()) {
+                        player.addPotionEffect(oldEffect);
+                    }
                 }
             }
         }

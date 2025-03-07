@@ -84,11 +84,11 @@ public class NinjaListener implements Listener {
         // Calculate the yaw difference.
         int difference = Math.abs(playerYaw - targetYaw);
 
-        // The player is behind the target; apply 50% damage increase.
+        // The player is behind the target; apply 75% damage increase.
         if (difference <= 90) {
             target.getWorld().playSound(targetLoc, Sound.BAT_HURT, 1, 1);
             double damage = event.getDamage();
-            event.setDamage(damage * 1.5);
+            event.setDamage(damage * 1.75);
         }
     }
 }

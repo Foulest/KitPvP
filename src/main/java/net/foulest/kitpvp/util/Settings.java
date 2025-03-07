@@ -55,6 +55,7 @@ public class Settings {
     public static boolean flaskEnabled;
     public static int flaskAmount;
     public static int flaskCooldown;
+    public static int flaskOnKill;
 
     // Combat tag settings
     public static boolean combatTagEnabled;
@@ -125,15 +126,6 @@ public class Settings {
     public static int pyroKitCooldown;
     public static int pyroKitDuration;
     public static double pyroKitDamage;
-
-    // Reaper kit settings
-    public static int reaperKitCooldown;
-    public static int reaperKitDuration;
-
-    // Soldier kit settings
-    public static int soldierKitBattalionDuration;
-    public static int soldierKitBannerDuration;
-    public static int soldierKitMaxRage;
 
     // Tank kit settings
     public static int tankKitCooldown;
@@ -267,6 +259,7 @@ public class Settings {
         flaskEnabled = config.getBoolean("kitpvp.flasks.enabled");
         flaskAmount = config.getInt("kitpvp.flasks.amount");
         flaskCooldown = config.getInt("kitpvp.flasks.cooldown");
+        flaskOnKill = config.getInt("kitpvp.flasks.on-kill");
 
         // Archer kit settings
         archerKitCooldown = config.getInt("kitpvp.kits.archer.ability.cooldown");
@@ -297,15 +290,6 @@ public class Settings {
         pyroKitCooldown = config.getInt("kitpvp.kits.pyro.ability.cooldown");
         pyroKitDuration = config.getInt("kitpvp.kits.pyro.ability.duration");
         pyroKitDamage = config.getDouble("kitpvp.kits.pyro.ability.damage");
-
-        // Reaper kit settings
-        reaperKitCooldown = config.getInt("kitpvp.kits.reaper.ability.cooldown");
-        reaperKitDuration = config.getInt("kitpvp.kits.reaper.ability.duration");
-
-        // Soldier kit settings
-        soldierKitBattalionDuration = config.getInt("kitpvp.kits.soldier.ability.battalion-duration");
-        soldierKitBannerDuration = config.getInt("kitpvp.kits.soldier.ability.banner-duration");
-        soldierKitMaxRage = config.getInt("kitpvp.kits.soldier.ability.max-rage");
 
         // Tank kit settings
         tankKitCooldown = config.getInt("kitpvp.kits.tank.ability.cooldown");

@@ -73,9 +73,10 @@ public class FlaskListener implements Listener {
                     int itemAmount = item.getAmount();
 
                     if (item.getItemMeta().getDisplayName().contains("Flask")) {
-                        FLASK.setAmount(itemAmount);
+                        ItemStack flaskItem = FLASK.clone();
+                        flaskItem.setAmount(itemAmount);
                         player.getInventory().remove(item);
-                        player.getInventory().addItem(FLASK);
+                        player.getInventory().addItem(flaskItem);
                         player.updateInventory();
                         return;
                     }
@@ -177,8 +178,9 @@ public class FlaskListener implements Listener {
                         if (itemAmount == 1) {
                             player.getInventory().remove(item);
                         } else {
-                            EMPTY_FLASK.setAmount(itemAmount - 1);
-                            player.setItemInHand(EMPTY_FLASK);
+                            ItemStack emptyFlask = EMPTY_FLASK.clone();
+                            emptyFlask.setAmount(itemAmount - 1);
+                            player.setItemInHand(emptyFlask);
                         }
 
                         event.setCancelled(true);

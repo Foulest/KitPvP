@@ -22,7 +22,6 @@ import net.foulest.kitpvp.data.PlayerData;
 import net.foulest.kitpvp.data.PlayerDataManager;
 import net.foulest.kitpvp.kits.Kit;
 import net.foulest.kitpvp.kits.type.Mage;
-import net.foulest.kitpvp.kits.type.Pyro;
 import net.foulest.kitpvp.region.Regions;
 import net.foulest.kitpvp.util.*;
 import org.bukkit.Effect;
@@ -33,8 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -106,14 +103,14 @@ public class MageListener implements Listener {
             Kit targetKit = targetData.getActiveKit();
             Location targetLoc = target.getLocation();
 
-            // Give the target Slowness, Blindness, and Weakness for 3 seconds.
+            // Give the target Slowness, Blindness, and Weakness.
             target.playSound(targetLoc, Sound.FIZZ, 1, 1);
             target.getWorld().playSound(targetLoc, Sound.ZOMBIE_WOODBREAK, 0.5F, 1);
             target.getWorld().playEffect(targetLoc, Effect.LARGE_SMOKE, 1);
             target.getWorld().playEffect(targetLoc, Effect.LARGE_SMOKE, 1);
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Settings.mageKitDuration * 20, 1, false, false));
-            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.mageKitDuration * 20, 1, false, false));
-            target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.mageKitDuration * 20, 1, false, false));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Settings.mageKitDuration * 20, 1, false, true));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Settings.mageKitDuration * 20, 1, false, true));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Settings.mageKitDuration * 20, 1, false, true));
             MessageUtil.messagePlayer(target, "&cYou have been debuffed by a Mage!");
 
             // Gives the kit's default potion effects back after the ability duration.
@@ -131,89 +128,5 @@ public class MageListener implements Listener {
         player.playSound(playerLoc, Sound.FIZZ, 1, 1);
         MessageUtil.messagePlayer(player, "&aYour ability has been used.");
         playerData.setCooldown(playerKit, abilityItem, Settings.mageKitCooldown, true);
-    }
-
-    /**
-     * Handles damaging players with a Sun Staff.
-     *
-     * @param event The event.
-     */
-    @EventHandler
-    public static void onSunStaffHit(@NotNull EntityDamageByEntityEvent event) {
-        // Ignores the event if the damager or target is not a player.
-        if (!(event.getDamager() instanceof Player)
-                || !(event.getEntity() instanceof Player)) {
-            return;
-        }
-
-        // Player data
-        Player player = (Player) event.getDamager();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-        // Target data
-        Player target = (Player) event.getEntity();
-        PlayerData targetData = PlayerDataManager.getPlayerData(target);
-        Location targetLoc = target.getLocation();
-
-        // ----------------------------------------------------------------
-        // If the player, who's holding a Sun Staff, attacks the target...
-        // 1. Check if the target is on fire and not a Pyro.
-        // 1a. If they are, deal 6.0 damage.
-        // 1b. Else, deal 3.0 damage.
-        // ----------------------------------------------------------------
-
-        // If the player, who's holding a Sun Staff, attacks the target...
-        if (playerData.getActiveKit() instanceof Mage
-                && player.getItemInHand().getType() == Material.BLAZE_ROD
-                && player.getItemInHand().getItemMeta().getDisplayName().contains("Sun Staff")) {
-
-            // If the target is on fire and the target is not a Pyro...
-            if (target.getFireTicks() > 0 && !(targetData.getActiveKit() instanceof Pyro)) {
-                target.getWorld().playSound(targetLoc, Sound.FIZZ, 0.5F, 1);
-                event.setDamage(6.0);
-            } else {
-                event.setDamage(3.0);
-            }
-        }
-    }
-
-    /**
-     * Handles taking reduced fire damage while holding a Sun Staff.
-     *
-     * @param event EntityDamageEvent
-     */
-    @EventHandler
-    public static void onFireDamage(@NotNull EntityDamageEvent event) {
-        // Ignores the event if the target is not a player.
-        if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
-
-        // Player data
-        Player player = (Player) event.getEntity();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-        // Ignores the event if the player is not a Mage.
-        if (!(playerData.getActiveKit() instanceof Mage)) {
-            return;
-        }
-
-        // Ignores the event if the player is not holding a Sun Staff.
-        if (player.getItemInHand() == null
-                || player.getItemInHand().getType() != Material.BLAZE_ROD
-                || !player.getItemInHand().hasItemMeta()
-                || !player.getItemInHand().getItemMeta().hasDisplayName()
-                || !player.getItemInHand().getItemMeta().getDisplayName().contains("Sun Staff")) {
-            return;
-        }
-
-        // If the player is taking fire damage...
-        if (event.getCause() == EntityDamageEvent.DamageCause.FIRE
-                || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK
-                || event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
-            // Reduce the damage by 40%.
-            double damage = event.getDamage();
-            event.setDamage(damage * 0.6);
-        }
     }
 }
